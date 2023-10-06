@@ -1,7 +1,8 @@
 {
-  "main": "dist/my-lib.js",
-  "module": "dist/my-lib.mjs",
-  "typings": "dist/my-lib.d.ts",
+  "name": "@commonweb/core",
+  "main": "dist/lib.js",
+  "module": "dist/lib.mjs",
+  "typings": "dist/lib.d.ts",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
