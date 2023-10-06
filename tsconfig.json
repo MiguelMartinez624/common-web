@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "outFile": "./dist/index.js",
     "target": "esnext",
-    "declaration": false,
+    "declaration": true,
     "sourceMap": false,
     "removeComments": true,
     "baseUrl": "src",
+    // optional - in general it's a good practice to decouple declaration files from your actual transpiled JavaScript files
+    "declarationDir": "dist/dts",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "lib": [

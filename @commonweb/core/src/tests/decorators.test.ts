@@ -1,5 +1,5 @@
 import {describe, expect, test, beforeEach} from '@jest/globals';
-import {changeStorageValue} from "../core";
+import {changeStorageValue} from "..";
 
 // Will install components to the register
 import './test-components';
