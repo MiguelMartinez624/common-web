@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outFile": "./dist/index.js",
+    "target": "esnext",
+    "declaration": false,
+    "sourceMap": false,
+    "removeComments": true,
+    "baseUrl": "src",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "lib": [
+      "es2016",
+      "dom"
+    ]
+  }
+}
