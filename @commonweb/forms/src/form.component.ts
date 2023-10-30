@@ -78,10 +78,17 @@ export class EntityForm extends HTMLElement {
         this.shadowRoot.querySelectorAll("tt-select")
             .forEach((ele: SelectInput) => values[ele.propertyName] = ele.getValue)
 
-        // send method on return values
-        this.reset();
+
         return {inputs, values};
     }
+
+    public submit() {
+        const {values} = this.value();
+        const submitEvent = new CustomEvent("submit", {detail: {values: values}})
+
+        this.dispatchEvent(submitEvent)
+    }
+
 
     @Attribute('configurations')
     public processConfigurations(configStr: any) {

@@ -13,6 +13,7 @@ const validateSelector = (selector: string) => {
     }
 };
 
+export const PROCESSOR_KEY: string = '_webcommon_components_processors';
 
 function insertTemplate(attr: CustomElementConfig) {
     //TODO casted may no be required
@@ -40,6 +41,11 @@ export function WebComponent(attr: CustomElementConfig) {
                 attemptBindEvents((this as unknown as HTMLElement));
 
                 syncWithStorage(this);
+
+                if (window[PROCESSOR_KEY]) {
+                    window[PROCESSOR_KEY]
+                        .forEach(processor => processor(this));
+                }
 
             }
 

@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0-beta.2",
-  "name": "@commonweb/forms",
+  "version": "1.0.0-beta.37",
+  "name": "@commonweb/router",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
   "typings": "dist/lib.d.ts",
