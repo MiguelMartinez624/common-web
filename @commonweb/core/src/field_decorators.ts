@@ -16,12 +16,3 @@ export function PropagateToChild(param: PropagationConfig) {
         target['property_to_propagate'].set(`${propertyKey}`, param);
     };
 }
-
-
-
-// TODO Storage
-// De forma reactiva cunado un valor ahi cambie llamar el metodo asi peudo hacer esas alocaciones
-//o cambios modificando el storage directamente, pero tendria q usar un metodo para esto,
-//seria storage y es local storage wrapper?
-
-
