@@ -38,7 +38,6 @@ export class DataFetcher extends HTMLElement {
 
     @Attribute('subscribed-key')
     storageKey(key: any) {
-
         subscribeToKeyChange(key, this.execute.bind(this));
     }
 
@@ -106,7 +105,8 @@ export class DataFetcher extends HTMLElement {
                     body: filters ? JSON.stringify(filters) : '',
                 }).then((res) => res.json())
             case "localstorage":
-                const value = localStorage.getItem(this.getAttribute("subscribed-key"))
+                const storageKey = source.slice(source.indexOf(":"));
+                const value = localStorage.getItem(storageKey)
                 if (value) {
                     // TODO apply filters
                     return JSON.parse(value)

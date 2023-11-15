@@ -7,10 +7,10 @@ import {DataFetcherConfiguration} from "../reader.componnet";
 // TODO check static creation
 //https://stackoverflow.com/questions/35049091/how-to-dynamically-create-static-method-in-javascript
 
-const dataRequestConfiguration: (entity: string) => DataFetcherConfiguration = (entity: string) => {
+const dataLocalStorageRequestConfiguration: (entity: string) => DataFetcherConfiguration = (entity: string) => {
     return {
-        injectTo: ['go-table:data'],
-        source: `${window['__HOST']}/v3/api/${entity}/search`,
+        injectTo: ['test-component:data'],
+        source: `localstorage://local/data/v3/api/${entity}/search`,
         auto: true,
         fieldType: 'set'
     }
@@ -21,9 +21,12 @@ describe('DataFetcher', () => {
         // fetch.mockClear();
     });
 
-    test('should propagate data to the elements target', async () => {
+    test('should propagate data to the elements target from the localStorage', async () => {
+        const configs = JSON.stringify(dataLocalStorageRequestConfiguration('products'));
+
+        localStorage.setItem("://local/data/v3/api/products/search", JSON.stringify({data: "hello-world"}))
         document.body.innerHTML = `
-            <data-fetcher configurations="${JSON.stringify(dataRequestConfiguration('products'))}"
+            <data-fetcher configurations='${configs}'
             ></data-fetcher>
             <test-component></test-component>
         `;
@@ -32,7 +35,7 @@ describe('DataFetcher', () => {
         const customElement = window.document.querySelector("test-component");
         expect(customElement).toBeDefined();
         console.log("data ", customElement.innerHTML)
-        expect(customElement.innerHTML).toBe("No Data")
+        expect(customElement.shadowRoot.querySelector("pre").innerHTML).toBe(JSON.stringify({data: "hello-world"}, null, 2))
     });
 
 

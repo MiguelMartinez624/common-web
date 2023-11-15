@@ -34,14 +34,14 @@ export class Router extends HTMLElement {
 
     // Return true if the rute was actually changed
     private changePageByLocation(): boolean {
-        const sections = window.location.pathname.split("/");
+        const sections = window.location.pathname.split("/").filter(s=>s.trim()!=="");
         const routes = this.querySelectorAll("go-route");
         const pageToLoad = [...routes]
             .filter(eleent => eleent.getAttribute("route") !== undefined)
-            .filter((f: Route) => f.getAttribute("route").split("/").length === sections.length)
+            .filter((f: Route) => f.getAttribute("route").split("/").filter(s=>s.trim()!=="").length === sections.length)
             // Search the first match with the pattern
             .find((f: Route) => {
-                const routeSections = f.getAttribute("route").split("/")
+                const routeSections = f.getAttribute("route").split("/").filter(s=>s.trim()!=="")
                 for (let i = 0; i < routeSections.length; i++) {
                     const currentSection = routeSections[i];
                     if (currentSection.startsWith("{") && currentSection[currentSection.length - 1] === "}") {

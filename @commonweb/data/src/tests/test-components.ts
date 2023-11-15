@@ -8,7 +8,8 @@ import {Attribute, WebComponent} from "@commonweb/core";
 export class TestComponent extends HTMLElement {
 
     @Attribute('data')
-    public updateTemplate(data: any) {
+    public set data(data: any) {
+        console.log("aca")
         if (data) {
             console.log({data})
             this.shadowRoot.querySelector("pre").innerHTML = JSON.stringify(data, null, 2);

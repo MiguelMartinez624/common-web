@@ -42,10 +42,14 @@ export function bindEvents(target: HTMLElementWithEventStack) {
             const event = sections[1];
             window.addEventListener(event, method.bind(target))
         } else {
-            const element = target.shadowRoot.querySelector(sections[0]);
+            const element = target.shadowRoot.querySelectorAll(sections[0]);
 
             if (element) {
-                element.addEventListener(sections[1], method.bind(target));
+                element.forEach((ele) => {
+                    ele.addEventListener(sections[1], method.bind(target))
+                });
+
+                //TODO remove listener
             }
 
         }
