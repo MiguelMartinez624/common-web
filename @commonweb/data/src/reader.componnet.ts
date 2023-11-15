@@ -105,7 +105,7 @@ export class DataFetcher extends HTMLElement {
                     body: filters ? JSON.stringify(filters) : '',
                 }).then((res) => res.json())
             case "localstorage":
-                const storageKey = source.slice(source.indexOf(":"));
+                const storageKey: = source.slice(source.indexOf(":"));
                 const value = localStorage.getItem(storageKey)
                 if (value) {
                     // TODO apply filters
