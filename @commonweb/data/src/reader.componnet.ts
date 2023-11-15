@@ -100,13 +100,17 @@ export class DataFetcher extends HTMLElement {
         switch (sourceType) {
             case "https" :
             case "http"  :
+                const method = this.getAttribute("method");
                 return fetch(source, {
-                    method: this.getAttribute("method") || 'GET',
-                    body: filters ? JSON.stringify(filters) : '',
+                    method: method  || 'GET',
+                    body: (filters && method !== 'GET') ? JSON.stringify(filters) : null,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                 }).then((res) => res.json())
             case "localstorage":
-                const storageKey: = source.slice(source.indexOf(":"));
-                const value = localStorage.getItem(storageKey)
+                const storageKey = source.slice(source.indexOf(":"));
+                const value = localStorage.getItem(storageKey);
                 if (value) {
                     // TODO apply filters
                     return JSON.parse(value)
