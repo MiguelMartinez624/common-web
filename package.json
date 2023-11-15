@@ -1,7 +1,10 @@
 {
   "workspaces": [
     "@commonweb/core",
-    "@commonweb/forms"
+    "@commonweb/forms",
+    "@commonweb/data",
+    "@commonweb/router",
+    "@commonweb/components"
   ],
   "scripts": {
   },
