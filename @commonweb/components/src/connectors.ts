@@ -87,7 +87,6 @@ export class BindElementComponent extends HTMLElement {
             default:
                 console.error(`[${triggerQuery.propertyType}] trigger method under development`)
         }
-
         this.binded = true;
     }
 

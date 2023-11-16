@@ -48,3 +48,4 @@ export class TestComponentWithAttribute extends HTMLElement {
         this.shadowRoot.querySelector("h4").innerHTML += ` ${name}`;
     }
 }
+
