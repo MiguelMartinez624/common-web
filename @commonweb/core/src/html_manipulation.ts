@@ -7,7 +7,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     }
     return queryResult;
 }
-export function findManyNodeOnUpTree(selector: string, element: Node):  NodeListOf<Node> {
+export function findManyNodeOnUpTree(selector: string, element: any):  NodeListOf<Node> {
     let queryResult: NodeListOf<Node> = (element as HTMLElement).querySelectorAll(selector);
     if (queryResult.length === 0 && element.parentNode !== null) {
         queryResult = findManyNodeOnUpTree(selector, element.parentNode)

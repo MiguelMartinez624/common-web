@@ -53,7 +53,13 @@ describe('@EventBind', () => {
     });
 
 });
+describe('@EventBindAll', () => {
+    test('should attach event listeners to the corresponding event pattern.', () => {
+        document.body.innerHTML = `<orders-page name="Dev!"></orders-page>`;
 
+    });
+
+});
 
 describe('@FromStorage', () => {
     beforeEach(() => {

@@ -38,10 +38,10 @@ export function WebComponent(attr: CustomElementConfig) {
                 super(...args)
                 this.casted = insertTemplate.call(this, attr);
                 // we init the listeners
-                attemptBindEvents((this as unknown as HTMLElement));
+
 
                 syncWithStorage(this);
-
+                attemptBindEvents((this as unknown as HTMLElement));
                 if (window[PROCESSOR_KEY]) {
                     window[PROCESSOR_KEY]
                         .forEach(processor => processor(this));

@@ -7,20 +7,25 @@ export type EventMap = { [key: EventPattern]: Function };
 
 export interface ElementWithEventsStack {
     callback_bind_stack: EventMap;
+}
+export interface ElementWithBulkEventsStack {
     callback_bind_all_stack: EventMap;
 }
+
+
 
 const eventMapName = 'callback_bind_stack';
 const eventBulkMapName = 'callback_bind_all_stack';
 
 type HTMLElementWithEventStack = HTMLElement & ElementWithEventsStack;
+type HTMLElementWithBulkEventStack = HTMLElement & ElementWithBulkEventsStack;
 
 function isHTMLElementWithEventStack(element: HTMLElement | HTMLElementWithEventStack): boolean {
     return eventMapName in (element as ElementWithEventsStack);
 }
 
-function isHTMLElementWithAllEventStack(element: HTMLElement | HTMLElementWithEventStack): boolean {
-    return eventBulkMapName in (element as ElementWithEventsStack);
+function isHTMLElementWithAllEventStack(element: HTMLElement | ElementWithBulkEventsStack): boolean {
+    return eventBulkMapName in (element as ElementWithBulkEventsStack);
 }
 
 
@@ -38,10 +43,10 @@ export function EventBind(values: string) {
 export function EventBindAll(values: string) {
     return function (target: HTMLElement, propertyKey: string, descriptor: PropertyDescriptor) {
         if (!isHTMLElementWithAllEventStack(target)) {
-            target[eventMapName] = {};
+            target[eventBulkMapName] = {};
         }
         const method = target[propertyKey];
-        (target as HTMLElementWithEventStack).callback_bind_all_stack[`${values}`] = method
+        (target as HTMLElementWithBulkEventStack).callback_bind_all_stack[`${values}`] = method;
     };
 }
 
@@ -49,7 +54,10 @@ export function EventBindAll(values: string) {
 export function attemptBindEvents(element: HTMLElement) {
     if (isHTMLElementWithEventStack(element)) {
         bindEvents(element as HTMLElementWithEventStack);
-        bindOnAllEvents(element as HTMLElementWithEventStack);
+    }
+
+    if(isHTMLElementWithAllEventStack(element)){
+        bindOnAllEvents(element as HTMLElementWithBulkEventStack);
     }
 }
 
@@ -65,7 +73,6 @@ export function bindEvents(target: HTMLElementWithEventStack) {
             window.addEventListener(event, method.bind(target))
         } else {
             const element = target.shadowRoot.querySelectorAll(sections[0]);
-
             if (element) {
                 element.forEach((ele) => {
                     ele.addEventListener(sections[1], method.bind(target))
@@ -78,25 +85,26 @@ export function bindEvents(target: HTMLElementWithEventStack) {
     })
 }
 
-export function bindOnAllEvents(target: HTMLElementWithEventStack) {
-
-    Object.keys(target.callback_bind_stack).forEach((key: string) => {
-
+export function bindOnAllEvents(target: HTMLElementWithBulkEventStack) {
+    console.log(target.callback_bind_all_stack)
+    Object.keys(target.callback_bind_all_stack).forEach((key: string) => {
         const sections = key.split(":");
-        const method = target.callback_bind_stack[key];
+        const method = target.callback_bind_all_stack[key];
 
         if (sections[0].startsWith("window")) {
             const event = sections[1];
             window.addEventListener(event, method.bind(target))
         } else {
-            const element = findManyNodeOnUpTree(sections[0],target);
 
-            if (element) {
+            const element = findManyNodeOnUpTree(sections[0],target);
+            if (element.length > 0) {
                 element.forEach((ele) => {
+                    console.log(ele)
                     ele.addEventListener(sections[1], method.bind(target))
                 });
-
                 //TODO remove listener
+            }else {
+                console.log("no found")
             }
 
         }
