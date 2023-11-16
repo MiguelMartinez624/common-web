@@ -8,10 +8,10 @@ export type EventMap = { [key: EventPattern]: Function };
 export interface ElementWithEventsStack {
     callback_bind_stack: EventMap;
 }
+
 export interface ElementWithBulkEventsStack {
     callback_bind_all_stack: EventMap;
 }
-
 
 
 const eventMapName = 'callback_bind_stack';
@@ -56,7 +56,7 @@ export function attemptBindEvents(element: HTMLElement) {
         bindEvents(element as HTMLElementWithEventStack);
     }
 
-    if(isHTMLElementWithAllEventStack(element)){
+    if (isHTMLElementWithAllEventStack(element)) {
         bindOnAllEvents(element as HTMLElementWithBulkEventStack);
     }
 }
@@ -95,15 +95,18 @@ export function bindOnAllEvents(target: HTMLElementWithBulkEventStack) {
             const event = sections[1];
             window.addEventListener(event, method.bind(target))
         } else {
-
-            const element = findManyNodeOnUpTree(sections[0],target);
+            const slot = target.shadowRoot.querySelector("slot");
+            const slottedElements = slot !== null ? slot.assignedElements().filter(ele => ele.matches(sections[0])) :[]
+            const element = [
+                ...target.shadowRoot.querySelectorAll(sections[0]),
+                ...slottedElements
+            ];
             if (element.length > 0) {
                 element.forEach((ele) => {
-                    console.log(ele)
                     ele.addEventListener(sections[1], method.bind(target))
                 });
                 //TODO remove listener
-            }else {
+            } else {
                 console.log("no found")
             }
 
