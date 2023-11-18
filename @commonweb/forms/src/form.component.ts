@@ -1,4 +1,4 @@
-import {Attribute, EventBind, WebComponent} from "@commonweb/core";
+import {Attribute, EventBind, extractData, WebComponent} from "@commonweb/core";
 import {FormField, FormFieldDescription} from "./form_field.component";
 import {SelectInput} from "./select.component";
 
@@ -9,15 +9,15 @@ import {SelectInput} from "./select.component";
     style: `:host{
                 color: var(--font-color, black);
                 width:100%;
-               }
-            .form {
-               
+            }
+            
+            .form {   
               display:flex;
               flex-direction: column;
             }
+            
             .form_field {
-               padding:1rem;
-               
+               padding:1rem;   
                border: 1px solid var(--item-border-color, gray);
                margin:0.5em;
             }
@@ -41,6 +41,23 @@ import {SelectInput} from "./select.component";
 export class EntityForm extends HTMLElement {
     mainElement;
 
+    public setValue(data: any) {
+        // should no return should call metod reset
+        const inputs: NodeListOf<FormField> = this.shadowRoot.querySelectorAll("form-field");
+        inputs.forEach((input, i) => input.setValue(extractData(input.propertyName, data)));
+
+        // for listing
+        //TODO change class name
+        const subForms: NodeListOf<EntityForm> = this.shadowRoot.querySelectorAll("entity-form.sub_form");
+        subForms.forEach((subForm) => {
+            if (!data[subForm.getAttribute("property")]) {
+                return;
+            }
+
+            subForm.setValue(extractData(subForm.getAttribute("property"), data));
+        });
+
+    }
 
     static get observedAttributes() {
         return ["configurations", "submit-label"];
@@ -64,10 +81,10 @@ export class EntityForm extends HTMLElement {
         //TODO change class name
         const subForms: NodeListOf<EntityForm> = this.shadowRoot.querySelectorAll("entity-form.sub_form");
         subForms.forEach((subForm) => {
-            if (!values[subForm.getAttribute("property")]) {
-                values[subForm.getAttribute("property")] = []
+            if (!values[subForm.getAttribute("property-name")]) {
+                values[subForm.getAttribute("property-name")] = []
             }
-            values[subForm.getAttribute("property")].push(subForm.value().values);
+            values[subForm.getAttribute("property-name")].push(subForm.value().values);
         });
 
         // main values
@@ -153,7 +170,7 @@ export class EntityForm extends HTMLElement {
         let nestedForm: EntityForm = document.createElement("entity-form") as EntityForm;
         nestedForm.classList.add("sub_form")
         // metadata for building parent
-        nestedForm.setAttribute("property", value.propertyName);
+        nestedForm.setAttribute("property-name", value.propertyName);
         nestedForm.configurations = value.subDescriptions;
         nestedForm.shadowRoot.querySelector("button")?.setAttribute("hidden", "by sub")
         return nestedForm;

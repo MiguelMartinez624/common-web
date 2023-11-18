@@ -1,5 +1,6 @@
 import {Attribute, findNodeOnUpTree, WebComponent,extractData} from "@commonweb/core";
 
+// ElementQuery string with a format cssSelector:property/method
 class ElementQuery {
     private readonly elementSelector: string;
     private readonly elementProperty: string;
@@ -91,9 +92,7 @@ export class BindElementComponent extends HTMLElement {
     }
 
     private affectTarget(ev: CustomEvent): void {
-        console.log({customEvent: ev})
         let data = null
-        console.log("CALLING METHOD")
         // TODO use the extract method here
         // to be checked
         if (this.getAttribute("input-src")) {
@@ -112,7 +111,6 @@ export class BindElementComponent extends HTMLElement {
         } else {
             data = ev.detail.data;
         }
-        console.log({data})
         // We get the trigger here
         const targetQuery = new ElementQuery(this.getAttribute("to"));
         const targetElement = targetQuery.searchElement(this);

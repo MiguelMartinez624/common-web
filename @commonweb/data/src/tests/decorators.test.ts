@@ -12,6 +12,7 @@ const dataLocalStorageRequestConfiguration: (entity: string) => DataFetcherConfi
         injectTo: ['test-component:data'],
         source: `localstorage://local/data/v3/api/${entity}/search`,
         auto: true,
+        method:"GET",
         fieldType: 'set'
     }
 }

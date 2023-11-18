@@ -1,4 +1,4 @@
-import {Attribute, subscribeToKeyChange, WebComponent} from "@commonweb/core";
+import {Attribute, subscribeToKeyChange, WebComponent, extractData} from "@commonweb/core";
 import {findNodeOnUpTree} from "@commonweb/core";
 
 export enum DataFetcherPropsName {
@@ -6,16 +6,13 @@ export enum DataFetcherPropsName {
     Source = "source",
 }
 
-function extractData(resultPath: string, result: any) {
-    let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
-    return properties.reduce((prev: any, curr: any) => prev?.[curr], result)
-}
 
 export interface DataFetcherConfiguration {
     source: string;
     auto: boolean;
     injectTo: string[];
     resultPath?: string;
+    method: 'POST' | 'GET' | 'DELETE' | 'PUT';
     fieldType: 'attribute' | 'set'
 }
 
@@ -24,7 +21,6 @@ export interface DataFetcherConfiguration {
     template: ''
 })
 export class DataFetcher extends HTMLElement {
-    private source: string;
     private target: string;
     private auto: any;
     private configuration: DataFetcherConfiguration;
@@ -95,29 +91,44 @@ export class DataFetcher extends HTMLElement {
             throw new Error("No source set for this reader");
         }
         const sourceType = source.slice(0, source.indexOf(":"));
+        const method = this.configuration.method || 'GET';
 
         // Implement factory pattern
         switch (sourceType) {
             case "https" :
             case "http"  :
-                const method = this.getAttribute("method");
+
                 return fetch(source, {
-                    method: method  || 'GET',
+                    method: method,
                     body: (filters && method !== 'GET') ? JSON.stringify(filters) : null,
                     headers: {
                         "Content-Type": "application/json",
                     },
-                }).then((res) => res.json())
+                }).then((res) => res.json());
+
             case "localstorage":
                 const storageKey = source.slice(source.indexOf(":"));
-                const value = localStorage.getItem(storageKey);
-                if (value) {
-                    // TODO apply filters
-                    return JSON.parse(value)
+                switch (method) {
+                    case "POST":
+                        localStorage.setItem(storageKey, JSON.parse(filters));
+                        break;
+                    case "GET":
+                        const value = localStorage.getItem(storageKey);
+                        if (value) {
+                            return JSON.parse(value)
+                        }
+                        return null;
+                    case "DELETE":
+                        localStorage.removeItem(storageKey);
+                        break;
+                    case "PUT":
+                        break;
+
                 }
-                return null;
+                break;
+
             default:
-                throw new Error("Invaid source type, available types [http,https,localstorage]");
+                throw new Error("Invalid source type, available types [http,https,localstorage]");
 
         }
     }

@@ -21,14 +21,15 @@ export interface FormFieldDescription {
                         <span></span>
                         <input />
                     </label>`,
-        style: ` :host{
+        style: `
+            :host{
                display:flex;
                width: 100%;
                color: var(--font-primary, #efefef);
-                margin: 10px 0;
+               margin: 10px 0;
              }
-             input{
-       
+             
+            input{
                   color: var( --font-primary, #efefef);
                   padding: 12px 20px;
                   margin: 10px 0;
@@ -38,10 +39,10 @@ export interface FormFieldDescription {
                   box-sizing: border-box;
                   background-color: var(--bg-primary,gray);
             }
+            
             .form-field {
               display:flex;
-                                width: 100%;
-
+              width: 100%;
               flex-direction:column;
             }
         `,
@@ -106,5 +107,9 @@ export class FormField extends HTMLElement {
         return this.getAttribute("property-name");
     }
 
+    setValue(value: any) {
+        const input = this.shadowRoot.querySelector("input");
+        input.value = value;
+    }
 }
 

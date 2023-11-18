@@ -1,8 +1,30 @@
-import {Attribute, WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent, extractData} from "@commonweb/core";
 
-export interface FieldDescription {
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});
+
+export type FieldType = "string" | "date" | "currency" | "image"
+
+export class FieldDescription {
     label: string;
     propertyName: string;
+    type: FieldType;
+}
+
+function getFieldTemplate(type: FieldType, value: any): string {
+    switch (type) {
+        case "string":
+            return value;
+        case "date":
+            return new Date(value).toLocaleDateString();
+        case "currency":
+           return formatter.format(Number(value));
+        case "image":
+            return `<img height="80" width="80"  alt="no" src="${value} "/>`
+
+    }
 }
 
 @WebComponent({
@@ -18,7 +40,7 @@ export interface FieldDescription {
        }
        table{width:100%}
         table, th, td {
-            border: 1px solid var(--font-primary,white);
+            border: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.10));
             border-collapse: collapse;
         }
         tr:hover {
@@ -26,10 +48,16 @@ export interface FieldDescription {
             background-color:var(--bg-primary)
         }
         th,td {
-            padding:0.8rem;
-            max-width:200px;
+            padding:0.6rem;
             text-overflow: ellipsis;
             overflow: hidden;
+        }
+        
+        td:has(img){
+            padding: 0.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     `
 
@@ -80,7 +108,8 @@ export class Table extends HTMLElement {
 
             this.configurations.forEach((field) => {
                 const headerElement = document.createElement("td");
-                headerElement.innerHTML = item[field.propertyName] || "";
+                const value = extractData(field.propertyName, item);
+                headerElement.innerHTML =  `${getFieldTemplate(field.type, value)}`
                 row.appendChild(headerElement);
             });
 
