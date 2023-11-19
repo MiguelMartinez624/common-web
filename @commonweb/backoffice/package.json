@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0-beta.2",
+  "name": "@commonweb/backoffice-app",
+  "main": "dist/lib.js",
+  "module": "dist/lib.mjs",
+  "typings": "dist/lib.d.ts",
+  "type": "module",
+  "exports": {
+    "umd": "dist/lib.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "push": "npm run build && npm publish --access public",
+    "build": "rollup -c ",
+    "build:watch": "rollup -c --watch",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiguelMartinez624/common-web.git"
+  },
+  "dependencies": {
+    "@commonweb/components": "^1.0.0-beta.7",
+    "@commonweb/core": "^1.0.0-beta.51",
+    "@commonweb/data": "^1.0.0-beta.41",
+    "@commonweb/forms": "^1.0.0-beta.4",
+    "@commonweb/router": "^1.0.0-beta.43"
+  },
+  "devDependencies": {
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-serve": "^2.0.2"
+  }
+}
