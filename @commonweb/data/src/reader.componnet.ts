@@ -1,5 +1,4 @@
-import {Attribute, subscribeToKeyChange, WebComponent, extractData} from "@commonweb/core";
-import {findNodeOnUpTree} from "@commonweb/core";
+import {Attribute, extractData, findNodeOnUpTree, subscribeToKeyChange, WebComponent} from "@commonweb/core";
 
 export enum DataFetcherPropsName {
     For = "for",
@@ -42,15 +41,31 @@ export class DataFetcher extends HTMLElement {
         if (Boolean(this.configuration.auto) === true) {
             // TODO for auto add filters from the outside
             this.data({}).then((result) => {
+                const eventSuccess = new CustomEvent(
+                    "request-success", {
+                        bubbles: true,
+                        detail: {data: result}
+                    });
+                this.dispatchEvent(eventSuccess);
                 this.injectData(this.configuration.injectTo, result);
             });
         }
     }
 
     public execute(filters: any) {
-        this.data(filters).then((result) => {
-            this.injectData(this.target, result);
-        });
+        this.data(filters)
+            .then((result) => {
+                const eventSuccess = new CustomEvent(
+                    "request-success", {
+                        bubbles: true,
+                        detail: {data: result}
+                    });
+                this.dispatchEvent(eventSuccess);
+                this.injectData(this.target, result);
+            })
+            .catch((err) => {
+                this.dispatchEvent(new CustomEvent("request-failed"));
+            });
     }
 
     private injectData(elementsSelector: any, data: any) {
@@ -66,7 +81,9 @@ export class DataFetcher extends HTMLElement {
         if (typeof elementsSelector === "string") {
             targetElements = JSON.parse(elementsSelector);
         }
-
+        if (!targetElements) {
+            return;
+        }
         targetElements.forEach((pattern) => {
             const sections = pattern.split(":");
             const element = findNodeOnUpTree(sections[0], this);
@@ -85,7 +102,17 @@ export class DataFetcher extends HTMLElement {
         })
     }
 
+    public get Payload(): any {
+        const payload = this.getAttribute("payload")
+        if (!payload) {
+            return {};
+        }
+        return JSON.parse(payload);
+    }
+
     async data(filters: any): Promise<any> {
+
+        this.dispatchEvent(new CustomEvent("loading"));
         const source = this.configuration.source;
         if (!source) {
             throw new Error("No source set for this reader");
@@ -97,35 +124,9 @@ export class DataFetcher extends HTMLElement {
         switch (sourceType) {
             case "https" :
             case "http"  :
-
-                return fetch(source, {
-                    method: method,
-                    body: (filters && method !== 'GET') ? JSON.stringify(filters) : null,
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then((res) => res.json());
-
+                return await this.callRemoteAPI(source, method, filters);
             case "localstorage":
-                const storageKey = source.slice(source.indexOf(":"));
-                switch (method) {
-                    case "POST":
-                        localStorage.setItem(storageKey, JSON.parse(filters));
-                        break;
-                    case "GET":
-                        const value = localStorage.getItem(storageKey);
-                        if (value) {
-                            return JSON.parse(value)
-                        }
-                        return null;
-                    case "DELETE":
-                        localStorage.removeItem(storageKey);
-                        break;
-                    case "PUT":
-                        break;
-
-                }
-                break;
+                return this.callLocalStorage(source, method, filters);
 
             default:
                 throw new Error("Invalid source type, available types [http,https,localstorage]");
@@ -133,8 +134,46 @@ export class DataFetcher extends HTMLElement {
         }
     }
 
+    private async callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
+
+        const result = await fetch(source, {
+            method: method,
+            body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...this.Payload}) : null,
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+        if (!result.ok) {
+            throw {error: result.json()}
+        }
+        return await result.json();
+
+    }
+
+    private callLocalStorage(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
+        const storageKey = source.slice(source.indexOf(":"));
+        switch (method) {
+            case "POST":
+                localStorage.setItem(storageKey, JSON.parse(filters));
+                break;
+            case "GET":
+                const value = localStorage.getItem(storageKey);
+                if (value) {
+                    return JSON.parse(value)
+                }
+                throw "not found on storage";
+            case "DELETE":
+                localStorage.removeItem(storageKey);
+                return;
+            case "PUT":
+                return;
+
+        }
+        return;
+    }
+
     static get observedAttributes() {
-        return ["method", "configurations", DataFetcherPropsName.Source, "auto", "result-path", "subscribed-key"];
+        return ["method", "configurations", DataFetcherPropsName.Source, "auto", "result-path", "subscribed-key", "payload"];
     }
 }
 

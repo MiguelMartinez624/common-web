@@ -1,41 +1,137 @@
 import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core";
+import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
+
+const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
+    return {
+        "injectTo": [],
+        "source": `http://localhost:8080/orders/search`,
+        "auto": true,
+        "method": "POST",
+        "fieldType": "set",
+        resultPath: "content"
+    }
+}
 
 @WebComponent({
-    style: ``,
+    style: `:host{}`,
     template: `
     <h1>Tablero Ordenes</h1>
-    <draggable-list title="Pendiente">
- 
-        <li selector="item1" draggable="true">Orden Numero 1</li>
-        <li selector="item2" draggable="true">Orden Numero 2</li>
-                <li selector="item3" draggable="true">Orden Numero 3</li>
-
-        <li selector="item4" draggable="true">Orden Numero 4</li>
-        <li selector="item5" draggable="true">Orden Numero 5</li>
-
-    </draggable-list>
-    <draggable-list title="En Cocina">
-           <div  selector="order-1" draggable="true" class="product">
-              <h2>Producto 1</h2>
-              <p>Precio: $100</p>
-              <p>Cantidad: 1</p>
-    </div>
-     </draggable-list>
-    <draggable-list title="Completada" id="done">
-    </draggable-list>
+    <data-fetcher PENDING></data-fetcher>
+     <bind-element 
+         input-path="detail.data.content" 
+         from="data-fetcher[PENDING]:(request-success)"
+          to="draggable-list[PENDING]:appendMany">
+    </bind-element>
+    <draggable-list
+     status="Created"
+     element-list="order-card-component" PENDING title="Pendiente"></draggable-list>
+    
+    <data-fetcher IN_PREPARATION></data-fetcher>
+    <bind-element 
+         input-path="detail.data.content" 
+         from="data-fetcher[IN_PREPARATION]:(request-success)"
+          to="draggable-list[IN_PREPARATION]:appendMany">
+    </bind-element>
+    <draggable-list
+     status="InitPreparation"
+     element-list="order-card-component" IN_PREPARATION title="En Cocina"></draggable-list>
+    
+    <data-fetcher COMPLETED></data-fetcher>
+    <bind-element 
+    
+         input-path="detail.data.content" 
+         from="data-fetcher[COMPLETED]:(request-success)"
+          to="draggable-list[COMPLETED]:appendMany">
+    </bind-element>
+    <draggable-list  
+    status="Completed" 
+    element-list="order-card-component" COMPLETED title="Completada"></draggable-list>
 
     `,
     selector: 'orders-page'
 })
 export class OrdersBoardComponent extends HTMLElement {
+
+    connectedCallback() {
+
+        const pending = this.shadowRoot.querySelector("data-fetcher[PENDING]") as DataFetcher;
+        pending.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("PEDNING")));
+        pending.setAttribute("payload",
+            JSON.stringify({
+                "query": {
+                    "clientId": "",
+                    "date": null,
+                    "status": "Created"
+                },
+                "page": {
+                    "page": 1,
+                    "size": 100
+                }
+            }));
+
+        const preparation = this.shadowRoot.querySelector("data-fetcher[IN_PREPARATION]") as DataFetcher;
+        preparation.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("IN_PREPARATION")));
+        preparation.setAttribute("payload",
+            JSON.stringify({
+                "query": {
+                    "clientId": "",
+                    "date": null,
+                    "status":"InPreparation"
+                },
+                "page": {
+                    "page": 1,
+                    "size": 100
+                }
+            }));
+        const completed = this.shadowRoot.querySelector("data-fetcher[COMPLETED]") as DataFetcher;
+        completed.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("COMPLETED")));
+        completed.setAttribute("payload",
+            JSON.stringify({
+                "query": {
+                    "clientId": "",
+                    "date": null,
+                    "status": "Completed"
+                },
+                "page": {
+                    "page": 1,
+                    "size": 100
+                }
+            }));
+    }
+
     @EventBind("draggable-list:drop")
     public handleDrop(ev) {
         const selector = ev.dataTransfer.getData("text/plain");
-        const list = this.shadowRoot.querySelector(`[selector="${selector}"]`);
-        if (ev.target.nodeName === "DRAGGABLE-LIST") {
-            ev.target.appendChild(list)
-            ev.preventDefault()
+        if (ev.target.nodeName !== "DRAGGABLE-LIST") {
+            return;
         }
+        const listTarget = ev.target;
+        this.shadowRoot.querySelectorAll("draggable-list").forEach((list) => {
+            const element = list.shadowRoot.querySelector(`[selector="${selector}"]`);
+            if (element) {
+
+
+                const fetcher = document.createElement("data-fetcher") as DataFetcher;
+                fetcher.setAttribute("configurations",JSON.stringify({
+                    source:`http://localhost:8080/orders/${element.getAttribute('selector')}/dispatch-event`,
+                    method:"POST",
+                } as DataFetcherConfiguration))
+
+                fetcher.setAttribute("payload",JSON.stringify({
+                    event_type:listTarget.getAttribute("status"),
+                    payload:{}
+                }));
+                fetcher.execute({});
+
+                fetcher.addEventListener("request-success",()=>{
+                    listTarget.shadowRoot.querySelector("slot").appendChild(element);
+                    ev.preventDefault();
+                })
+
+            }
+        });
+
+
     }
 }
 
@@ -52,17 +148,18 @@ export class OrdersBoardComponent extends HTMLElement {
           display: inline-block;
           vertical-align: top;
          
-}
-.list{
-     padding:10px;
-}
-.title {
-    background: var(--bg-primary);
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.30));
-    font-weight: 700;
-    font-size: 22px;
-}
+        }
+        .list{
+           overflow: scroll;
+            height: 100%;
+        }
+        .title {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.30));
+            font-weight: 700;
+            font-size: 22px;
+        }
     `,
     template: `
         <div class="title"></div>
@@ -75,7 +172,28 @@ export class OrdersBoardComponent extends HTMLElement {
 export class DraggableList extends HTMLElement {
 
     static get observedAttributes(): string[] {
-        return ["title"]
+        return ["title", "element-list"]
+    }
+
+    public appendMany(items: any[]) {
+        console.log({items})
+        const elementListName = this.getAttribute("element-list");
+        items.forEach((item) => {
+            const element = document.createElement(elementListName);
+            element.setAttribute("draggable", "true");
+            element.setAttribute("selector", item.id);
+            element.data(item);
+
+            element.addEventListener("dragstart", (event) => {
+                event.dataTransfer.setData("text/plain", event.target.getAttribute('selector'));
+            });
+
+            this.shadowRoot.querySelector("slot")
+                .appendChild(element);
+
+
+
+        })
     }
 
     @Attribute("title")
@@ -85,7 +203,6 @@ export class DraggableList extends HTMLElement {
 
     @EventBindAll("*[draggable]:dragstart")
     public appendDragStartHandler(event) {
-        console.log(event)
         event.dataTransfer.setData("text/plain", event.target.getAttribute('selector'));
 
     }
@@ -102,4 +219,48 @@ export class DraggableList extends HTMLElement {
             });
 
     }
+}
+
+@WebComponent({
+    style: `:host{
+        border-bottom: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.30));
+        display:flex;
+        flex-direction:column;
+        padding: 1rem;
+        background:var( --bg-primary, #FFFFFF);
+    }
+    .field{display:flex}
+    `,
+    template: `
+        <div>
+           <div class="field">Direccion: <div address></div></div>
+           <div class="field">Modo:  <div mode></div></div>
+            
+             <div>
+             <div class="field">Telefono: <div phone></div></div>
+              <div class="field">Email: <div email></div></div>
+             
+             </div>
+        </div>
+        
+    `,
+    selector: 'order-card-component'
+})
+export class OrderCardComponent extends HTMLElement {
+
+    static get observedAttributes(): string[] {
+        return ["data", "element-list"]
+    }
+
+
+    @Attribute("data")
+    public data(data: any) {
+        this.shadowRoot.querySelector("[address]").innerHTML = data.shipping_address.address;
+        this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode;
+        this.shadowRoot.querySelector("[phone]").innerHTML = data.contact_info.phoneNumber;
+        this.shadowRoot.querySelector("[email]").innerHTML =data.contact_info.email;
+
+    }
+
+
 }

@@ -1,14 +1,15 @@
 import {Attribute, EventBind, WebComponent} from "@commonweb/core";
-import {DataFetcherConfiguration} from "@commonweb/data";
+import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import {SidePanel} from "./side-panel";
 import {EntityForm} from "@commonweb/forms";
 // TODO make fetcher configuration complete
 const listConfiguration: (entity: string) => DataFetcherConfiguration = (entity: string) => {
     return {
         injectTo: ['go-table:configurations'],
-        source: `${window['__UI']}/ui/${entity}/listing`,
+        source: `localstorage://ui/${entity}/listing`,
         auto: true,
-        fieldType: 'attribute'
+        fieldType: 'attribute',
+        method: "GET"
     }
 }
 
@@ -16,9 +17,10 @@ const listConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
 const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity: string) => {
     return {
         injectTo: ['entity-form:configurations'],
-        source: `${window['__UI']}/ui/${entity}/form`,
+        source: `localstorage://ui/${entity}/form`,
         auto: true,
-        fieldType: 'attribute'
+        fieldType: 'attribute',
+        method: "GET"
     }
 }
 
@@ -31,9 +33,10 @@ const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
         <tt-button>Crear</tt-button>
         <bind-element  from="tt-button:(click)" to="side-panel:toggle"></bind-element>
         
-        <data-fetcher  data="" method="GET" ></data-fetcher>
         <go-card>
-                <data-fetcher configuration=""  method="POST"></data-fetcher>
+            <data-fetcher  data=""></data-fetcher>
+            <data-fetcher configuration=""></data-fetcher>
+            <bind-element input-path="detail.data.content" from="data-fetcher[data]:(request-success)" to="go-table:generateDataRows"></bind-element>
             <go-table></go-table>
         </go-card>
         <side-panel>
@@ -52,14 +55,8 @@ export class BackofficeEntityPage extends HTMLElement {
     private fetchData(entity: string) {
         const configDataFetcher = this.shadowRoot.querySelector("data-fetcher[configuration]");
         const queryDataFetcher = this.shadowRoot.querySelector("data-fetcher[data]");
-
-
-        configDataFetcher.setAttribute(
-            "configurations", JSON.stringify(listConfiguration(entity)));
-
+        configDataFetcher.setAttribute("configurations", JSON.stringify(listConfiguration(entity)));
         queryDataFetcher.setAttribute("configurations", JSON.stringify(window[`endpoint::listing-${entity}`]));
-
-
     }
 
 
@@ -102,28 +99,35 @@ export class BackofficeEntityPage extends HTMLElement {
 })
 export class BackofficeEntityForm extends HTMLElement {
     private _entity: any;
-
+    // Add private variables
+    private submitDataFetcher: DataFetcher;
+    private form: EntityForm;
+    private submitButton: HTMLElement;
 
     public setEntity(entity: any) {
-        let entName = window.location.href.split("/").pop()
-        const submitDataFetcher = this.shadowRoot.querySelector("data-fetcher[submit]");
-        const form = this.shadowRoot.querySelector("entity-form") as unknown as EntityForm;
+        this._entity = entity;
+        const entName = window.location.href.split("/").pop();
+        this.submitButton.innerHTML = entity ? "Actualizar" : "Crear";
+        const fetchConfiguration: DataFetcherConfiguration = entity ? {
+            ...window[`endpoint::update-${entName}`],
+            source: entity.id
+        } : window[`endpoint::create-${entName}`];
+        this.submitDataFetcher.setAttribute("configurations",JSON.stringify( fetchConfiguration));
 
         if (!entity) {
-            form.reset();
-            submitDataFetcher.setAttribute("configurations", JSON.stringify(window[`endpoint::create-${entName}`]));
-            this.shadowRoot.querySelector("tt-button[submit]").innerHTML = "Crear";
+            this.form.reset();
             return;
         }
-        const updateConfiguration: DataFetcherConfiguration = {...window[`endpoint::update-${entName}`]};
-        updateConfiguration.source += entity.id;
-        submitDataFetcher.setAttribute("configurations", JSON.stringify(updateConfiguration));
-        this.shadowRoot.querySelector("tt-button[submit]").innerHTML = "Actualizar";
-        this._entity = entity;
-        form.setValue(entity);
+
+
+        this.form.setValue(entity);
+
     }
 
     connectedCallback() {
+        this.submitDataFetcher = this.shadowRoot.querySelector("data-fetcher[submit]") as DataFetcher;
+        this.form = this.shadowRoot.querySelector("entity-form") as unknown as EntityForm;
+        this.submitButton = this.shadowRoot.querySelector("tt-button[submit]");
         this.fetchData(window.location.href.split("/").pop());
     }
 
@@ -131,7 +135,7 @@ export class BackofficeEntityForm extends HTMLElement {
         const formConfigurationFetcher = this.shadowRoot.querySelector("data-fetcher[form]");
         formConfigurationFetcher.setAttribute("configurations", JSON.stringify(formConfiguration(entity)));
 
-        const createDataFetcher = this.shadowRoot.querySelector("data-fetcher[create]");
+        const createDataFetcher = this.shadowRoot.querySelector("data-fetcher[submit]");
         createDataFetcher.setAttribute("configurations", JSON.stringify(window[`endpoint::create-${entity}`]));
 
 

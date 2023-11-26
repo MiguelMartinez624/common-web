@@ -142,7 +142,7 @@ export class ECommerceBackOffice extends HTMLElement {
     template: `
         <div class="container">
            <div class="sidebar"><slot name="sidebar"></slot></div>
-           <div style="flex:0.8;">
+           <div style="flex:1;overflow:hidden;">
                 <div class="header"><slot name="header"></slot></div>
                 <div class="content"><slot name="content"></slot></div>   
            </div>
@@ -158,7 +158,7 @@ export class ECommerceBackOffice extends HTMLElement {
             overflow:hidden;
             height:100%;
             display:flex;
-           
+            overflow:hidden;
          }
          .sidebar{  
             display:flex;

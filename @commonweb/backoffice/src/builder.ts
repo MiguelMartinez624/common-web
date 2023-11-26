@@ -7,7 +7,7 @@ export class BackofficeRouteBuilder {
         window[`endpoint::${key}`] = {
             source: path,
             method:method,
-            injectTo: ['go-table:data'],
+            injectTo: [],
             resultPath: resultPath,
             fieldType: 'set',
             auto:true
@@ -17,7 +17,7 @@ export class BackofficeRouteBuilder {
     addEditEndpoint(key: string, path: string, method: string, resultPath?: string) {
         window[`endpoint::${key}`] = {
             source: path,
-            injectTo: ['go-table:data'],
+            injectTo: [],
             method:method,
             resultPath: resultPath,
             fieldType: 'attribute'
@@ -28,19 +28,19 @@ export class BackofficeRouteBuilder {
         window[`endpoint::${key}`] = {
             source: path,
             method:method,
-            injectTo: ['go-table:data'],
+            injectTo: [],
             resultPath: resultPath,
             fieldType: 'attribute'
         } as DataFetcherConfiguration;
         return this;
     }
     addFormConfiguration(key, configuration) {
-        localStorage.setItem(`://localhost:8080/ui/${key}/form`, JSON.stringify(configuration));
+        localStorage.setItem(`://ui/${key}/form`, JSON.stringify(configuration));
         return this;
     }
 
     addTableConfiguration(key, configuration) {
-        localStorage.setItem(`://localhost:8080/ui/${key}/listing`, JSON.stringify(configuration));
+        localStorage.setItem(`://ui/${key}/listing`, JSON.stringify(configuration));
         return this;
     }
 

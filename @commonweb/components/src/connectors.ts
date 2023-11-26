@@ -121,9 +121,7 @@ export class BindElementComponent extends HTMLElement {
         switch (targetQuery.propertyType) {
             case "method":
                 // For method call
-                console.log("target method", targetQuery.propertyName)
                 if (targetElement[targetQuery.propertyName]) {
-                    console.log("lo tiene")
                     targetElement[targetQuery.propertyName](data)
                 }
                 break;
