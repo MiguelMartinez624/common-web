@@ -1,9 +1,5 @@
-import {Attribute, WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent,extractData} from "@commonweb/core";
 
-const getObjectPropertyValue = (path: string, obj: any, separator = '.') => {
-    let properties = Array.isArray(path) ? [path] : path.split(separator)
-    return properties.reduce((prev: any, curr: any) => prev?.[curr], obj)
-}
 
 export interface SelectOption {
     label: string;
@@ -19,11 +15,19 @@ export interface ValueInput {
     template: `
         <label for="select-input"></label>
         <select name="select-input"></select>\`
+    `,
+    style:`:host{
+            display:flex;flex-direction:column;gap:10px;color: var( --font-primary, #efefef);
+        }
+        select {
+            padding: 12px 20px;border: 1px solid #ccc;border-radius: var(--btn-radius,4px);
+            background-color: var(--bg-primary,gray);
+        }
     `
 })
 export class SelectInput extends HTMLElement {
     static get observedAttributes() {
-        return ["label-path", "value-path", "label", "property-name"];
+        return ["label-path", "value-path", "label", "property-name","options"];
     }
 
 
@@ -49,8 +53,8 @@ export class SelectInput extends HTMLElement {
             .map((item: any) => {
                 // TODO validate and add ignore policis as a param
                 return {
-                    value: getObjectPropertyValue(valuePath, item, "."),
-                    label: getObjectPropertyValue(labelPath, item, "."),
+                    value: extractData(valuePath, item),
+                    label: extractData(labelPath, item),
                 } as SelectOption;
             })
             // Span one html element per option

@@ -13,14 +13,10 @@ import {SelectInput} from "./select.component";
             
             .form {   
               display:flex;
-              flex-direction: column;
+              flex-wrap:wrap;
+              gap:10px;
             }
-            
-            .form_field {
-               padding:1rem;   
-               border: 1px solid var(--item-border-color, gray);
-               margin:0.5em;
-            }
+       
             .sub_form {
                 padding: 1rem;
                 border:1px solid gray;
@@ -92,7 +88,7 @@ export class EntityForm extends HTMLElement {
 
         this.shadowRoot.querySelectorAll("[input-holder]")
             .forEach((ele: any) => console.log("value on some", ele.getValue))
-        this.shadowRoot.querySelectorAll("tt-select")
+        this.shadowRoot.querySelectorAll("select-input")
             .forEach((ele: SelectInput) => values[ele.propertyName] = ele.getValue)
 
 
@@ -132,12 +128,14 @@ export class EntityForm extends HTMLElement {
         values.forEach((value) => {
             if (value.type === "select") {
                 console.log({value})
-                const select = document.createElement("tt-select");
+                const select = document.createElement("select-input");
                 select.setAttribute("value-path", value.valuePath);
                 select.setAttribute("label-path", value.labelPath);
                 select.setAttribute("source", value.source);
                 select.setAttribute("label", value.label);
+                select.setAttribute("options", JSON.stringify(value.options));
                 select.setAttribute("property-name", value.propertyName);
+                select.style.width = String(value.width || "100%");
                 this.mainElement.appendChild(select);
 
             } else if (value.type === "list") {
@@ -159,6 +157,8 @@ export class EntityForm extends HTMLElement {
                 formField.setAttribute("label", value.label);
                 formField.setAttribute("property-name", value.propertyName);
                 formField.setAttribute("type", value.type);
+                formField.style.width = String(value.width || "100%");
+
                 this.mainElement.appendChild(formField)
             }
 

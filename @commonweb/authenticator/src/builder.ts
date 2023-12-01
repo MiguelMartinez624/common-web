@@ -1,5 +1,11 @@
 export class AuthenticatorBuilder {
+    private callback: Function;
 
+    onSuccess(callback: Function): AuthenticatorBuilder {
+        this.callback = callback;
+        return this;
+
+    }
 
     build(selector) {
 
@@ -10,7 +16,11 @@ export class AuthenticatorBuilder {
 
         element.innerHTML = `
         <login-page>
-            <credentials-strategy endpoint="https:localhost:4200/auth/login"></credentials-strategy>
+            <firebase-strategy endpoint="https:localhost:4200/auth/login"></firebase-strategy>
         </login-page>`;
+
+
+        element.querySelector("[auth-strategy]").addEventListener("login-success",this.callback);
+
     }
 }

@@ -1,12 +1,16 @@
 import {Attribute, EventBind, WebComponent} from "@commonweb/core";
 
 export interface FormFieldDescription {
+
     type: string;
     label: string;
     propertyName: string;
     subDescriptions?: FormFieldDescription[] | null;
 
     // Can be null
+    width?: string;
+
+    options?: any[];
     valuePath?: string;
     labelPath?: string;
     source?: string;
@@ -22,12 +26,7 @@ export interface FormFieldDescription {
                         <input />
                     </label>`,
         style: `
-            :host{
-               display:flex;
-               width: 100%;
-               color: var(--font-primary, #efefef);
-               margin: 10px 0;
-             }
+            :host{display:flex;flex-direction:column;gap:10px;color: var( --font-primary, #efefef);}
              
             input{
                   color: var( --font-primary, #efefef);

@@ -1,11 +1,12 @@
 import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core";
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
+import "@commonweb/forms";
 
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
     return {
         "injectTo": [],
         "source": `http://localhost:8080/orders/search`,
-        "auto": true,
+        "auto": false,
         "method": "POST",
         "fieldType": "set",
         resultPath: "content"
@@ -13,47 +14,101 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
 }
 
 @WebComponent({
-    style: `:host{}`,
+    style: `:host{display:flex;flex-direction:column;} draggable-list{flex:1}`,
     template: `
-    <h1>Tablero Ordenes</h1>
-    <data-fetcher PENDING></data-fetcher>
-     <bind-element 
-         input-path="detail.data.content" 
-         from="data-fetcher[PENDING]:(request-success)"
-          to="draggable-list[PENDING]:appendMany">
-    </bind-element>
-    <draggable-list
-     status="Created"
-     element-list="order-card-component" PENDING title="Pendiente"></draggable-list>
-    
-    <data-fetcher IN_PREPARATION></data-fetcher>
-    <bind-element 
-         input-path="detail.data.content" 
-         from="data-fetcher[IN_PREPARATION]:(request-success)"
-          to="draggable-list[IN_PREPARATION]:appendMany">
-    </bind-element>
-    <draggable-list
-     status="InitPreparation"
-     element-list="order-card-component" IN_PREPARATION title="En Cocina"></draggable-list>
-    
-    <data-fetcher COMPLETED></data-fetcher>
-    <bind-element 
-    
-         input-path="detail.data.content" 
-         from="data-fetcher[COMPLETED]:(request-success)"
-          to="draggable-list[COMPLETED]:appendMany">
-    </bind-element>
-    <draggable-list  
-    status="Completed" 
-    element-list="order-card-component" COMPLETED title="Completada"></draggable-list>
+    <h3>Tablero Ordenes</h3>
+    <div style="
+        display: flex;
+        align-items: center;
+        gap: 11px;justify-content: end;">
+        <div>
+        <entity-form configurations='${JSON.stringify([
+        {"type": "date", "label": "Fecha de Entrega", "propertyName": "deliveryDate", "width": "200px"},
+        {
+            "type": "select", "label": "Ciudad", "propertyName": "city", "width": "200px",
+            "valuePath": "value",
+            "labelPath": "label",
+            "options": [
+                {"label": "Seleccione una Ciudad", "value": null},
+                {"label": "Barquisimeto", "value": "Barquisimeto"},
+                {"label": "Caracas", "value": "Caracas"}
+            ]
+        }])}'>
+            </entity-form>
+            </div>
+            <bind-element from="tt-button[search]:(click)" to="entity-form:submit"></bind-element>
+            
+            <tt-button search>Buscar</tt-button>
+    </div>
+    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[initial]:hide"></bind-element>
+    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[loading]:toggle"></bind-element>
+    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[board]:hide"></bind-element>
 
+    <bind-element from="data-fetcher[PENDING]:(request-success)" to="toggle-component[loading]:toggle"></bind-element>
+    <bind-element from="data-fetcher[PENDING]:(request-success)" to="toggle-component[board]:toggle"></bind-element>
+
+     <toggle-component loading start-closed="true">
+        <div style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
+           <brand-icon-animated-component></brand-icon-animated-component>
+           Cargando...
+        </div>
+           
+    </toggle-component>
+    <toggle-component initial>
+        <div style="display: flex;align-items: center;justify-content: center;height: 300px;">
+            <h2> Seleccione la fecha de delivery y presione Buscar</h2>
+        </div>
+    </toggle-component>
+    <toggle-component board start-closed="true">
+        <div board style="display: flex;">
+        <data-fetcher PENDING></data-fetcher>
+         <bind-element 
+             input-path="detail.data.content" 
+             from="data-fetcher[PENDING]:(request-success)"
+              to="draggable-list[PENDING]:appendMany">
+        </bind-element>
+        <draggable-list
+         status="Created"
+         element-list="order-card-component" PENDING title="Pendiente"></draggable-list>
+        
+        <data-fetcher IN_PREPARATION></data-fetcher>
+        <bind-element 
+             input-path="detail.data.content" 
+             from="data-fetcher[IN_PREPARATION]:(request-success)"
+              to="draggable-list[IN_PREPARATION]:appendMany">
+        </bind-element>
+        <draggable-list
+         status="InitPreparation"
+         element-list="order-card-component" IN_PREPARATION title="En Cocina"></draggable-list>
+        
+        <data-fetcher COMPLETED></data-fetcher>
+        <bind-element 
+        
+             input-path="detail.data.content" 
+             from="data-fetcher[COMPLETED]:(request-success)"
+              to="draggable-list[COMPLETED]:appendMany">
+        </bind-element>
+        <draggable-list  
+        status="Completed" 
+        element-list="order-card-component" COMPLETED title="Completada"></draggable-list>
+    </div>
+</toggle-component>
     `,
     selector: 'orders-page'
 })
 export class OrdersBoardComponent extends HTMLElement {
 
     connectedCallback() {
+        this.fetchOrdersByDeliveryDate(new Date())
+    }
 
+    @EventBind("entity-form:submit")
+    public searchOrders(ev) {
+        this.fetchOrdersByDeliveryDate(ev.detail.values.deliveryDate)
+    }
+
+    private fetchOrdersByDeliveryDate(date: Date) {
+        console.log({date})
         const pending = this.shadowRoot.querySelector("data-fetcher[PENDING]") as DataFetcher;
         pending.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("PEDNING")));
         pending.setAttribute("payload",
@@ -61,7 +116,9 @@ export class OrdersBoardComponent extends HTMLElement {
                 "query": {
                     "clientId": "",
                     "date": null,
-                    "status": "Created"
+                    "status": "Created",
+                    "deliveryDate": date,
+
                 },
                 "page": {
                     "page": 1,
@@ -76,7 +133,8 @@ export class OrdersBoardComponent extends HTMLElement {
                 "query": {
                     "clientId": "",
                     "date": null,
-                    "status":"InPreparation"
+                    "status": "InPreparation",
+                    "deliveryDate": date
                 },
                 "page": {
                     "page": 1,
@@ -90,13 +148,19 @@ export class OrdersBoardComponent extends HTMLElement {
                 "query": {
                     "clientId": "",
                     "date": null,
-                    "status": "Completed"
+                    "status": "Completed",
+                    "deliveryDate": date
                 },
                 "page": {
                     "page": 1,
                     "size": 100
                 }
             }));
+        completed.execute({});
+        pending.execute({});
+        preparation.execute({});
+
+
     }
 
     @EventBind("draggable-list:drop")
@@ -112,18 +176,18 @@ export class OrdersBoardComponent extends HTMLElement {
 
 
                 const fetcher = document.createElement("data-fetcher") as DataFetcher;
-                fetcher.setAttribute("configurations",JSON.stringify({
-                    source:`http://localhost:8080/orders/${element.getAttribute('selector')}/dispatch-event`,
-                    method:"POST",
+                fetcher.setAttribute("configurations", JSON.stringify({
+                    source: `http://localhost:8080/orders/${element.getAttribute('selector')}/dispatch-event`,
+                    method: "POST",
                 } as DataFetcherConfiguration))
 
-                fetcher.setAttribute("payload",JSON.stringify({
-                    event_type:listTarget.getAttribute("status"),
-                    payload:{}
+                fetcher.setAttribute("payload", JSON.stringify({
+                    event_type: listTarget.getAttribute("status"),
+                    payload: {}
                 }));
                 fetcher.execute({});
 
-                fetcher.addEventListener("request-success",()=>{
+                fetcher.addEventListener("request-success", () => {
                     listTarget.shadowRoot.querySelector("slot").appendChild(element);
                     ev.preventDefault();
                 })
@@ -143,7 +207,6 @@ export class OrdersBoardComponent extends HTMLElement {
           border: 1px solid #ccc;
           border-radius: 5px;
           height:500px;
-          width: 30%;
           margin: 0 0.5%;
           display: inline-block;
           vertical-align: top;
@@ -190,7 +253,6 @@ export class DraggableList extends HTMLElement {
 
             this.shadowRoot.querySelector("slot")
                 .appendChild(element);
-
 
 
         })
@@ -258,9 +320,36 @@ export class OrderCardComponent extends HTMLElement {
         this.shadowRoot.querySelector("[address]").innerHTML = data.shipping_address.address;
         this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode;
         this.shadowRoot.querySelector("[phone]").innerHTML = data.contact_info.phoneNumber;
-        this.shadowRoot.querySelector("[email]").innerHTML =data.contact_info.email;
+        this.shadowRoot.querySelector("[email]").innerHTML = data.contact_info.email;
 
     }
 
+
+}
+
+
+@WebComponent({
+    template: `<slot></slot>`,
+    selector: 'toggle-component'
+})
+export class ToggleComponent extends HTMLElement {
+    private _show: boolean = true;
+
+    connectedCallback() {
+        this._show = Boolean(this.getAttribute("start-closed")) || false;
+        this.toggle();
+    }
+
+
+    public hide(): void {
+        this._show = false;
+        this.shadowRoot.querySelector("slot").style.display = this._show ? "block" : "none";
+
+    }
+
+    public toggle(): void {
+        this._show = !this._show;
+        this.shadowRoot.querySelector("slot").style.display = this._show ? "block" : "none";
+    }
 
 }

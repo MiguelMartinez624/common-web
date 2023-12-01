@@ -64,8 +64,10 @@ export function WebComponent(attr: CustomElementConfig) {
 
         }
 
+        if (!window.customElements.get(attr.selector)) {
+            window.customElements.define(attr.selector, component as any);
+        }
 
-        window.customElements.define(attr.selector, component as any);
         return component;
     }
 }

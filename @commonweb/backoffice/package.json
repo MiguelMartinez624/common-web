@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.23",
   "name": "@commonweb/backoffice-app",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
@@ -22,10 +22,10 @@
     "url": "https://github.com/MiguelMartinez624/common-web.git"
   },
   "dependencies": {
-    "@commonweb/components": "^1.0.0-beta.7",
-    "@commonweb/core": "^1.0.0-beta.51",
+    "@commonweb/components": "^1.0.0-beta.9",
+    "@commonweb/core": "^1.0.0-beta.52",
     "@commonweb/data": "^1.0.0-beta.483",
-    "@commonweb/forms": "^1.0.0-beta.4",
+    "@commonweb/forms": "^1.0.0-beta.46",
     "@commonweb/router": "^1.0.0-beta.43"
   },
   "devDependencies": {

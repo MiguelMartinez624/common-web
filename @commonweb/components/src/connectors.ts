@@ -108,7 +108,7 @@ export class BindElementComponent extends HTMLElement {
         } else if (this.getAttribute("input-path")) {
             data = extractData(this.getAttribute("input-path"), ev);
 
-        } else {
+        } else if(ev.detail){
             data = ev.detail.data;
         }
         // We get the trigger here
