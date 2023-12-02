@@ -1,4 +1,5 @@
-import {Attribute, findNodeOnUpTree, WebComponent,extractData} from "@commonweb/core";
+import {Attribute, findNodeOnUpTree, WebComponent, extractData} from "@commonweb/core";
+import {isJSON} from "@commonweb/core/src";
 
 // ElementQuery string with a format cssSelector:property/method
 class ElementQuery {
@@ -14,7 +15,8 @@ class ElementQuery {
 
     public get propertyName(): string {
         switch (this.elementProperty[0]) {
-            case "(" || "[":
+            case "(":
+            case  "[":
                 return this.elementProperty.slice(1, this.elementProperty.length - 1);
             default:
                 return this.elementProperty;
@@ -63,15 +65,15 @@ export class BindElementComponent extends HTMLElement {
 
     @Attribute('from')
     public connectFrom(selector: string) {
-        this.bindElements(selector);
+        this.bindElements();
     }
 
     @Attribute('to')
     public connectTo(selector: string) {
-        this.bindElements(selector);
+        this.bindElements();
     }
 
-    private bindElements(selector: string) {
+    private bindElements() {
         const fromSelector = this.getAttribute("from");
         const toSelector = this.getAttribute("to");
         if (!fromSelector || !toSelector || this.binded) {
@@ -93,8 +95,8 @@ export class BindElementComponent extends HTMLElement {
 
     private affectTarget(ev: CustomEvent): void {
         let data = null
-        // TODO use the extract method here
-        // to be checked
+
+
         if (this.getAttribute("input-src")) {
             const sourceInputQuery = new ElementQuery(this.getAttribute("input-src"));
             const elementSource = sourceInputQuery.searchElement(this);
@@ -105,15 +107,27 @@ export class BindElementComponent extends HTMLElement {
             const field = elementSource[sourceInputQuery.propertyName]
             data = typeof field === 'function' ? field() : field;
 
-        } else if (this.getAttribute("input-path")) {
+        }
+        // get the value from the event
+        else if (this.getAttribute("input-path")) {
             data = extractData(this.getAttribute("input-path"), ev);
-
-        } else if(ev.detail){
+        }
+        // Default path from CustomEvents
+        else if (ev.detail) {
             data = ev.detail.data;
+        }
+        // In case there is a value comming already
+        else if (this.getAttribute("value")) {
+            const value = this.getAttribute("value");
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                data = value;
+            } else if (isJSON(value)) {
+                data = JSON.parse(value);
+            }
         }
         // We get the trigger here
         const targetQuery = new ElementQuery(this.getAttribute("to"));
-        const targetElement = targetQuery.searchElement(this);
+        const targetElement = targetQuery.searchElement(this) as HTMLElement;
         if (!targetElement) {
             return;
         }
@@ -124,6 +138,9 @@ export class BindElementComponent extends HTMLElement {
                 if (targetElement[targetQuery.propertyName]) {
                     targetElement[targetQuery.propertyName](data)
                 }
+                break;
+            case "attribute":
+                targetElement.setAttribute(targetQuery.propertyName, data)
                 break;
             default:
                 console.error(`[${targetQuery.propertyType}] method under development`)

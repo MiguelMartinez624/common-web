@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.9",
+  "version": "1.0.0-beta.11",
   "name": "@commonweb/components",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "push": "npm run build && npm publish --access public",
+    "push": "npm run test && npm run build && npm publish --access public",
     "build": "rollup -c",
     "test": "jest"
   },

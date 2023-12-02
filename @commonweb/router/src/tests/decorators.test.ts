@@ -1,6 +1,5 @@
 import {describe, expect, test, beforeEach} from '@jest/globals';
 import '../index';
-// Will install components to the register
 import './test-components';
 import {WebComponent} from "@commonweb/core";
 import {pushUrl} from "../router";
