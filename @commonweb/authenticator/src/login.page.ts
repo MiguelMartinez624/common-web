@@ -1,4 +1,4 @@
-import {EventBind, WebComponent} from "@commonweb/core";
+import {EventBind, FromStorage, WebComponent} from "@commonweb/core";
 import "@commonweb/forms";
 import "@commonweb/components";
 import {EntityForm} from "@commonweb/forms";
@@ -54,14 +54,22 @@ fill="#92FBB6"/>
         `
 })
 export class LoginPage extends HTMLElement {
+
+    @FromStorage("user")
+    public user(user: any) {
+        if(!user){
+            this.dispatchEvent(new CustomEvent("logout"))
+        }
+    }
+
     @EventBind("tt-button:click")
     public submit() {
         const {values} = (this.shadowRoot.querySelector("entity-form") as EntityForm).value();
         const strategy = this.querySelector("[auth-strategy]");
 
-        if(strategy){
+        if (strategy) {
             strategy.execute(values);
-        }else{
+        } else {
             throw "NO AUTH STRATEGY"
         }
 

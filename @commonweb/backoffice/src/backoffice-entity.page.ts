@@ -29,34 +29,72 @@ const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
     selector: 'backoffice-entity-page',
     style: `:host{display:block;height:100%}`,
     template: `
-        
-        <tt-button>Crear</tt-button>
-        <bind-element  from="tt-button:(click)" to="side-panel:toggle"></bind-element>
-        
-        <go-card>
-            <data-fetcher  data=""></data-fetcher>
-            <data-fetcher configuration=""></data-fetcher>
-            <bind-element input-path="detail.data.content" from="data-fetcher[data]:(request-success)" to="go-table:generateDataRows"></bind-element>
-            <go-table></go-table>
-        </go-card>
+        <h3 title style="text-transform: capitalize">Lista</h3>
+        <div>
+            <tt-button>Crear</tt-button>
+            <bind-element  from="tt-button:(click)" to="side-panel:toggle"></bind-element>
+            <go-card>
+                <data-fetcher data></data-fetcher>
+
+                <data-fetcher configuration=""></data-fetcher>
+                <bind-element input-path="detail.data.content" from="data-fetcher[data]:(request-success)" to="go-table:generateDataRows"></bind-element>
+                <bind-element value="table" from="data-fetcher[data]:(request-success)"  to="conditional-render-cases:[state]"></bind-element>
+                <bind-element value="loading" from="data-fetcher[data]:(loading)"  to="conditional-render-cases:[state]"></bind-element>
+                <bind-element value="error" from="data-fetcher[data]:(request-failed)"  to="conditional-render-cases:[state]"></bind-element>
+
+               <conditional-render-cases style="height: 100%;width: 100%" state="loading">
+                  <div case="table"><go-table ></go-table></div>
+                    <div style="height: 100%;width: 100%" case="loading">
+                        <div  style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
+                            <brand-icon-animated-component></brand-icon-animated-component>
+                            Cargando...
+                        </div>
+                    </div>
+                    <div style="height: 100%;width: 100%" case="error">
+                        <div  style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
+                            Lo sentimos! al parecer el imperio esta hackiando nuestros servidores!
+                        </div>
+                    </div>
+               </conditional-render-cases>
+               
+            </go-card>
+        </div>
         <side-panel>
-             <bind-element  from="backoffice-entity-form:(close)" to="side-panel:toggle"></bind-element>
+            <bind-element  from="backoffice-entity-form:(close)" to="side-panel:toggle"></bind-element>
             <backoffice-entity-form></backoffice-entity-form>
-           
         </side-panel>
         
         `
 })
 export class BackofficeEntityPage extends HTMLElement {
     connectedCallback() {
-        this.fetchData(window.location.href.split("/").pop());
+        setTimeout(() => {
+            this.fetchData(window.location.href.split("/").pop());
+        }, 300)
     }
 
     private fetchData(entity: string) {
+        this.shadowRoot.querySelector("h3[title]").innerHTML = `Lista de ${entity}`
         const configDataFetcher = this.shadowRoot.querySelector("data-fetcher[configuration]");
         const queryDataFetcher = this.shadowRoot.querySelector("data-fetcher[data]");
         configDataFetcher.setAttribute("configurations", JSON.stringify(listConfiguration(entity)));
-        queryDataFetcher.setAttribute("configurations", JSON.stringify(window[`endpoint::listing-${entity}`]));
+        const listingConfiguration = window[`endpoint::listing-${entity}`];
+        if (listingConfiguration.method === 'POST') {
+            queryDataFetcher.setAttribute("payload",
+                JSON.stringify({
+                    "query": {
+                        "name": "",
+                    },
+                    "page": {
+                        "page": 1,
+                        "size": 100
+                    }
+                }));
+            queryDataFetcher.setAttribute("configurations", JSON.stringify(listingConfiguration));
+        } else {
+            queryDataFetcher.setAttribute("configurations", JSON.stringify(listingConfiguration));
+
+        }
     }
 
 
@@ -112,7 +150,7 @@ export class BackofficeEntityForm extends HTMLElement {
             ...window[`endpoint::update-${entName}`],
             source: entity.id
         } : window[`endpoint::create-${entName}`];
-        this.submitDataFetcher.setAttribute("configurations",JSON.stringify( fetchConfiguration));
+        this.submitDataFetcher.setAttribute("configurations", JSON.stringify(fetchConfiguration));
 
         if (!entity) {
             this.form.reset();
@@ -144,6 +182,8 @@ export class BackofficeEntityForm extends HTMLElement {
     @EventBind("tt-button[close]:click")
     public bubbleClose() {
         this.setEntity(null);
+        // TODO crear elemento custom event q se emeta dentro de element bind y significque q pueda despacharlo
+        // quizas la data tmb se pueda mover asi?
         const closeEvent = new CustomEvent("close", {detail: {data: null}});
         this.dispatchEvent(closeEvent)
     }

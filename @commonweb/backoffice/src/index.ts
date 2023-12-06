@@ -1,13 +1,13 @@
-import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core";
+import {changeStorageValue, EventBind, FromStorage, WebComponent} from "@commonweb/core";
 import {pushUrl} from "@commonweb/router";
 import "@commonweb/components";
 import "@commonweb/forms";
 import "@commonweb/data";
-import {Icon} from "@commonweb/components";
 import "./backoffice-entity.page";
 import "./side-panel";
 import "./orders-managment.page";
 import "./logo"
+
 export * from "./builder";
 
 
@@ -76,7 +76,7 @@ export class NavigationListComponent extends HTMLElement {
     selector: 'ecommerce-backoffice-app',
     template: `
             <dashboard-layout>
-                <bind-element from="nav-header:(click)" to="dashboard-layout:toggleSidebar"></bind-element>
+                <bind-element from="nav-header:(menu-clicked)" to="dashboard-layout:toggleSidebar"></bind-element>
                 <navigation-list slot="sidebar"></navigation-list>
                 <nav-header slot="header"></nav-header>
                 <go-router  slot="content"> </go-router>
@@ -173,10 +173,34 @@ export class DashboardLayout extends HTMLElement {
     template: `
         <header>
             <tt-icon icon="menu"></tt-icon>
+            <tt-icon class="hidden" icon="account_circle"></tt-icon>
+            <div class="menu-floating hidden">
+               <div close>Cerrar</div>
+            </div>
         </header>
          <div class="content"><slot name="content"></slot></div>
     `,
     style: `
+
+        .hidden{
+            transition: opacity 200ms, display 200ms;
+            opacity: 0;
+            display:none;
+        }
+        .menu-floating{
+               width:180px;
+               box-shadow: 0px 0px 8px rgba(0,0,0,.2);
+               position: absolute;
+               z-index: 999;
+               padding: 1rem;
+               right: 10px;
+               background-color:var(--bg-primary,#322f2f);
+               top:60px;
+               right:10px;   
+        }
+        .menu-floating > div {
+            cursor:pointer;
+        }
         .content{
             display: none;
             position:absolute;
@@ -195,11 +219,10 @@ export class DashboardLayout extends HTMLElement {
 
  
         
-        tt-icon{ font-size:40px;cursor:pointer;}
+        tt-icon{font-size:40px;cursor:pointer;}
         header{
             justify-content: space-between;
             padding:0 1.5rem ;
-            color: white;
             display:flex;
             align-items:center;
             background-color:var(--bg-primary,#322f2f);
@@ -209,14 +232,39 @@ export class DashboardLayout extends HTMLElement {
     `
 })
 export class NavHeader extends HTMLElement {
-    @EventBind("tt-icon:click")
-    public toggleContent(): void {
-        const contentEle = (this.shadowRoot.querySelector("div.content") as unknown as HTMLElement);
-        if (contentEle.style.display === "block") {
-            contentEle.style.display = "none";
-        } else {
-            contentEle.style.display = "block";
+
+    @FromStorage("user")
+    public user(user: any) {
+        const personOption = this.shadowRoot.querySelector("tt-icon[icon='account_circle']") as HTMLElement;
+        if (personOption && user) {
+            personOption.classList.toggle("hidden");
         }
+    }
+
+    @EventBind("[close]:click")
+    public closeSession() {
+        changeStorageValue("user", null)
+    }
+
+    @EventBind(".menu-floating:mouseleave")
+    public hideMenu(): void {
+        const menu = this.shadowRoot.querySelector(".menu-floating") as HTMLElement;
+        if (menu) {
+            menu.style.display = "none";
+        }
+    }
+
+    @EventBind("tt-icon[icon='account_circle']:click")
+    public toggleOptions(): void {
+        const menu = this.shadowRoot.querySelector(".menu-floating") as HTMLElement;
+        if (menu) {
+            menu.classList.toggle("hidden");
+        }
+    }
+
+    @EventBind("tt-icon[icon='menu']:click")
+    public toggleContent(): void {
+        this.dispatchEvent(new CustomEvent('menu-clicked'));
     }
 }
 
@@ -228,7 +276,8 @@ export class NavHeader extends HTMLElement {
                 display:flex;
                 padding:1rem;
                 background-color:var(--bg-primary,#322f2f);
-                box-shadow: 0px 0px 8px rgba(0,0,0,.6)}`
+                box-shadow: 0px 0px 8px rgba(0,0,0,.2);
+                }`
     }
 )
 export class Card extends HTMLElement {

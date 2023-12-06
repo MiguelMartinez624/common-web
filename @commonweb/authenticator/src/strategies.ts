@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {changeStorageValue, WebComponent} from "@commonweb/core";
 import "@commonweb/data";
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 
@@ -64,11 +64,13 @@ export class FirebaseStrategy extends HTMLElement {
 
     }
 
-    public execute(credentials:{username: string, password: string}): void {
-        debugger
+    public execute(credentials: { username: string, password: string }): void {
+
         this.signInWithEmailAndPassword(this.auth, credentials.username, credentials.password)
-            .then((_) => {
-              this.dispatchEvent(new CustomEvent("login-success"));
+            .then((result) => {
+                console.log({result})
+                changeStorageValue("user", {username: "test"})
+                this.dispatchEvent(new CustomEvent("login-success"));
             })
             .catch((error) => {
                 console.error(error.message);

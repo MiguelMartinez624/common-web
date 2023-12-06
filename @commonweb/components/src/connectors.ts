@@ -96,8 +96,14 @@ export class BindElementComponent extends HTMLElement {
     private affectTarget(ev: CustomEvent): void {
         let data = null
 
-
-        if (this.getAttribute("input-src")) {
+        if (this.getAttribute("value")) {
+            const value = this.getAttribute("value");
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                data = value;
+            } else if (isJSON(value)) {
+                data = JSON.parse(value);
+            }
+        } else if (this.getAttribute("input-src")) {
             const sourceInputQuery = new ElementQuery(this.getAttribute("input-src"));
             const elementSource = sourceInputQuery.searchElement(this);
             if (!elementSource) {
@@ -115,15 +121,6 @@ export class BindElementComponent extends HTMLElement {
         // Default path from CustomEvents
         else if (ev.detail) {
             data = ev.detail.data;
-        }
-        // In case there is a value comming already
-        else if (this.getAttribute("value")) {
-            const value = this.getAttribute("value");
-            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                data = value;
-            } else if (isJSON(value)) {
-                data = JSON.parse(value);
-            }
         }
         // We get the trigger here
         const targetQuery = new ElementQuery(this.getAttribute("to"));

@@ -2,7 +2,7 @@ import {Attribute, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     selector: 'conditional-render-cases',
-    template: '',
+    template: '<slot></slot>',
 })
 export class ConditionalRenderCasesComponent extends HTMLElement {
 

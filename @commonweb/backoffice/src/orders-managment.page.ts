@@ -5,7 +5,7 @@ import "@commonweb/forms";
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
     return {
         "injectTo": [],
-        "source": `http://localhost:8080/orders/search`,
+        "source": `https://pavlova-backend-natp7refrq-uc.a.run.app/orders/search`,
         "auto": false,
         "method": "POST",
         "fieldType": "set",
@@ -14,7 +14,7 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
 }
 
 @WebComponent({
-    style: `:host{display:flex;flex-direction:column;} draggable-list{flex:1}`,
+    style: `:host{display:flex;flex-direction:column;} draggable-list{flex:1;overflow:scroll;}`,
     template: `
     <h3>Tablero Ordenes</h3>
     <div style="
@@ -177,7 +177,7 @@ export class OrdersBoardComponent extends HTMLElement {
 
                 const fetcher = document.createElement("data-fetcher") as DataFetcher;
                 fetcher.setAttribute("configurations", JSON.stringify({
-                    source: `http://localhost:8080/orders/${element.getAttribute('selector')}/dispatch-event`,
+                    source: `https://pavlova-backend-natp7refrq-uc.a.run.app/orders/${element.getAttribute('selector')}/dispatch-event`,
                     method: "POST",
                 } as DataFetcherConfiguration))
 
@@ -285,24 +285,42 @@ export class DraggableList extends HTMLElement {
 
 @WebComponent({
     style: `:host{
+        margin: 5px;
+        cursor:pointer;
         border-bottom: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.30));
         display:flex;
         flex-direction:column;
         padding: 1rem;
         background:var( --bg-primary, #FFFFFF);
     }
-    .field{display:flex}
+    .field{
+        display: flex;
+        gap: 5px;
+        margin-top:5px;
+    }
+    .centered{        align-items: center;}
+    .field > span {
+        font-weight:bold;
+    }
+    .rows{
+        flex-direction:column;
+    }    
+    tt-icon{
+        font-size:30px;
+    }
     `,
     template: `
         <div>
-           <div class="field">Direccion: <div address></div></div>
-           <div class="field">Modo:  <div mode></div></div>
+           <div>
+               <div class="field centered"> <span> Modo:</span>  <div mode></div></div>
+           </div>
+           <div class="field rows"><span> Direccion:</span> <div address></div></div>
             
-             <div>
-             <div class="field">Telefono: <div phone></div></div>
-              <div class="field">Email: <div email></div></div>
-             
-             </div>
+           <div>
+              <h3 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h3>
+              <div class="field "><span> Telefono:</span> <div phone></div></div>
+              <div class="field "><span>Email: </span><div email></div></div>
+           </div>
         </div>
         
     `,
@@ -318,7 +336,7 @@ export class OrderCardComponent extends HTMLElement {
     @Attribute("data")
     public data(data: any) {
         this.shadowRoot.querySelector("[address]").innerHTML = data.shipping_address.address;
-        this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode;
+        this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
         this.shadowRoot.querySelector("[phone]").innerHTML = data.contact_info.phoneNumber;
         this.shadowRoot.querySelector("[email]").innerHTML = data.contact_info.email;
 
@@ -353,3 +371,14 @@ export class ToggleComponent extends HTMLElement {
     }
 
 }
+
+
+@WebComponent({
+    template: `<slot></slot>`,
+    selector: 'order-details-component'
+})
+export class OrderDetailsComponent extends HTMLElement {
+
+
+}
+
