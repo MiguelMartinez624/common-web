@@ -284,7 +284,12 @@ export class DraggableList extends HTMLElement {
 }
 
 @WebComponent({
-    style: `:host{
+    style: `
+    :host:hover{
+        background:lightcyan;
+    }
+    
+    :host{
         margin: 5px;
         cursor:pointer;
         border-bottom: 1px solid var(--border-line-color, rgba(28, 28, 28, 0.30));
@@ -298,7 +303,7 @@ export class DraggableList extends HTMLElement {
         gap: 5px;
         margin-top:5px;
     }
-    .centered{        align-items: center;}
+    .centered{   display:flex;     align-items: center;}
     .field > span {
         font-weight:bold;
     }
@@ -308,11 +313,12 @@ export class DraggableList extends HTMLElement {
     tt-icon{
         font-size:30px;
     }
+    .between{justify-content: space-between;}
     `,
     template: `
         <div>
            <div>
-               <div class="field centered"> <span> Modo:</span>  <div mode></div></div>
+             <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> <tt-icon icon="visibility"></tt-icon> </div>
            </div>
            <div class="field rows"><span> Direccion:</span> <div address></div></div>
             

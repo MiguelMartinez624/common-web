@@ -69,7 +69,6 @@ export class DataFetcher extends HTMLElement {
     }
 
     private injectData(elementsSelector: any, data: any) {
-        // TODO validate eagains array?
 
         const resultPath = this.configuration.resultPath;
         let result = data;
