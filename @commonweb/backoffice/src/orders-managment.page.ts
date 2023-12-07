@@ -14,7 +14,7 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
 }
 
 @WebComponent({
-    style: `:host{display:flex;flex-direction:column;} draggable-list{flex:1;overflow:scroll;}`,
+    style: `:host{display:flex;flex-direction:column;} draggable-list{flex:1;}`,
     template: `
     <h3>Tablero Ordenes</h3>
     <div style="
@@ -40,27 +40,24 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
             
             <tt-button search>Buscar</tt-button>
     </div>
-    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[initial]:hide"></bind-element>
-    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[loading]:toggle"></bind-element>
-    <bind-element from="data-fetcher[PENDING]:(loading)" to="toggle-component[board]:hide"></bind-element>
+    <bind-element value="loading" from="data-fetcher[PENDING]:(loading)" to="conditional-render-cases:[state]"></bind-element>
 
-    <bind-element from="data-fetcher[PENDING]:(request-success)" to="toggle-component[loading]:toggle"></bind-element>
-    <bind-element from="data-fetcher[PENDING]:(request-success)" to="toggle-component[board]:toggle"></bind-element>
+    <bind-element value="board" from="data-fetcher[PENDING]:(request-success)" to="conditional-render-cases:[state]"></bind-element>
 
-     <toggle-component loading start-closed="true">
-        <div style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
-           <brand-icon-animated-component></brand-icon-animated-component>
-           Cargando...
+    <conditional-render-cases style="height: 100%;width: 100%" state="initial">
+        <div case="initial">
+            <div  style="display: flex;align-items: center;justify-content: center;height: 300px;">
+                <h2> Seleccione la fecha de delivery y presione Buscar</h2>
+            </div>
         </div>
-           
-    </toggle-component>
-    <toggle-component initial>
-        <div style="display: flex;align-items: center;justify-content: center;height: 300px;">
-            <h2> Seleccione la fecha de delivery y presione Buscar</h2>
+        <div case="loading">
+            <div  style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
+               <brand-icon-animated-component></brand-icon-animated-component>
+               Cargando...
+            </div> 
         </div>
-    </toggle-component>
-    <toggle-component board start-closed="true">
-        <div board style="display: flex;">
+          <div case="board">
+        <div  style="display: flex;">
         <data-fetcher PENDING></data-fetcher>
          <bind-element 
              input-path="detail.data.content" 
@@ -92,7 +89,13 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
         status="Completed" 
         element-list="order-card-component" COMPLETED title="Completada"></draggable-list>
     </div>
-</toggle-component>
+     </div>
+    </conditional-render-cases>
+
+        
+  
+
+
     `,
     selector: 'orders-page'
 })
@@ -108,7 +111,7 @@ export class OrdersBoardComponent extends HTMLElement {
     }
 
     private fetchOrdersByDeliveryDate(date: Date) {
-        console.log({date})
+
         const pending = this.shadowRoot.querySelector("data-fetcher[PENDING]") as DataFetcher;
         pending.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("PEDNING")));
         pending.setAttribute("payload",
@@ -213,8 +216,8 @@ export class OrdersBoardComponent extends HTMLElement {
          
         }
         .list{
-           overflow: scroll;
-            height: 100%;
+            overflow-y: scroll;
+            height: 89%;
         }
         .title {
             background: var(--bg-primary);
@@ -239,7 +242,6 @@ export class DraggableList extends HTMLElement {
     }
 
     public appendMany(items: any[]) {
-        console.log({items})
         const elementListName = this.getAttribute("element-list");
         items.forEach((item) => {
             const element = document.createElement(elementListName);
@@ -303,9 +305,9 @@ export class DraggableList extends HTMLElement {
         gap: 5px;
         margin-top:5px;
     }
-    .centered{   display:flex;     align-items: center;}
+    .centered{   display:flex;     align-items: center;gap:7px;}
     .field > span {
-        font-weight:bold;
+        font-weight:500;
     }
     .rows{
         flex-direction:column;
@@ -314,16 +316,24 @@ export class DraggableList extends HTMLElement {
         font-size:30px;
     }
     .between{justify-content: space-between;}
+    .pointer{cursor:pointer}
     `,
     template: `
+            <modal-component>
+              <order-details-component></order-details-component>
+            </modal-component>
         <div>
            <div>
-             <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> <tt-icon icon="visibility"></tt-icon> </div>
+             <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> 
+             <tt-icon  details class="pointer" icon="visibility"></tt-icon>
+             <bind-element from="tt-icon[details]:(click)" to="modal-component:toggle"></bind-element>
+
+              </div>
            </div>
            <div class="field rows"><span> Direccion:</span> <div address></div></div>
             
            <div>
-              <h3 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h3>
+              <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
               <div class="field "><span> Telefono:</span> <div phone></div></div>
               <div class="field "><span>Email: </span><div email></div></div>
            </div>
@@ -345,46 +355,96 @@ export class OrderCardComponent extends HTMLElement {
         this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
         this.shadowRoot.querySelector("[phone]").innerHTML = data.contact_info.phoneNumber;
         this.shadowRoot.querySelector("[email]").innerHTML = data.contact_info.email;
+        const details = this.shadowRoot.querySelector("order-details-component");
+        if (details) {
+            details.setAttribute("data", JSON.stringify(data))
+        }
 
     }
 
 
 }
 
-
 @WebComponent({
-    template: `<slot></slot>`,
-    selector: 'toggle-component'
-})
-export class ToggleComponent extends HTMLElement {
-    private _show: boolean = true;
-
-    connectedCallback() {
-        this._show = Boolean(this.getAttribute("start-closed")) || false;
-        this.toggle();
-    }
-
-
-    public hide(): void {
-        this._show = false;
-        this.shadowRoot.querySelector("slot").style.display = this._show ? "block" : "none";
-
-    }
-
-    public toggle(): void {
-        this._show = !this._show;
-        this.shadowRoot.querySelector("slot").style.display = this._show ? "block" : "none";
-    }
-
-}
-
-
-@WebComponent({
-    template: `<slot></slot>`,
+    template: `<pre></pre>`,
     selector: 'order-details-component'
 })
 export class OrderDetailsComponent extends HTMLElement {
+    static get observedAttributes(): string[] {
+        return ["data"]
+    }
 
+    @Attribute("data")
+    public data(order: any) {
+        this.shadowRoot.querySelector("pre")
+            .innerHTML = JSON.stringify(order, null, 2);
+    }
 
+}
+
+@WebComponent({
+    template: `
+    <div main  class="hide">
+             <div class="modal-overlay">   </div>
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <slot></slot> 
+            </div>
+      </div>
+        `,
+    selector: 'modal-component',
+    style: `
+    .modal-overlay{
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0,0,0); /* Fallback color */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    .modal-content{
+         position: fixed;
+        z-index: 2;
+        background-color: var(--bg-primary);
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 65%;
+        top: 10%;
+        left: 16%;
+        height:60%;
+        overflow-y:auto;
+    }
+    .close {
+      color: #aaaaaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+    }
+      .hide{
+        display:none;
+      }
+    `
+})
+export class ModalComponent extends HTMLElement {
+
+    @EventBind(".close:click")
+    public toggleC() {
+        this.shadowRoot.querySelector("[main]").classList.toggle("hide")
+    }
+    @EventBind(".modal-overlay:click")
+    public toggle() {
+        this.shadowRoot.querySelector("[main]").classList.toggle("hide")
+    }
 }
 
