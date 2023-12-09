@@ -33,11 +33,18 @@ export * from "./builder";
         padding: 1.2rem;
         margin:0px;
       }
-      
+     
+      li:hover{
+            cursor: pointer;
+            font-weight: 600;
+      }
+      .selected {
+        font-weight: 600;
+      }
       li{
-      display:flex;
-      align-items:center;
-      gap:5px;
+          display:flex;
+          align-items:center;
+          gap:5px;
         font-size: 18px;
         font-style: normal;
         font-weight: 400;

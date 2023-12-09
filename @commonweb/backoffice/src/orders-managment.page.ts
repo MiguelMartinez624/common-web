@@ -366,8 +366,74 @@ export class OrderCardComponent extends HTMLElement {
 }
 
 @WebComponent({
-    template: `<pre></pre>`,
-    selector: 'order-details-component'
+    style:`:host{display:flex;justify-content:space-between;margin:0px 8px;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
+    template: `
+       
+               <div product-name></div>
+               <div quantity></div>
+       
+    `,
+    selector: 'product-item-component'
+})
+export class ProductItemComponent extends HTMLElement {
+    static get observedAttributes(): string[] {
+        return ["data"]
+    }
+
+    @Attribute("data")
+    public data(order: any) {
+        this.shadowRoot.querySelector("[product-name]").innerHTML = order.name;
+
+        this.shadowRoot.querySelector("[quantity]").innerHTML = order.quantity;
+    }
+
+}
+
+
+@WebComponent({
+    template: `
+        <div>
+            
+        <div>
+           <div>
+             <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> 
+
+              </div>
+           </div>
+           <div class="field rows"><span> Direccion:</span> <div address></div></div>
+            
+           <div>
+              <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
+              <div class="field "><span> Telefono:</span> <div phone></div></div>
+              <div class="field "><span>Email: </span><div email></div></div>
+           </div>
+        </div>
+            <h4>Items</h4>
+            <div style="margin-top: 10px" products>
+            
+            </div>
+        </div>
+`,
+    selector: 'order-details-component',
+    style:`
+            .field{
+        display: flex;
+        gap: 5px;
+        margin-top:5px;
+    }
+    .centered{   display:flex;     align-items: center;gap:7px;}
+    .field > span {
+        font-weight:500;
+    }
+    .rows{
+        flex-direction:column;
+    }    
+    tt-icon{
+        font-size:30px;
+    }
+    .between{justify-content: space-between;}
+    .pointer{cursor:pointer}
+    `
 })
 export class OrderDetailsComponent extends HTMLElement {
     static get observedAttributes(): string[] {
@@ -376,8 +442,16 @@ export class OrderDetailsComponent extends HTMLElement {
 
     @Attribute("data")
     public data(order: any) {
-        this.shadowRoot.querySelector("pre")
-            .innerHTML = JSON.stringify(order, null, 2);
+        this.shadowRoot.querySelector("[address]").innerHTML = order.shipping_address.address;
+        this.shadowRoot.querySelector("[mode]").innerHTML = order.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
+        this.shadowRoot.querySelector("[phone]").innerHTML = order.contact_info.phoneNumber;
+        this.shadowRoot.querySelector("[email]").innerHTML = order.contact_info.email;
+        order.product_list.forEach((p) => {
+            const productItem = document.createElement("product-item-component");
+            productItem.data(p)
+            this.shadowRoot.querySelector("[products]").appendChild(productItem)
+
+        })
     }
 
 }
@@ -442,6 +516,7 @@ export class ModalComponent extends HTMLElement {
     public toggleC() {
         this.shadowRoot.querySelector("[main]").classList.toggle("hide")
     }
+
     @EventBind(".modal-overlay:click")
     public toggle() {
         this.shadowRoot.querySelector("[main]").classList.toggle("hide")
