@@ -1,11 +1,11 @@
 import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core";
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import "@commonweb/forms";
-
+const hostURL = "http://localhost:8080"
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
     return {
         "injectTo": [],
-        "source": `https://pavlova-backend-natp7refrq-uc.a.run.app/orders/search`,
+        "source": `${hostURL}/orders/search`,
         "auto": false,
         "method": "POST",
         "fieldType": "set",
@@ -107,10 +107,10 @@ export class OrdersBoardComponent extends HTMLElement {
 
     @EventBind("entity-form:submit")
     public searchOrders(ev) {
-        this.fetchOrdersByDeliveryDate(ev.detail.values.deliveryDate)
+        this.fetchOrdersByDeliveryDate(ev.detail.values)
     }
 
-    private fetchOrdersByDeliveryDate(date: Date) {
+    private fetchOrdersByDeliveryDate(data:{deliveryDate,city}) {
 
         const pending = this.shadowRoot.querySelector("data-fetcher[PENDING]") as DataFetcher;
         pending.setAttribute("configurations", JSON.stringify(ordersRequestConfiguration("PEDNING")));
@@ -120,7 +120,8 @@ export class OrdersBoardComponent extends HTMLElement {
                     "clientId": "",
                     "date": null,
                     "status": "Created",
-                    "deliveryDate": date,
+                    "deliveryDate": data.deliveryDate,
+                    "city":data.city
 
                 },
                 "page": {
@@ -137,7 +138,8 @@ export class OrdersBoardComponent extends HTMLElement {
                     "clientId": "",
                     "date": null,
                     "status": "InPreparation",
-                    "deliveryDate": date
+                    "deliveryDate": data.deliveryDate,
+                    "city":data.city
                 },
                 "page": {
                     "page": 1,
@@ -152,7 +154,8 @@ export class OrdersBoardComponent extends HTMLElement {
                     "clientId": "",
                     "date": null,
                     "status": "Completed",
-                    "deliveryDate": date
+                    "deliveryDate": data.deliveryDate,
+                    "city":data.city
                 },
                 "page": {
                     "page": 1,
@@ -180,7 +183,7 @@ export class OrdersBoardComponent extends HTMLElement {
 
                 const fetcher = document.createElement("data-fetcher") as DataFetcher;
                 fetcher.setAttribute("configurations", JSON.stringify({
-                    source: `https://pavlova-backend-natp7refrq-uc.a.run.app/orders/${element.getAttribute('selector')}/dispatch-event`,
+                    source: `${hostURL}/orders/${element.getAttribute('selector')}/dispatch-event`,
                     method: "POST",
                 } as DataFetcherConfiguration))
 
@@ -242,6 +245,7 @@ export class DraggableList extends HTMLElement {
     }
 
     public appendMany(items: any[]) {
+        this.shadowRoot.querySelector("slot").innerHTML ="";
         const elementListName = this.getAttribute("element-list");
         items.forEach((item) => {
             const element = document.createElement(elementListName);
@@ -325,8 +329,9 @@ export class DraggableList extends HTMLElement {
         <div>
            <div>
              <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> 
+              <bind-element from="tt-icon[details]:(click)" to="modal-component:toggle"></bind-element>
              <tt-icon  details class="pointer" icon="visibility"></tt-icon>
-             <bind-element from="tt-icon[details]:(click)" to="modal-component:toggle"></bind-element>
+            
 
               </div>
            </div>
@@ -351,10 +356,10 @@ export class OrderCardComponent extends HTMLElement {
 
     @Attribute("data")
     public data(data: any) {
-        this.shadowRoot.querySelector("[address]").innerHTML = data.shipping_address.address;
-        this.shadowRoot.querySelector("[mode]").innerHTML = data.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
-        this.shadowRoot.querySelector("[phone]").innerHTML = data.contact_info.phoneNumber;
-        this.shadowRoot.querySelector("[email]").innerHTML = data.contact_info.email;
+        this.shadowRoot.querySelector("[address]").innerHTML = data.shippingAddress.address;
+        this.shadowRoot.querySelector("[mode]").innerHTML = data.deliveryMode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
+        this.shadowRoot.querySelector("[phone]").innerHTML = data.contactInfo.phoneNumber;
+        this.shadowRoot.querySelector("[email]").innerHTML = data.contactInfo.email;
         const details = this.shadowRoot.querySelector("order-details-component");
         if (details) {
             details.setAttribute("data", JSON.stringify(data))
@@ -366,7 +371,7 @@ export class OrderCardComponent extends HTMLElement {
 }
 
 @WebComponent({
-    style: `:host{display:flex;justify-content:space-between;margin:0px 8px;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
+    style: `:host{display:flex;justify-content:space-between;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
     template: `
        
                <div product-name></div>
@@ -396,47 +401,54 @@ const formatter = new Intl.NumberFormat('en-US', {
 
 @WebComponent({
     template: `
+       <div style="display: flex;height: 100%">
+    <div class="detail-section right">
         <div>
-            
-        <div>
-           <div>
-             <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> 
-
-              </div>
-           </div>
-           <div class="field rows"><span> Direccion:</span> <div address></div></div>
-            
-           <div>
-              <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
-              <div class="field "><span> Telefono:</span> <div phone></div></div>
-              <div class="field "><span>Email: </span><div email></div></div>
-           </div>
+            <h4 style="margin-top: 5px;margin-bottom: 0px;">Codigo de Orden</h4>
+            <div code></div>
         </div>
-            <h4>Items</h4>
-            <div style="margin-top: 10px" products>
+        <div>
+            <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span>
             </div>
         </div>
-        <div style="display:flex;justify-content: end" total>
-            
+        <div class="field rows">
+          <h4 style="margin-top: 5px;margin-bottom: 0px;">Direccion</h4>
+            <div address></div>
         </div>
+
+        <div>
+            <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
+            <div class="field "><span> Telefono:</span>
+                <div phone></div>
+            </div>
+            <div class="field "><span>Email: </span>
+                <div email></div>
+            </div>
+        </div>
+    
+    <h4>Items</h4>
+    <div style="margin-top: 10px" products>
+    </div>
+
+    <div style="display:flex;justify-content: end;margin-top: 1em" total></div>
+</div>
+    <div class="detail-section">
+    <h3>Recibo</h3>
+    <div style="display: flex;justify-content: center;">
+        <img receipt src="" alt="receipt">
+    </div>
+    </div>
+</div>
 `,
     selector: 'order-details-component',
     style: `
-            .field{
-        display: flex;
-        gap: 5px;
-        margin-top:5px;
-    }
+    .right{border-right:1px solid var(--border-line-color, rgba(28, 28, 28, 0.30))}
+    .detail-section{flex:1;padding:1em}
+    .field{display: flex; gap: 5px; margin-top:5px;}
     .centered{   display:flex;     align-items: center;gap:7px;}
-    .field > span {
-        font-weight:500;
-    }
-    .rows{
-        flex-direction:column;
-    }    
-    tt-icon{
-        font-size:30px;
-    }
+    .field > span {font-weight:500; }
+    .rows{ flex-direction:column;  }    
+    tt-icon{ font-size:30px; }
     .between{justify-content: space-between;}
     .pointer{cursor:pointer}
     `
@@ -448,12 +460,14 @@ export class OrderDetailsComponent extends HTMLElement {
 
     @Attribute("data")
     public data(order: any) {
-        this.shadowRoot.querySelector("[address]").innerHTML = order.shipping_address.address;
-        this.shadowRoot.querySelector("[mode]").innerHTML = order.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
-        this.shadowRoot.querySelector("[phone]").innerHTML = order.contact_info.phoneNumber;
-        this.shadowRoot.querySelector("[email]").innerHTML = order.contact_info.email;
+        this.shadowRoot.querySelector("[code]").innerHTML = order.orderCode;
+
+        this.shadowRoot.querySelector("[address]").innerHTML = order.shippingAddress.address;
+        this.shadowRoot.querySelector("[mode]").innerHTML = order.deliveryMode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
+        this.shadowRoot.querySelector("[phone]").innerHTML = order.contactInfo.phoneNumber;
+        this.shadowRoot.querySelector("[email]").innerHTML = order.contactInfo.email;
         let total = 0;
-        order.product_list.forEach((p) => {
+        order.productList.forEach((p) => {
             const productItem = document.createElement("product-item-component");
             total += (p.price * p.quantity) / 100;
             productItem.data(p)
@@ -462,7 +476,8 @@ export class OrderDetailsComponent extends HTMLElement {
 
         this.shadowRoot.querySelector("[total]").innerHTML = formatter.format(total);
 
-
+        const createEvent = order.eventHistory.find(ev=>ev.type === "created");
+        this.shadowRoot.querySelector("[receipt]").src =  createEvent.payload.receiptURL
     }
 
 }

@@ -36,8 +36,10 @@ export * from "./builder";
      
       li:hover{
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 600;   
       }
+  
+
       .selected {
         font-weight: 600;
       }
@@ -61,11 +63,18 @@ export class NavigationListComponent extends HTMLElement {
 
 
         li.addEventListener("click", () => {
+            this.shadowRoot
+                .querySelectorAll("li")
+                .forEach((liItem) => {
+                    liItem.classList.remove("selected");
+                });
+
+            li.classList.add("selected");
             window.history.pushState({}, title, `${window.location.origin}/${path}`)
             window.dispatchEvent(new Event('popstate'));
         });
-        this.shadowRoot.querySelector("ul")
-            .appendChild(li);
+
+        this.shadowRoot.querySelector("ul") .appendChild(li);
     }
 
 
