@@ -366,11 +366,11 @@ export class OrderCardComponent extends HTMLElement {
 }
 
 @WebComponent({
-    style:`:host{display:flex;justify-content:space-between;margin:0px 8px;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
+    style: `:host{display:flex;justify-content:space-between;margin:0px 8px;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
     template: `
        
                <div product-name></div>
-               <div quantity></div>
+               <div style="display: flex;gap:1em;">Cantidad:  <div style="font-weight: bold" quantity></div></div>
        
     `,
     selector: 'product-item-component'
@@ -389,6 +389,10 @@ export class ProductItemComponent extends HTMLElement {
 
 }
 
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+});
 
 @WebComponent({
     template: `
@@ -410,12 +414,14 @@ export class ProductItemComponent extends HTMLElement {
         </div>
             <h4>Items</h4>
             <div style="margin-top: 10px" products>
-            
             </div>
+        </div>
+        <div style="display:flex;justify-content: end" total>
+            
         </div>
 `,
     selector: 'order-details-component',
-    style:`
+    style: `
             .field{
         display: flex;
         gap: 5px;
@@ -446,12 +452,17 @@ export class OrderDetailsComponent extends HTMLElement {
         this.shadowRoot.querySelector("[mode]").innerHTML = order.delivery_mode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
         this.shadowRoot.querySelector("[phone]").innerHTML = order.contact_info.phoneNumber;
         this.shadowRoot.querySelector("[email]").innerHTML = order.contact_info.email;
+        let total = 0;
         order.product_list.forEach((p) => {
             const productItem = document.createElement("product-item-component");
+            total += (p.price * p.quantity) / 100;
             productItem.data(p)
             this.shadowRoot.querySelector("[products]").appendChild(productItem)
+        });
 
-        })
+        this.shadowRoot.querySelector("[total]").innerHTML = formatter.format(total);
+
+
     }
 
 }
