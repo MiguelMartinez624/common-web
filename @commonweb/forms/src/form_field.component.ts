@@ -14,10 +14,15 @@ export interface FormFieldDescription {
     valuePath?: string;
     labelPath?: string;
     source?: string;
-
-
+    optionsLoader?: DataFetcherConfiguration;
 }
 
+export interface DataFetcherConfiguration {
+    source: string;
+    resultPath?: string;
+    filters: any;
+    method: 'POST' | 'GET' | 'DELETE' | 'PUT';
+}
 
 @WebComponent({
         selector: 'form-field',

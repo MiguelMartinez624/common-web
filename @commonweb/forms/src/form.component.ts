@@ -134,6 +134,9 @@ export class EntityForm extends HTMLElement {
                 select.setAttribute("source", value.source);
                 select.setAttribute("label", value.label);
                 select.setAttribute("options", JSON.stringify(value.options));
+
+                select.setAttribute("options-loader", JSON.stringify(value.optionsLoader));
+
                 select.setAttribute("property-name", value.propertyName);
                 select.style.width = String(value.width || "100%");
                 this.mainElement.appendChild(select);

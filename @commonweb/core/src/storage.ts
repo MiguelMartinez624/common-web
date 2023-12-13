@@ -37,6 +37,19 @@ export function changeStorageValue(key: string, value: any): void {
     window.dispatchEvent(changeEvent);
 }
 
+export function removeStoreValue(key: string): void {
+    //TODO add reasibng why is necesary to trigger new event
+    const changeEvent = new CustomEvent(`storage-change:${key}`, {
+        detail: {
+            data: null,
+            remove: true
+        }
+    });
+    //Try catch
+    localStorage.removeItem(key);
+    window.dispatchEvent(changeEvent);
+}
+
 export function syncWithStorage(target) {
     if (target[storageKeyMapName]) {
         for (const [storageKey, method] of target[storageKeyMapName]) {

@@ -1,4 +1,5 @@
-import {Attribute, WebComponent,extractData} from "@commonweb/core";
+import {Attribute, WebComponent, extractData} from "@commonweb/core";
+import {DataFetcherConfiguration} from "./form_field.component";
 
 
 export interface SelectOption {
@@ -16,7 +17,7 @@ export interface ValueInput {
         <label for="select-input"></label>
         <select name="select-input"></select>\`
     `,
-    style:`:host{
+    style: `:host{
             display:flex;flex-direction:column;gap:10px;color: var( --font-primary, #efefef);
         }
         select {
@@ -26,8 +27,10 @@ export interface ValueInput {
     `
 })
 export class SelectInput extends HTMLElement {
+    private _options: any[] = [];
+
     static get observedAttributes() {
-        return ["label-path", "value-path", "label", "property-name","options"];
+        return ["label-path", "value-path", "label", "property-name", "options", "options-loader"];
     }
 
 
@@ -41,6 +44,7 @@ export class SelectInput extends HTMLElement {
         if (!options || !Array.isArray(options)) {
             return;
         }
+        this._options = options;
         // Clear the options
         const select = this.shadowRoot.querySelector("select");
         select.innerHTML = "";
@@ -66,6 +70,17 @@ export class SelectInput extends HTMLElement {
             });
     }
 
+    @Attribute('options-loader')
+    public optionsLoader(config: DataFetcherConfiguration) {
+        callRemoteAPI(config.source, config.method, config.filters)
+            .then((result) => {
+                if (config.resultPath) {
+                    const options = extractData(config.resultPath, result);
+                    this.updateOptions([...this._options, ...options]);
+                }
+            })
+            .catch(console.error)
+    }
 
     get propertyName() {
         return this.getAttribute("property-name");
@@ -78,3 +93,20 @@ export class SelectInput extends HTMLElement {
 }
 
 
+
+async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
+
+    const result = await fetch(source, {
+        method: method,
+        body: (filters && method !== 'GET') ? JSON.stringify({...filters}) : null,
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+
+    if (!result.ok) {
+        throw {error: await result.json()}
+    }
+    return await result.json();
+
+}

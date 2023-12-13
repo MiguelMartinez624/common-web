@@ -1,4 +1,4 @@
-import {changeStorageValue, EventBind, FromStorage, WebComponent} from "@commonweb/core";
+import {changeStorageValue, EventBind, FromStorage, removeStoreValue , WebComponent} from "@commonweb/core";
 import {pushUrl} from "@commonweb/router";
 import "@commonweb/components";
 import "@commonweb/forms";
@@ -259,7 +259,7 @@ export class NavHeader extends HTMLElement {
 
     @EventBind("[close]:click")
     public closeSession() {
-        changeStorageValue("user", null)
+       removeStoreValue("user");
     }
 
     @EventBind(".menu-floating:mouseleave")

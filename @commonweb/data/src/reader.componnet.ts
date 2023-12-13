@@ -135,17 +135,20 @@ export class DataFetcher extends HTMLElement {
 
     private async callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
 
-        const result = await fetch(source, {
-            method: method,
-            body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...this.Payload}) : null,
-            headers: {
-                "Content-Type": "application/json",
+
+            const result = await fetch(source, {
+                method: method,
+                body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...this.Payload}) : null,
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            });
+
+            if (!result.ok) {
+                throw {error: await result.json()}
             }
-        });
-        if (!result.ok) {
-            throw {error: result.json()}
-        }
-        return await result.json();
+            return await result.json();
+
 
     }
 

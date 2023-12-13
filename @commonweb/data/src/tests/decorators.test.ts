@@ -15,7 +15,15 @@ const dataLocalStorageRequestConfiguration: (entity: string, auto: boolean) => D
         fieldType: 'set'
     }
 }
-
+const dataRemoteRequestConfiguration: (entity: string, auto: boolean) => DataFetcherConfiguration = (entity: string, auto: boolean) => {
+    return {
+        injectTo: ['test-component:data'],
+        source: `https://dontexistiklnow.test.com`,
+        auto: auto,
+        method: "GET",
+        fieldType: 'set'
+    }
+}
 describe('DataFetcher', () => {
     beforeEach(() => {
         // fetch.mockClear();
@@ -58,6 +66,28 @@ describe('DataFetcher', () => {
         })
         fetcher.execute({});
 
+
+        expect(loadedCalled).toBeTruthy()
+    });
+
+    test('should emit request-failed when any data fetching fail', async () => {
+        const configs = JSON.stringify(dataRemoteRequestConfiguration('products', false));
+
+        document.body.innerHTML = `
+            <data-fetcher configurations='${configs}'
+            ></data-fetcher>
+            <test-component></test-component>
+        `;
+
+
+        const fetcher = window.document.querySelector("data-fetcher") as DataFetcher;
+        let loadedCalled = false;
+
+        fetcher.addEventListener("request-failed", () => {
+            loadedCalled = true;
+        })
+        fetcher.execute({});
+        await new Promise(r => setTimeout(r, 2000));
 
         expect(loadedCalled).toBeTruthy()
     });
