@@ -2,8 +2,8 @@ import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core"
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import "@commonweb/forms";
 
-//const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
-const hostURL = "http://localhost:8080"
+const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
+//const hostURL = "http://localhost:8080"
 
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
     return {

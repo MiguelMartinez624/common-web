@@ -24,6 +24,15 @@ const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
     }
 }
 
+const DEFAULT_QUERY = {
+    "query": {
+        "name": "",
+    },
+    "page": {
+        "page": 1,
+        "size": 100
+    }
+};
 
 @WebComponent({
     selector: 'backoffice-entity-page',
@@ -61,6 +70,8 @@ const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
         </div>
         <side-panel>
             <bind-element  from="backoffice-entity-form:(close)" to="side-panel:toggle"></bind-element>
+            <bind-element value="${JSON.stringify(DEFAULT_QUERY)}" from="backoffice-entity-form:(close)" to="data-fetcher[data]:execute"></bind-element>
+
             <backoffice-entity-form></backoffice-entity-form>
         </side-panel>
         
@@ -80,16 +91,7 @@ export class BackofficeEntityPage extends HTMLElement {
         configDataFetcher.setAttribute("configurations", JSON.stringify(listConfiguration(entity)));
         const listingConfiguration = window[`endpoint::listing-${entity}`];
         if (listingConfiguration.method === 'POST') {
-            queryDataFetcher.setAttribute("payload",
-                JSON.stringify({
-                    "query": {
-                        "name": "",
-                    },
-                    "page": {
-                        "page": 1,
-                        "size": 100
-                    }
-                }));
+            queryDataFetcher.setAttribute("payload", JSON.stringify(DEFAULT_QUERY));
             queryDataFetcher.setAttribute("configurations", JSON.stringify(listingConfiguration));
         } else {
             queryDataFetcher.setAttribute("configurations", JSON.stringify(listingConfiguration));
@@ -133,7 +135,13 @@ export class BackofficeEntityPage extends HTMLElement {
                     </div>
                   </div>
                 </go-card>
-            </div>`
+            </div>
+
+       <bind-element from="data-fetcher[submit]:(request-success)" to="snackbar-component:toggle"></bind-element>
+        <snackbar-component>
+            Operación exitosa
+        </snackbar-component>
+`
 })
 export class BackofficeEntityForm extends HTMLElement {
     private _entity: any;
@@ -164,6 +172,10 @@ export class BackofficeEntityForm extends HTMLElement {
 
     connectedCallback() {
         this.submitDataFetcher = this.shadowRoot.querySelector("data-fetcher[submit]") as DataFetcher;
+        this.submitDataFetcher.addEventListener("request-success", () => {
+            const closeEvent = new CustomEvent("close", {detail: {data: null}});
+            this.dispatchEvent(closeEvent)
+        })
         this.form = this.shadowRoot.querySelector("entity-form") as unknown as EntityForm;
         this.submitButton = this.shadowRoot.querySelector("tt-button[submit]");
         this.fetchData(window.location.href.split("/").pop());

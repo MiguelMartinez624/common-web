@@ -36,6 +36,7 @@ import {SelectInput} from "./select.component";
 })
 export class EntityForm extends HTMLElement {
     mainElement;
+    private _configurations: FormFieldDescription[];
 
     public setValue(data: any) {
         // should no return should call metod reset
@@ -70,6 +71,10 @@ export class EntityForm extends HTMLElement {
     value() {
         // get the form values
         const values = {}
+
+        this._configurations.filter(c=> c.type === "silent")
+            .forEach(c=> values[c.propertyName] = c.defaultValue)
+
         // should no return should call metod reset
         const inputs: NodeListOf<FormField> = this.shadowRoot.querySelectorAll("form-field");
 
@@ -114,6 +119,7 @@ export class EntityForm extends HTMLElement {
     }
 
     public set configurations(config: FormFieldDescription[]) {
+        this._configurations = config;
         this.buildForm(config);
     }
 
@@ -125,9 +131,11 @@ export class EntityForm extends HTMLElement {
             this.mainElement = this.shadowRoot.querySelector(".form");
         }
 
-        values.forEach((value) => {
+        values
+            .filter(c=> c.type !== "silent")
+            .forEach((value) => {
             if (value.type === "select") {
-                console.log({value})
+
                 const select = document.createElement("select-input");
                 select.setAttribute("value-path", value.valuePath);
                 select.setAttribute("label-path", value.labelPath);

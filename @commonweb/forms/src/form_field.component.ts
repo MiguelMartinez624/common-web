@@ -6,7 +6,7 @@ export interface FormFieldDescription {
     label: string;
     propertyName: string;
     subDescriptions?: FormFieldDescription[] | null;
-
+    defaultValue?: any;
     // Can be null
     width?: string;
 
@@ -103,6 +103,9 @@ export class FormField extends HTMLElement {
         }
         if (this.getAttribute("type") === "number") {
             return Number(input.value);
+        }
+        if (this.getAttribute("type") === "checkbox") {
+            return input.checked;
         }
         return input.value;
     }
