@@ -7,7 +7,7 @@ import "./backoffice-entity.page";
 import "./side-panel";
 import "./orders-managment.page";
 import "./logo"
-
+import "./history-report.page";
 export * from "./builder";
 
 
