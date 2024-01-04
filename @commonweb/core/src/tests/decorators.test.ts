@@ -53,13 +53,6 @@ describe('@EventBind', () => {
     });
 
 });
-describe('@EventBindAll', () => {
-    test('should attach event listeners to the corresponding event pattern.', () => {
-        document.body.innerHTML = `<orders-page name="Dev!"></orders-page>`;
-
-    });
-
-});
 
 describe('@FromStorage', () => {
     beforeEach(() => {
@@ -95,6 +88,35 @@ describe('@FromStorage', () => {
         const component = document.body.querySelector("hello-world-storage");
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
         expect(currentH4Content).toBe("Hello World!");
+    });
+
+});
+
+
+describe('Template Interpolation', () => {
+    beforeEach(() => {
+        // restart the storage
+        localStorage.clear();
+    })
+
+    test('should replace template values with the host (this) value on the component.', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->Miguel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
+    });
+
+
+    test('should update interpolated values once the attributes changes ', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+
+        component.setAttribute("name", "Manuel")
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->Manuel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
     });
 
 })

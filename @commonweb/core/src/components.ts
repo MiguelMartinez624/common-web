@@ -1,5 +1,7 @@
 import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
+import {TemplateInterpolation, Transformer} from "./transformer";
+import {extractData} from "./html_manipulation";
 
 interface CustomElementConfig {
     selector: string;
@@ -21,9 +23,50 @@ function insertTemplate(attr: CustomElementConfig) {
     const shadowRoot = casted.attachShadow({mode: 'open'});
     const template = document.createElement("template");
 
-    template.innerHTML = attr.style ? `<style>${attr.style}</style>${attr.template}` : attr.template;
+    template.innerHTML = attr.style ?
+        `<style>${attr.style}</style>${attr.template}` : attr.template;
     shadowRoot.appendChild(template.content.cloneNode(true));
-    return casted;
+
+}
+
+/**
+ * Need to create transformers from the templates and clear up those markdowns
+ * host stand for the component itself (this) and then it comes the property and any key
+ * <div>{{@host.property.key}}</div>
+ *
+ * Same as before but here we can use a [CSSSelector] to show other elements properties custom or
+ * native properties
+ * <div>{{[CSSSelector].property.key}}</div>
+ */
+function bindTemplateToProperties(node: HTMLElement) {
+    /*
+    * CHeck properties to create a transform for each binding
+    * */
+
+    const interpolations = new Map<string, TemplateInterpolation[]>();
+    [...node.shadowRoot.children].forEach((child) => {
+
+        let innerHTML = child.innerHTML;
+        const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
+        for (const match of matches) {
+
+            const propertyPath = match[1];
+            const interpolation = new TemplateInterpolation(node, child, propertyPath, `<!--${propertyPath}-->`);
+            /*
+             * Need to attach this interpolation to the properties
+             * */
+            const attributeName = match[1].replace("@host.", "");
+            let interpolationsStored = interpolations.get(attributeName);
+            if (!interpolationsStored) {
+                interpolations.set(attributeName, [interpolation]);
+                continue;
+            }
+            interpolationsStored.push(interpolation);
+        }
+
+        (node as any).interpolations = interpolations;
+
+    })
 }
 
 export function WebComponent(attr: CustomElementConfig) {
@@ -32,15 +75,17 @@ export function WebComponent(attr: CustomElementConfig) {
         validateSelector(attr.selector)
 
         let component = class extends constr {
-            casted: any;
+
+            private _transformers: Transformer[] = [];
 
             constructor(...args: any[]) {
                 super(...args)
-                this.casted = insertTemplate.call(this, attr);
-                // we init the listeners
 
+                insertTemplate.call(this, attr);
 
-                syncWithStorage(this);
+                bindTemplateToProperties(this as unknown as HTMLElement)
+
+                syncWithStorage(this as unknown as HTMLElement);
                 attemptBindEvents((this as unknown as HTMLElement));
                 if (window[PROCESSOR_KEY]) {
                     window[PROCESSOR_KEY]
@@ -50,7 +95,6 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
             attributeChangedCallback(name, oldValue, newValue) {
-                // if you didn't use the notation wont have this field set.
                 if ((this as any).attribute_list) {
                     const handler = (this as any).attribute_list.get(name);
                     if (handler) {
@@ -60,6 +104,16 @@ export function WebComponent(attr: CustomElementConfig) {
                         handler.apply(this, [newValue])
                     }
                 }
+
+                // if you didn't use the notation wont have this field set.
+                if ((this as any).interpolations) {
+                    console.log({interpolations: (this as any).interpolations})
+                    const interpolationsList = (this as any).interpolations.get(name);
+                    if (interpolationsList) {
+                        interpolationsList.forEach((interpolation: TemplateInterpolation) => interpolation.update())
+                    }
+                }
+
             }
 
         }

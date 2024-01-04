@@ -17,5 +17,6 @@ export function findManyNodeOnUpTree(selector: string, element: any):  NodeListO
 
 export function extractData(resultPath: string, result: any) {
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
+        .filter((p)=> p !== "@host")
     return properties.reduce((prev: any, curr: any) => prev?.[curr], result)
 }
