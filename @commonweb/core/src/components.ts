@@ -69,6 +69,26 @@ function bindTemplateToProperties(node: HTMLElement) {
     })
 }
 
+function updateAttributes(element: any, name: string, newValue: any) {
+    if ((element as any).attribute_list) {
+        const handler = (element as any).attribute_list.get(name);
+        if (!handler) {
+            return;
+        }
+        const valueToPass = typeof newValue === 'string' && isJSON(newValue) ? JSON.parse(newValue) : newValue;
+        // if the content is a object
+        if (typeof handler === "function") {
+            handler.apply(element, [valueToPass])
+        } else {
+            // in this case handler is the property name no a value actually
+            // so we can index the property on the target
+            element[handler] = valueToPass;
+        }
+
+
+    }
+}
+
 export function WebComponent(attr: CustomElementConfig) {
     return function _WebComponent<T extends { new(...args: any[]): {} }>(constr: T) {
 
@@ -95,19 +115,10 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
             attributeChangedCallback(name, oldValue, newValue) {
-                if ((this as any).attribute_list) {
-                    const handler = (this as any).attribute_list.get(name);
-                    if (handler) {
-                        if (typeof newValue === 'string' && isJSON(newValue)) {
-                            return handler.apply(this, [JSON.parse(newValue)])
-                        }
-                        handler.apply(this, [newValue])
-                    }
-                }
+                updateAttributes(this, name, newValue);
 
                 // if you didn't use the notation wont have this field set.
                 if ((this as any).interpolations) {
-                    console.log({interpolations: (this as any).interpolations})
                     const interpolationsList = (this as any).interpolations.get(name);
                     if (interpolationsList) {
                         interpolationsList.forEach((interpolation: TemplateInterpolation) => interpolation.update())

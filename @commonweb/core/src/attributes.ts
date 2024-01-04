@@ -10,9 +10,13 @@ export function Attribute(name: string) {
             target[AttributeMapKey] = new Map<string, any>();
         }
 
-        //
-        const method = target[propertyKey];
 
-        target[AttributeMapKey].set(name, method);
+        const method = target[propertyKey];
+        if (typeof method === "function") {
+            target[AttributeMapKey].set(name, method);
+        } else {
+            target[AttributeMapKey].set(name, propertyKey);
+        }
+
     };
 }

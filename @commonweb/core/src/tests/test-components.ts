@@ -56,14 +56,13 @@ export class TestComponentWithAttribute extends HTMLElement {
 })
 export class StringTemplateComponent extends HTMLElement {
     public save: string = "YES"
+    @Attribute("name")
     public name: string = "Miguel";
+
     public lastname: string = "Martinez";
     static get observedAttributes() {
         return ["name"]
     }
-    @Attribute("name")
-    public nameUpdate(newName: string) {
-        this.name = newName;
-    }
+
 
 }

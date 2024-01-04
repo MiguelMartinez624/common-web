@@ -55,14 +55,19 @@ export class TemplateInterpolation {
         const value = extractData(propertyPath, this.root);
 
         this.prevValue = value;
-        element.innerHTML = element.innerHTML
+        element.innerHTML = element
+            .innerHTML
             .replace(`{{${propertyPath}}}`, `${pattern}${value}${pattern}`);
-        console.log(`{{${propertyPath}}}`, element.innerHTML)
     }
 
     public update(): void {
         const value = extractData(this.propertyPath, this.root);
-        this.element.innerHTML = this.element.innerHTML
+        if (this.prevValue === value) {
+            return;
+        }
+        this.element.innerHTML = this.element
+            .innerHTML
             .replace(`<!--${this.propertyPath}-->${this.prevValue}<!--${this.propertyPath}-->`, `<!--${this.propertyPath}-->${value}<!--${this.propertyPath}-->`);
+        this.prevValue = value;
     }
 }
