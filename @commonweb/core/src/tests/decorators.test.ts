@@ -119,4 +119,12 @@ describe('Template Interpolation', () => {
         expect(currentH4Content).toBe("Hello World! <!--@host.name-->Manuel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
     });
 
+    test('should update interpolated obj', () => {
+        document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
+        const component = document.body.querySelector("string-template-obj-component");
+
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");
+    });
 })

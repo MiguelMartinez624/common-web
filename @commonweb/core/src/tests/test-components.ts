@@ -60,8 +60,25 @@ export class StringTemplateComponent extends HTMLElement {
     public name: string = "Miguel";
 
     public lastname: string = "Martinez";
+
     static get observedAttributes() {
         return ["name"]
+    }
+
+
+}
+
+@WebComponent({
+    selector: 'string-template-obj-component',
+    template: '<h4>Hello World! {{@host.profile.name}} <span>{{@host.profile.lastname}}</span> </h4> <button>Click Me {{@host.save}}</button>'
+})
+export class StringTemplateWithObjAttributeComponent extends HTMLElement {
+    public save: string = "YES"
+    @Attribute("profile")
+    public profile: { name: string, lastname: string } = {name: "Miguel", lastname: "Martinez"};
+
+    static get observedAttributes() {
+        return ["profile"]
     }
 
 

@@ -55,7 +55,12 @@ function bindTemplateToProperties(node: HTMLElement) {
             /*
              * Need to attach this interpolation to the properties
              * */
-            const attributeName = match[1].replace("@host.", "");
+            let attributeName = match[1].replace("@host.", "");
+            const nextDot = attributeName.indexOf(".");
+            if (nextDot > -1) {
+                attributeName = attributeName.slice(0, nextDot)
+            }
+
             let interpolationsStored = interpolations.get(attributeName);
             if (!interpolationsStored) {
                 interpolations.set(attributeName, [interpolation]);
