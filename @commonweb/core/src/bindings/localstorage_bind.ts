@@ -7,15 +7,15 @@ import {isJSON} from "../web_components";
 
 export class LocalStorageBind {
     private readonly key: string;
-    private readonly elementProperty: string;
-    private propertyPath: string;
+    private readonly propertyPath: string;
 
     constructor(public readonly rawString: string) {
-        const value = rawString.replace("storage://", "");
-        const sections = value.split(":");
         // TODO: need toi validate the length of this strings to avoid out of index errors
+
+        const value = rawString.replace("localstorage=", "");
+        const sections = value.split(".");
         this.key = sections[0];
-        this.propertyPath = value.replace(this.key, "");
+        this.propertyPath = sections.filter((s) => s !== this.key).join(".");
     }
 
 

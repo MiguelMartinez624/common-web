@@ -8,9 +8,9 @@ export function bindFromString(bindingStr: string): ElementBind | LocalStorageBi
         return new ElementBind(bindingStr.slice(1));
     }
 
-    if (bindingStr.startsWith("storage://")) {
+    if (bindingStr.startsWith("localstorage=")) {
         return new LocalStorageBind(bindingStr);
     }
 
-    return
+    throw "bindingStr dont match any binding"
 }
