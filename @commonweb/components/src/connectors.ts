@@ -1,14 +1,19 @@
 import {Attribute, findNodeOnUpTree, WebComponent, extractData} from "@commonweb/core";
 import {isJSON} from "@commonweb/core/src";
 
-// ElementQuery string with a format cssSelector:property/method
-class ElementQuery {
+/*
+    ElementBind will bind a element and a property/event/method
+    to be used on a easy way.
+ */
+export class ElementBind {
     private readonly elementSelector: string;
     private readonly elementProperty: string;
+    private _element: any;
 
     constructor(public readonly value: string) {
         const sections = value.split(":");
-        this.elementSelector = sections[0]
+        // TODO: need toi validate the length of this strings to avoid out of index errors
+        this.elementSelector = sections[0][0] === "@" ? sections[0].slice(1) : sections[0];
         this.elementProperty = sections[1];
 
     }
@@ -20,6 +25,20 @@ class ElementQuery {
                 return this.elementProperty.slice(1, this.elementProperty.length - 1);
             default:
                 return this.elementProperty;
+
+        }
+    }
+
+    public get propertyValue(): any {
+        switch (this.elementProperty[0]) {
+            case "(":
+                throw {message: "Functionality for events is not implemented yet"}
+            case  "[":
+                const value = this._element[this.propertyName] || this._element.getAttribute(this.propertyName);
+                return value
+            default:
+                // todo no params method for now
+                return this._element[this.propertyName]();
 
         }
     }
@@ -38,7 +57,8 @@ class ElementQuery {
 
     // Can be cached?
     public searchElement(initialNode: Node): Node | null {
-        return findNodeOnUpTree(this.elementSelector, initialNode);
+        this._element = findNodeOnUpTree(this.elementSelector, initialNode);
+        return this._element;
     }
 }
 
@@ -80,7 +100,7 @@ export class BindElementComponent extends HTMLElement {
             return;
         }
 
-        const triggerQuery = new ElementQuery(fromSelector);
+        const triggerQuery = new ElementBind(fromSelector);
         const triggerElement: any = triggerQuery.searchElement(this);
 
         switch (triggerQuery.propertyType) {
@@ -104,7 +124,7 @@ export class BindElementComponent extends HTMLElement {
                 data = JSON.parse(value);
             }
         } else if (this.getAttribute("input-src")) {
-            const sourceInputQuery = new ElementQuery(this.getAttribute("input-src"));
+            const sourceInputQuery = new ElementBind(this.getAttribute("input-src"));
             const elementSource = sourceInputQuery.searchElement(this);
             if (!elementSource) {
                 return;
@@ -123,7 +143,7 @@ export class BindElementComponent extends HTMLElement {
             data = ev.detail.data;
         }
         // We get the trigger here
-        const targetQuery = new ElementQuery(this.getAttribute("to"));
+        const targetQuery = new ElementBind(this.getAttribute("to"));
         const targetElement = targetQuery.searchElement(this) as HTMLElement;
         if (!targetElement) {
             return;

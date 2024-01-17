@@ -5,6 +5,9 @@ export interface DayInput {
     contentElement?: string | HTMLElement;
     template?: string
 
+    // what to render when clicking, this will be rendered as a modal on the view
+    detailsElement?: string;
+
 }
 
 @WebComponent({
@@ -14,6 +17,10 @@ export interface DayInput {
             <div class="day"></div>
             <div class="content"></div>   
         </div>
+        
+        <dialog>
+        
+        </dialog>
     `,
 
     // language=CSS
@@ -44,5 +51,17 @@ export class CalendarDayComponent extends HTMLElement {
         } else if (inputs.template) {
             content.innerHTML = inputs.template;
         }
+
+        // set the click event to display the details
+        if (inputs.detailsElement) {
+            const dialog = this.shadowRoot.querySelector("dialog");
+            dialog.innerHTML = inputs.detailsElement;
+
+
+            this.addEventListener("click", () => {
+                dialog.open ? dialog.close() : dialog.showModal();
+            });
+        }
+
     }
 }

@@ -6,34 +6,37 @@ export class BackofficeRouteBuilder {
     addListingEndpoint(key: string, path: string, method: string, resultPath?: string) {
         window[`endpoint::${key}`] = {
             source: path,
-            method:method,
+            method: method,
             injectTo: [],
             resultPath: resultPath,
             fieldType: 'set',
-            auto:true
+            auto: true
         } as DataFetcherConfiguration;
         return this;
     }
+
     addEditEndpoint(key: string, path: string, method: string, resultPath?: string) {
         window[`endpoint::${key}`] = {
             source: path,
             injectTo: [],
-            method:method,
+            method: method,
             resultPath: resultPath,
             fieldType: 'attribute'
         } as DataFetcherConfiguration;
         return this;
     }
+
     addCreateEndpoint(key: string, path: string, method: string, resultPath?: string) {
         window[`endpoint::${key}`] = {
             source: path,
-            method:method,
+            method: method,
             injectTo: [],
             resultPath: resultPath,
             fieldType: 'attribute'
         } as DataFetcherConfiguration;
         return this;
     }
+
     addFormConfiguration(key, configuration) {
         localStorage.setItem(`://ui/${key}/form`, JSON.stringify(configuration));
         return this;
@@ -69,6 +72,17 @@ export class BackofficeRouteBuilder {
             throw new Error("No se encontró ningún elemento con el selector especificado");
         }
 
-        element.innerHTML = `<ecommerce-backoffice-app routes='[${routesHTML}]'></ecommerce-backoffice-app>`;
+        element.innerHTML =
+            // language=HTML
+            `
+                <ecommerce-backoffice-app routes='[${routesHTML}]'>
+                    <go-route
+                            title="Productos"
+                            icon="inventory_2"
+                            route="backoffice/products"
+                            component="backoffice-entity-page"
+                            default="true">
+                    </go-route>
+                </ecommerce-backoffice-app>`;
     }
 }

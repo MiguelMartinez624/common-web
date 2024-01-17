@@ -1,5 +1,8 @@
-import {Attribute, WebComponent} from "@commonweb/core";
-import {ElementBind} from "./connectors";
+import {WebComponent} from "../web_components";
+import {ElementBind} from "../bindings/element_bind";
+import {Attribute} from "../attributes";
+import {bindFromString} from "../bindings";
+import {LocalStorageBind} from "../bindings/localstorage_bind";
 
 @WebComponent({
     selector: 'conditional-render-cases',
@@ -34,9 +37,9 @@ export class ConditionalRenderCasesComponent extends HTMLElement {
 })
 export class ShowIfComponent extends HTMLElement {
     public static CONDITION_SEPARATOR: string = "/";
-    private leftValue: ElementBind;
+    private leftValue: ElementBind | LocalStorageBind;
     private operator: string;
-    private rightValue: ElementBind;
+    private rightValue: ElementBind | LocalStorageBind;
 
     static get observedAttributes(): string[] {
         return ["condition", "html"]
@@ -60,13 +63,19 @@ export class ShowIfComponent extends HTMLElement {
             return;
         }
         const tokens = newState.split(ShowIfComponent.CONDITION_SEPARATOR);
-        this.leftValue = new ElementBind(tokens[0]);
+        this.leftValue = bindFromString(tokens[0]);
         this.operator = tokens[1];
-        this.rightValue = new ElementBind(tokens[2]);
+        this.rightValue = bindFromString(tokens[2]);
 
         // settings parents and quering elements
-        this.leftValue.searchElement(this.parentNode);
-        this.rightValue.searchElement(this.parentNode);
+        if (this.leftValue instanceof ElementBind) {
+            this.leftValue.searchElement(this.parentNode);
+        }
+
+        if (this.rightValue instanceof ElementBind) {
+            this.rightValue.searchElement(this.parentNode);
+        }
+
 
         this.evaluateCases();
     }
@@ -76,7 +85,7 @@ export class ShowIfComponent extends HTMLElement {
     public evaluateCases() {
         switch (this.operator) {
             case "=":
-                const result = this.leftValue.propertyValue === this.rightValue.propertyValue;
+                const result = this.leftValue.value === this.rightValue.value;
                 const slot = this.shadowRoot.querySelector("slot") as HTMLSlotElement;
                 if (!result) {
                     slot.innerHTML = "";

@@ -1,11 +1,12 @@
-import {PROCESSOR_KEY} from "./components";
+import {PROCESSOR_KEY} from "./web_components";
 
 export * from './field_decorators';
-export * from './components';
+export * from './web_components';
 export * from './html_manipulation';
 export * from './storage';
 export * from './events';
 export * from './attributes';
+export * from './components';
 
 // if there are not any processor yet start the empty array;
 if (!window[PROCESSOR_KEY]) {

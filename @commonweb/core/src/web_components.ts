@@ -1,7 +1,6 @@
 import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
-import {TemplateInterpolation, Transformer} from "./transformer";
-import {extractData} from "./html_manipulation";
+import {TemplateInterpolation} from "./transformer";
 
 interface CustomElementConfig {
     selector: string;
@@ -100,8 +99,6 @@ export function WebComponent(attr: CustomElementConfig) {
         validateSelector(attr.selector)
 
         let component = class extends constr {
-
-            private _transformers: Transformer[] = [];
 
             constructor(...args: any[]) {
                 super(...args)

@@ -1,5 +1,5 @@
-import {changeStorageValue, EventBind, FromStorage, removeStoreValue , WebComponent} from "@commonweb/core";
-import {pushUrl} from "@commonweb/router";
+import {changeStorageValue, EventBind, FromStorage, removeStoreValue, WebComponent} from "@commonweb/core";
+import {pushUrl, Route} from "@commonweb/router";
 import "@commonweb/components";
 import "@commonweb/forms";
 import "@commonweb/data";
@@ -8,6 +8,7 @@ import "./side-panel";
 import "./orders-managment.page";
 import "./logo"
 import "./history-report.page";
+
 export * from "./builder";
 
 
@@ -57,6 +58,7 @@ export * from "./builder";
 })
 export class NavigationListComponent extends HTMLElement {
     public addRoute(title: string, path: string, icon: string) {
+        console.log({title,path,icon})
         const li = document.createElement("li");
         li.setAttribute("route", path);
         li.innerHTML = icon && icon !== "undefined" ? `<tt-icon icon="${icon}"></tt-icon>` + ` ${title}` : title;
@@ -74,7 +76,7 @@ export class NavigationListComponent extends HTMLElement {
             window.dispatchEvent(new Event('popstate'));
         });
 
-        this.shadowRoot.querySelector("ul") .appendChild(li);
+        this.shadowRoot.querySelector("ul").appendChild(li);
     }
 
 
@@ -105,8 +107,9 @@ export class ECommerceBackOffice extends HTMLElement {
 
         const routes = JSON.parse(this.getAttribute("routes"))
         const router = this.shadowRoot.querySelector("go-router");
-        const navigationList = this.shadowRoot.querySelector("navigation-list");
+        const routeChild = this.querySelectorAll("go-route");
 
+        const navigationList = this.shadowRoot.querySelector("navigation-list");
         if (router) {
             routes.forEach(c => {
                 (navigationList as NavigationListComponent).addRoute(c.title, c.route, c.icon)
@@ -119,6 +122,16 @@ export class ECommerceBackOffice extends HTMLElement {
 
             })
         }
+        routeChild.forEach((r: Route) => {
+            console.log({r});
+            (navigationList as NavigationListComponent).addRoute(
+                r.title,
+                r.getAttribute("route"),
+                r.getAttribute("icon"))
+
+            router.appendChild(r);
+        })
+
     }
 
     @EventBind('action-bar:option-selected')
@@ -259,7 +272,7 @@ export class NavHeader extends HTMLElement {
 
     @EventBind("[close]:click")
     public closeSession() {
-       removeStoreValue("user");
+        removeStoreValue("user");
     }
 
     @EventBind(".menu-floating:mouseleave")

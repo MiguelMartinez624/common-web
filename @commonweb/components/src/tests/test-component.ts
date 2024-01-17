@@ -37,3 +37,5 @@ export class TestComponent extends HTMLElement {
 })
 export class TestComponentWithButtons extends HTMLElement {
 }
+
+

@@ -33,7 +33,10 @@ export class HistoryReportPage extends HTMLElement {
                 {
                     index: 14,
                     // language=HTML
-                    template: "<day-history cocked='24' completed='20'></day-history>"
+                    template: "<day-history cocked='24' completed='20'></day-history>",
+
+                    // language=HTML
+                    detailsElement:"<div>Esto son los detalles tio no te jode?</div>"
                 },
                 {
                     index: 15,

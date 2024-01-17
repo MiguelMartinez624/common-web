@@ -1,4 +1,4 @@
-import {isJSON} from "./components";
+import {isJSON} from "./web_components";
 
 
 const storageKeyMapName = "storage_keys";
