@@ -2,8 +2,8 @@ import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core"
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import "@commonweb/forms";
 
-const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
-//const hostURL = "http://localhost:8080"
+// const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
+const hostURL = "http://localhost:8080"
 
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
     return {
@@ -339,7 +339,7 @@ export class DraggableList extends HTMLElement {
     .rows{
         flex-direction:column;
     }    
-    tt-icon{
+    pp-icon{
         font-size:30px;
     }
     .between{justify-content: space-between;}
@@ -354,8 +354,8 @@ export class DraggableList extends HTMLElement {
             <div class="field centered between"><span class="centered"> <span> Codigo:</span>  <div code></div></span>  </div>
 
              <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span> 
-              <bind-element from="tt-icon[details]:(click)" to="modal-component:toggle"></bind-element>
-             <tt-icon  details class="pointer" icon="visibility"></tt-icon>
+              <bind-element from="pp-icon[details]:(click)" to="modal-component:toggle"></bind-element>
+             <pp-icon  details class="pointer" icon="visibility"></pp-icon>
             
 
               </div>
@@ -377,7 +377,7 @@ export class OrderCardComponent extends HTMLElement {
     @Attribute("data")
     public data(data: any) {
         this.shadowRoot.querySelector("[code]").innerHTML = data.orderCode;
-        this.shadowRoot.querySelector("[mode]").innerHTML = data.deliveryMode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
+        this.shadowRoot.querySelector("[mode]").innerHTML = data.deliveryMode === "PickUp" ? "<pp-icon icon='motorcycle'></pp-icon>" : "<pp-icon icon='storefront'></pp-icon>"
         data.productList.forEach((p) => {
             const productItem = document.createElement("li");
             productItem.innerHTML = p.name + " x" + p.quantity
@@ -472,7 +472,7 @@ const formatter = new Intl.NumberFormat('en-US', {
     .centered{   display:flex;     align-items: center;gap:7px;}
     .field > span {font-weight:500; }
     .rows{ flex-direction:column;  }    
-    tt-icon{ font-size:30px; }
+    pp-icon{ font-size:30px; }
     .between{justify-content: space-between;}
     .pointer{cursor:pointer}
     `
@@ -487,7 +487,7 @@ export class OrderDetailsComponent extends HTMLElement {
         this.shadowRoot.querySelector("[code]").innerHTML = order.orderCode;
 
         this.shadowRoot.querySelector("[address]").innerHTML = order.shippingAddress.address;
-        this.shadowRoot.querySelector("[mode]").innerHTML = order.deliveryMode === "PickUp" ? "<tt-icon icon='motorcycle'></tt-icon>" : "<tt-icon icon='storefront'></tt-icon>"
+        this.shadowRoot.querySelector("[mode]").innerHTML = order.deliveryMode === "PickUp" ? "<pp-icon icon='motorcycle'></pp-icon>" : "<pp-icon icon='storefront'></pp-icon>"
         this.shadowRoot.querySelector("[phone]").innerHTML = order.contactInfo.phoneNumber;
         this.shadowRoot.querySelector("[email]").innerHTML = order.contactInfo.email;
         let total = 0;

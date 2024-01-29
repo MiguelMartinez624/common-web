@@ -20,7 +20,7 @@ function getFieldTemplate(type: FieldType, value: any): string {
         case "date":
             return new Date(value).toLocaleDateString();
         case "currency":
-           return formatter.format(Number(value));
+            return formatter.format(Number(value));
         case "image":
             return `<img height="80" width="80"  alt="no" src="${value} "/>`
 
@@ -67,7 +67,7 @@ export class Table extends HTMLElement {
     private _data: any[] = [];
 
     static get observedAttributes() {
-        return ['configurations']
+        return ['configurations', 'data']
     }
 
     @Attribute('configurations')
@@ -89,7 +89,8 @@ export class Table extends HTMLElement {
         }
     }
 
-    public set data(data: any[]) {
+    @Attribute('data')
+    public data(data: any[]) {
         this._data = data;
         this.generateDataRows(data);
 
@@ -109,7 +110,7 @@ export class Table extends HTMLElement {
             this.configurations.forEach((field) => {
                 const headerElement = document.createElement("td");
                 const value = extractData(field.propertyName, item);
-                headerElement.innerHTML =  `${getFieldTemplate(field.type, value)}`
+                headerElement.innerHTML = `${getFieldTemplate(field.type, value)}`
                 row.appendChild(headerElement);
             });
 

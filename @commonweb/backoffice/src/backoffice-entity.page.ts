@@ -27,6 +27,7 @@ const formConfiguration: (entity: string) => DataFetcherConfiguration = (entity:
 const DEFAULT_QUERY = {
     "query": {
         "name": "",
+        "zones": []
     },
     "page": {
         "page": 1,

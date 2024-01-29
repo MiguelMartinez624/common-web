@@ -27,6 +27,11 @@ export class CalendarMonthComponent extends HTMLElement {
         return ["month"]
     }
 
+    public clear(): void {
+        const container = this.shadowRoot.querySelector(".calendar-month");
+        container.innerHTML = "";
+    }
+
     @Attribute("month")
     public month(m: number | CalendarMonthInput) {
         const container = this.shadowRoot.querySelector(".calendar-month");

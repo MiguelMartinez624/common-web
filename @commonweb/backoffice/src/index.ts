@@ -8,6 +8,7 @@ import "./side-panel";
 import "./orders-managment.page";
 import "./logo"
 import "./history-report.page";
+import "./icons";
 
 export * from "./builder";
 
@@ -58,10 +59,10 @@ export * from "./builder";
 })
 export class NavigationListComponent extends HTMLElement {
     public addRoute(title: string, path: string, icon: string) {
-        console.log({title,path,icon})
+        console.log({title, path, icon})
         const li = document.createElement("li");
         li.setAttribute("route", path);
-        li.innerHTML = icon && icon !== "undefined" ? `<tt-icon icon="${icon}"></tt-icon>` + ` ${title}` : title;
+        li.innerHTML = icon && icon !== "undefined" ? `<pp-icon icon="${icon}"></pp-icon>` + ` ${title}` : title;
 
 
         li.addEventListener("click", () => {
@@ -200,9 +201,9 @@ export class DashboardLayout extends HTMLElement {
 @WebComponent({
     selector: 'nav-header',
     template: `
+
         <header>
-            <tt-icon icon="menu"></tt-icon>
-            <tt-icon class="hidden" icon="account_circle"></tt-icon>
+             <pp-icon icon="menu"></pp-icon>
             <div class="menu-floating hidden">
                <div close>Cerrar</div>
             </div>
@@ -262,11 +263,14 @@ export class DashboardLayout extends HTMLElement {
 })
 export class NavHeader extends HTMLElement {
 
+    private menuIcon = `<pp-icon  icon="account_circle"></pp-icon>`;
+
+
     @FromStorage("user")
     public user(user: any) {
-        const personOption = this.shadowRoot.querySelector("tt-icon[icon='account_circle']") as HTMLElement;
+        const personOption = this.shadowRoot.querySelector("header") as HTMLElement;
         if (personOption && user) {
-            personOption.classList.toggle("hidden");
+            personOption.innerHTML += this.menuIcon
         }
     }
 
@@ -283,7 +287,7 @@ export class NavHeader extends HTMLElement {
         }
     }
 
-    @EventBind("tt-icon[icon='account_circle']:click")
+    @EventBind("pp-icon[icon='account_circle']:click")
     public toggleOptions(): void {
         const menu = this.shadowRoot.querySelector(".menu-floating") as HTMLElement;
         if (menu) {
@@ -291,7 +295,7 @@ export class NavHeader extends HTMLElement {
         }
     }
 
-    @EventBind("tt-icon[icon='menu']:click")
+    @EventBind("pp-icon[icon='menu']:click")
     public toggleContent(): void {
         this.dispatchEvent(new CustomEvent('menu-clicked'));
     }

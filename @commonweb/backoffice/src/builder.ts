@@ -47,25 +47,45 @@ export class BackofficeRouteBuilder {
         return this;
     }
 
-    addRoute(route, icon, title, component) {
+    addRoute(route, icon, title, component, allowedRoles) {
         this.routes.push({
             route,
             icon,
             title,
             component,
+            allowedRoles
         });
         return this;
     }
 
     build(selector) {
-        const routesHTML = this.routes.map((route) => {
-            return `{
+
+        let user = localStorage.getItem("user")
+        if (user) {
+            user = JSON.parse(user);
+        }
+
+        const routesHTML = this.routes
+            .filter((r) => {
+                if(!user){
+                    return false;
+                }
+                if (r.allowedRoles) {
+                    return r.allowedRoles.includes(user.role)
+                } else {
+                    // for every one
+                    return true;
+                }
+
+            })
+            .map((route) => {
+                return `{
         "route": "${route.route}",
         "icon": "${route.icon}",
         "title": "${route.title}",
         "component": "${route.component}"
       }`;
-        }).join(", ");
+            }).join(", ");
 
         const element = document.querySelector(selector);
         if (!element) {
@@ -76,13 +96,8 @@ export class BackofficeRouteBuilder {
             // language=HTML
             `
                 <ecommerce-backoffice-app routes='[${routesHTML}]'>
-                    <go-route
-                            title="Productos"
-                            icon="inventory_2"
-                            route="backoffice/products"
-                            component="backoffice-entity-page"
-                            default="true">
-                    </go-route>
+
+
                 </ecommerce-backoffice-app>`;
     }
 }

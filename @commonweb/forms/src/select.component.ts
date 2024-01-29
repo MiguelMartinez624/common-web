@@ -88,10 +88,9 @@ export class SelectInput extends HTMLElement {
 
     public get getValue(): any {
         const select = this.shadowRoot.querySelector("select");
-        return select.value;
+        return select.value === "null" ? null : select.value;
     }
 }
-
 
 
 async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {

@@ -17,10 +17,7 @@ export interface DayInput {
             <div class="day"></div>
             <div class="content"></div>   
         </div>
-        
-        <dialog>
-        
-        </dialog>
+       
     `,
 
     // language=CSS
@@ -53,15 +50,7 @@ export class CalendarDayComponent extends HTMLElement {
         }
 
         // set the click event to display the details
-        if (inputs.detailsElement) {
-            const dialog = this.shadowRoot.querySelector("dialog");
-            dialog.innerHTML = inputs.detailsElement;
 
-
-            this.addEventListener("click", () => {
-                dialog.open ? dialog.close() : dialog.showModal();
-            });
-        }
 
     }
 }
