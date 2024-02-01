@@ -5,6 +5,8 @@ export class TemplateInterpolation {
     private prevValue: string;
 
     constructor(
+        // TODO root is taking the parent but hwat happents when the parent is a some of the componentn?
+        // root should reference the component no the parent
         public readonly root: Element,
         public readonly element: Element,
         public readonly propertyPath: string,

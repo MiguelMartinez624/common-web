@@ -118,11 +118,29 @@ describe('Template Interpolation', () => {
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
         expect(currentH4Content).toBe("Hello World! <!--@host.name-->Manuel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
     });
+    test('should update value with eventbind decotar trigger ', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+        const btn = component.shadowRoot.querySelector("button");
+        btn.click();
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->De evento<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
+    });
 
     test('should update interpolated obj', () => {
         document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
         const component = document.body.querySelector("string-template-obj-component");
 
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");
+    });
+    test('should allow event binding and interpolation interpolated obj', () => {
+        document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
+        const component = document.body.querySelector("string-template-obj-component");
+        const btn = component.shadowRoot.querySelector("button");
+        btn.click();
 
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
         expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");

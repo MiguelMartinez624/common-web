@@ -9,6 +9,7 @@ import "./orders-managment.page";
 import "./logo"
 import "./history-report.page";
 import "./icons";
+import "./multiselect.component";
 
 export * from "./builder";
 
@@ -159,7 +160,9 @@ export class ECommerceBackOffice extends HTMLElement {
     style: `
         .header{height:60px;}
         .content{
-             padding:1rem;
+             padding:1rem 3rem;
+             background:#dbdbdb75;
+             height:calc(92% - 2rem);
         }
         .container{
             overflow:hidden;

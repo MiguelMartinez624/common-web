@@ -52,7 +52,8 @@ export class TestComponentWithAttribute extends HTMLElement {
 
 @WebComponent({
     selector: 'string-template-component',
-    template: '<h4>Hello World! {{@host.name}} <span>{{@host.lastname}}</span> </h4> <button>Click Me {{@host.save}}</button>'
+    template: '<h4>Hello World! {{@host.name}} <span>{{@host.lastname}}</span> </h4> ' +
+        '<button>Click Me {{@host.save}}</button>'
 })
 export class StringTemplateComponent extends HTMLElement {
     public save: string = "YES"
@@ -60,7 +61,10 @@ export class StringTemplateComponent extends HTMLElement {
     public name: string = "Miguel";
 
     public lastname: string = "Martinez";
-
+    @EventBind("button:click")
+    public updateProfile() {
+        this.setAttribute("name", "De evento");
+    }
     static get observedAttributes() {
         return ["name"]
     }
@@ -70,7 +74,8 @@ export class StringTemplateComponent extends HTMLElement {
 
 @WebComponent({
     selector: 'string-template-obj-component',
-    template: '<h4>Hello World! {{@host.profile.name}} <span>{{@host.profile.lastname}}</span> </h4> <button>Click Me {{@host.save}}</button>'
+    template: '<h4>Hello World! {{@host.profile.name}} <span>{{@host.profile.lastname}}</span> </h4>' +
+        ' <button>Click Me {{@host.save}}</button>'
 })
 export class StringTemplateWithObjAttributeComponent extends HTMLElement {
     public save: string = "YES"
@@ -81,5 +86,9 @@ export class StringTemplateWithObjAttributeComponent extends HTMLElement {
         return ["profile"]
     }
 
+    @EventBind("button:click")
+    public updateProfile() {
+        this.setAttribute("profile", JSON.stringify({name: "Cambio", lastname: "A click"}))
+    }
 
 }

@@ -2,7 +2,9 @@ import {WebComponent} from "@commonweb/core";
 
 export interface DayInput {
     index: number;
+    date: Date;
     contentElement?: string | HTMLElement;
+    data?: any;
     template?: string
 
     // what to render when clicking, this will be rendered as a modal on the view
