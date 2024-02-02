@@ -9,7 +9,7 @@ export interface FormFieldDescription {
     defaultValue?: any;
     // Can be null
     width?: string;
-
+    placeholder?: string;
     options?: any[];
     valuePath?: string;
     labelPath?: string;

@@ -1,6 +1,7 @@
 import {Attribute, EventBind, extractData, WebComponent} from "@commonweb/core";
 import {FormField, FormFieldDescription} from "./form_field.component";
 import {SelectInput} from "./select.component";
+import {MultiselectComponent} from "./multiselect.component";
 
 
 @WebComponent({
@@ -72,8 +73,8 @@ export class EntityForm extends HTMLElement {
         // get the form values
         const values = {}
 
-        this._configurations.filter(c=> c.type === "silent")
-            .forEach(c=> values[c.propertyName] = c.defaultValue)
+        this._configurations.filter(c => c.type === "silent")
+            .forEach(c => values[c.propertyName] = c.defaultValue)
 
         // should no return should call metod reset
         const inputs: NodeListOf<FormField> = this.shadowRoot.querySelectorAll("form-field");
@@ -96,7 +97,8 @@ export class EntityForm extends HTMLElement {
         this.shadowRoot.querySelectorAll("select-input")
             .forEach((ele: SelectInput) => values[ele.propertyName] = ele.getValue)
 
-
+        this.shadowRoot.querySelectorAll("multi-select")
+            .forEach((ele: MultiselectComponent) => values[ele.propertyName] = ele.getValue)
         return {inputs, values};
     }
 
@@ -132,49 +134,63 @@ export class EntityForm extends HTMLElement {
         }
 
         values
-            .filter(c=> c.type !== "silent")
+            .filter(c => c.type !== "silent")
             .forEach((value) => {
-            if (value.type === "select") {
+                if (value.type === "select") {
 
-                const select = document.createElement("select-input");
-                select.setAttribute("value-path", value.valuePath);
-                select.setAttribute("label-path", value.labelPath);
-                select.setAttribute("source", value.source);
-                select.setAttribute("label", value.label);
-                select.setAttribute("options", JSON.stringify(value.options));
+                    const select = document.createElement("select-input");
+                    select.setAttribute("value-path", value.valuePath);
+                    select.setAttribute("label-path", value.labelPath);
+                    select.setAttribute("source", value.source);
+                    select.setAttribute("label", value.label);
+                    select.setAttribute("options", JSON.stringify(value.options));
 
-                select.setAttribute("options-loader", JSON.stringify(value.optionsLoader));
+                    select.setAttribute("options-loader", JSON.stringify(value.optionsLoader));
 
-                select.setAttribute("property-name", value.propertyName);
-                select.style.width = String(value.width || "100%");
-                this.mainElement.appendChild(select);
+                    select.setAttribute("property-name", value.propertyName);
+                    select.style.width = String(value.width || "100%");
+                    this.mainElement.appendChild(select);
 
-            } else if (value.type === "list") {
-                // let nestedForm = this.createSubFormFRomDescription(value);
-                // need to do extendable list element with and ADD and X to remove elements
-                let addButton = document.createElement("button")
-                // append singular as a list should end on "S"
-                addButton.innerText = `Add New ${value.label.slice(0, value.label.length - 1)}`
-                addButton.addEventListener("click", () => {
-                    const newNestedForm = this.createSubFormFRomDescription(value);
-                    this.mainElement.appendChild(newNestedForm);
-                });
-                this.mainElement.appendChild(addButton)
+                } else if (value.type === "multi-select") {
 
-            } else {
-                // Appending regular input types
-                let formField = document.createElement("form-field")
+                    const select = document.createElement("multi-select");
+                    select.setAttribute("value-path", value.valuePath);
+                    select.setAttribute("placeholder", value.placeholder);
+                    select.setAttribute("label-path", value.labelPath);
+                    select.setAttribute("source", value.source);
+                    select.setAttribute("label", value.label);
+                    select.setAttribute("options", JSON.stringify(value.options));
+                    select.setAttribute("options-loader", JSON.stringify(value.optionsLoader));
+                    select.setAttribute("property-name", value.propertyName);
+                    select.style.width = String(value.width || "100%");
+                    this.mainElement.appendChild(select);
 
-                formField.setAttribute("label", value.label);
-                formField.setAttribute("property-name", value.propertyName);
-                formField.setAttribute("type", value.type);
-                formField.style.width = String(value.width || "100%");
+                } else if (value.type === "list") {
+                    // let nestedForm = this.createSubFormFRomDescription(value);
+                    // need to do extendable list element with and ADD and X to remove elements
+                    let addButton = document.createElement("button")
+                    // append singular as a list should end on "S"
+                    addButton.innerText = `Add New ${value.label.slice(0, value.label.length - 1)}`
+                    addButton.addEventListener("click", () => {
+                        const newNestedForm = this.createSubFormFRomDescription(value);
+                        this.mainElement.appendChild(newNestedForm);
+                    });
+                    this.mainElement.appendChild(addButton)
 
-                this.mainElement.appendChild(formField)
-            }
+                } else {
+                    // Appending regular input types
+                    let formField = document.createElement("form-field")
+
+                    formField.setAttribute("label", value.label);
+                    formField.setAttribute("property-name", value.propertyName);
+                    formField.setAttribute("type", value.type);
+                    formField.style.width = String(value.width || "100%");
+
+                    this.mainElement.appendChild(formField)
+                }
 
 
-        })
+            })
     }
 
     private createSubFormFRomDescription(value: FormFieldDescription) {

@@ -9,7 +9,6 @@ import "./orders-managment.page";
 import "./logo"
 import "./history-report.page";
 import "./icons";
-import "./multiselect.component";
 
 export * from "./builder";
 
@@ -60,7 +59,7 @@ export * from "./builder";
 })
 export class NavigationListComponent extends HTMLElement {
     public addRoute(title: string, path: string, icon: string) {
-        console.log({title, path, icon})
+
         const li = document.createElement("li");
         li.setAttribute("route", path);
         li.innerHTML = icon && icon !== "undefined" ? `<pp-icon icon="${icon}"></pp-icon>` + ` ${title}` : title;

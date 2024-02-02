@@ -10,7 +10,6 @@ const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app"
 const filters = [
     {"type": "date", "label": "Fecha Desde", "propertyName": "fromDate", "width": "200px"},
     {"type": "date", "label": "Fecha Hasta", "propertyName": "toDate", "width": "200px"},
-
     {
         "type": "select", "label": "Tienda", "propertyName": "store_id", "width": "200px",
         "valuePath": "id",
@@ -33,7 +32,37 @@ const filters = [
                 }
             }
         }
-    }];
+    },
+    {
+        "type": "multi-select", "label": "Productos", "propertyName": "productsIds", "width": "200px",
+        "valuePath": "id",
+        "labelPath": "name",
+        "placeholder": "Selecione Productos",
+        "options": [],
+        "optionsLoader": {
+            "method": "GET",
+            "resultPath": "content",
+            "source": `${hostURL}/products?page=1&size=100`,
+            "filters": {
+                "page": {
+                    "page": 1,
+                    "size": 100
+                }
+            }
+        }
+    },
+    {
+        "type": "multi-select", "label": "Estatus", "propertyName": "statuses", "width": "200px",
+        "valuePath": "value",
+        "labelPath": "name",
+        "placeholder": "Selecione Estatus",
+        "options": [
+            {"name": "Completados", "value": "Completed"},
+            {"name": "Creados", "value": "Created"},
+
+        ],
+    }
+];
 
 
 const productsEndpointConfig = {
@@ -62,17 +91,6 @@ const productsEndpointConfig = {
                         <div style="display: flex;align-items: center; gap: 11px;justify-content: end;margin-bottom: 2rem;">
                             <div style=" display: flex;flex-wrap: wrap; gap: 10px">
                                 <entity-form configurations='${JSON.stringify(filters)}'></entity-form>
-                                <multi-select
-                                        label-path="name"
-                                        value-path="id"
-                                        options-loader='${JSON.stringify(productsEndpointConfig)}'
-                                        placeholder="Seleccione Producto"
-                                        search-placeholder="Nombre Producto">
-                                </multi-select>
-                                <multi-select
-                                        placeholder="Seleccione Estatus"
-                                        search-placeholder="Estatus"
-                                ></multi-select>
                                 <bind-element from="tt-button[search]:(click)" to="entity-form:submit"></bind-element>
                             </div>
                             <tt-button search>Buscar</tt-button>

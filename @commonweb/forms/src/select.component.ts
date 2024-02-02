@@ -93,7 +93,7 @@ export class SelectInput extends HTMLElement {
 }
 
 
-async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
+export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
 
     const result = await fetch(source, {
         method: method,

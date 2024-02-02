@@ -26,27 +26,27 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
         gap: 11px;justify-content: end;">
         <div>
         <entity-form configurations='${JSON.stringify([
-        {"type": "date", "label": "Fecha de Entrega", "propertyName": "deliveryDate", "width": "200px"},
-        {
-            "type": "select", "label": "Ciudad", "propertyName": "city", "width": "200px",
-            "valuePath": "id",
-            "labelPath": "name",
-            "options": [
-                {"name": "Seleccione una Sucursal", "id": null},
-
-            ],
-            "optionsLoader": {
-                "method": "POST",
-                "resultPath": "content",
-                "source": `${hostURL}/branches/search`,
-                "filters": {
-                    "page": {
-                        "page": 1,
-                        "size": 100
+            {"type": "date", "label": "Fecha de Entrega", "propertyName": "deliveryDate", "width": "200px"},
+            {
+                "type": "select", "label": "Ciudad", "propertyName": "city", "width": "200px",
+                "valuePath": "id",
+                "labelPath": "name",
+                "options": [
+                    {"name": "Seleccione una Sucursal", "id": null},
+    
+                ],
+                "optionsLoader": {
+                    "method": "POST",
+                    "resultPath": "content",
+                    "source": `${hostURL}/branches/search`,
+                    "filters": {
+                        "page": {
+                            "page": 1,
+                            "size": 100
+                        }
                     }
                 }
-            }
-        }])}'>
+            }])}'>
             </entity-form>
             </div>
             <bind-element from="tt-button[search]:(click)" to="entity-form:submit"></bind-element>

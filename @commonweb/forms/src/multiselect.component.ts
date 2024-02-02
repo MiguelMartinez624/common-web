@@ -1,39 +1,44 @@
 import {Attribute, EventBind, extractData, WebComponent} from "@commonweb/core";
-import {DataFetcherConfiguration} from "@commonweb/forms";
-import {SelectOption} from "@commonweb/forms/src";
+import {callRemoteAPI, SelectOption} from "./select.component";
+import {DataFetcherConfiguration} from "./form_field.component";
 
 @WebComponent({
     selector: `multi-select`,
     template:
     // language=HTML
         `
-
-
+            <label>{{@host.label}}</label>
             <button main><span text>{{@host.placeholder}}</span>
                 <pp-icon icon="expand_more"></pp-icon>
             </button>
-          
-                <div class="dropdown-menu hidden">
-                     <form-field
-                            label="Nombre"
-                            placeholder="Ej. Pavlova"
-                            search type="text">
-                    </form-field>
-                    <ul class="options-list" aria-labelledby="multiSelectDropdown">
-                    </ul>
-              
-                </div>
-           
+
+            <div class="dropdown-menu hidden">
+                <form-field
+                        label="Nombre"
+                        placeholder="Ej. Pavlova"
+                        search type="text">
+                </form-field>
+                <ul class="options-list" aria-labelledby="multiSelectDropdown">
+                </ul>
+
+            </div>
+
 
         `,
     style:
     // language=CSS
         `
-            span[text]{
+            label {
+                display: block;
+                margin-bottom: 10px;
+            }
+
+            span[text] {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 text-wrap: nowrap;
             }
+
             :host {
                 width: 200px;
                 padding: 1px;
@@ -90,16 +95,19 @@ export class MultiselectComponent extends HTMLElement {
 
 
     @Attribute("placeholder")
-    public placeholder: string;
+    public placeholder: string = "";
+
+    @Attribute("label")
+    public label: string = "";
 
     private _options: any[] = [];
 
     static get observedAttributes(): string[] {
-        return ["placeholder", "options-loader"];
+        return ["placeholder", "options-loader", "label", "property-name", "options",];
     }
 
     connectedCallback() {
-        this.addEventListener("mouseleave",()=>{
+        this.addEventListener("mouseleave", () => {
             const options = this.shadowRoot.querySelector(".dropdown-menu");
 
             options.classList.add("hidden");
@@ -197,22 +205,17 @@ export class MultiselectComponent extends HTMLElement {
             });
     }
 
-}
+    public get getValue(): any {
+        const values = Array.from(this.shadowRoot.querySelectorAll("[option]"))
+            .filter((c: HTMLInputElement) => c.checked)
+            .map((c: HTMLInputElement) => c.getAttribute("value"))
 
+        return values;
 
-async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
-    console.log(source)
-    const result = await fetch(source, {
-        method: method,
-        body: (filters && method !== 'GET') ? JSON.stringify({...filters}) : null,
-        headers: {
-            "Content-Type": "application/json",
-        }
-    });
-
-    if (!result.ok) {
-        throw {error: await result.json()}
     }
-    return await result.json();
 
+    get propertyName() {
+        return this.getAttribute("property-name");
+    }
 }
+
