@@ -4,8 +4,8 @@ import {CalendarMonthComponent, CalendarMonthInput} from "./calendar";
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import {EntityForm} from "@commonweb/forms";
 
-// const hostURL = "http://localhost:8080";
-const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app"
+//const hostURL = "http://localhost:8080";
+ const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app"
 
 const filters = [
     {"type": "date", "label": "Fecha Desde", "propertyName": "fromDate", "width": "200px"},
@@ -283,21 +283,47 @@ export class DayHistory extends HTMLElement {
 
     template: `
          <div class="card">
-            <div>{{@host.order.orderCode}}</div>    
-            <div>
+            <div class="code">
+            {{@host.order.orderCode}}</div>    
+            <div class="content">
                 <div><span>Status: </span> {{@host.order.status}}</div>    
                 <div><span>Cantidad Productos: </span> {{@host.order.products.length}}</div>   
                  <div><span>Total: </span> {{@host.order.totalPrice}}</div> 
              </div> 
         </div>   
     `,
-    style: `
-        .card{
-            margin:1rem 0;
-            padding: 1rem;
-            display: flex;
-            box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;  
-        }  `
+    // language=CSS
+    style:
+        `
+            .completed {
+                color: white;
+                background-color: #9acd32c2;
+            }
+
+            .content {
+                padding-left: 1rem;
+            }
+
+            .code {
+                display: flex;
+                align-items: center;
+                padding: 1rem;
+                border-right: 1px solid white;
+            }
+
+            .created {
+                color: white;
+                background-color: #a3a3ff;
+            }
+
+            .card {
+                margin: 1rem 0;
+                padding: 1rem;
+                display: flex;
+                box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+                font-weight: 500;
+
+            }  `
 })
 export class OrderCard extends HTMLElement {
     public static get observedAttributes() {
@@ -306,4 +332,9 @@ export class OrderCard extends HTMLElement {
 
     @Attribute("order")
     public order: { status: string, products: any[], totalPrice: number, orderCode: string };
+
+    connectedCallback() {
+        this.shadowRoot.querySelector(".card").classList.add(this.order.status.toLowerCase());
+    }
+
 }

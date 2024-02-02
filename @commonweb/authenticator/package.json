@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0-beta.3",
-  "name": "@commonweb/backoffice-app",
+  "version": "1.0.0-beta.1",
+  "name": "@commonweb/authenticator-app",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
   "typings": "dist/lib.d.ts",
@@ -22,10 +22,10 @@
     "url": "https://github.com/MiguelMartinez624/common-web.git"
   },
   "dependencies": {
-    "@commonweb/components": "^1.0.0-beta.16",
-    "@commonweb/core": "^1.0.0-beta.52",
+    "@commonweb/components": "^1.0.0-beta.17",
+    "@commonweb/core": "^1.0.0-beta.54",
     "@commonweb/data": "^1.0.0-beta.483",
-    "@commonweb/forms": "^1.0.0-beta.46"
+    "@commonweb/forms": "^1.0.0-beta.55"
   },
   "devDependencies": {
     "rollup-plugin-commonjs": "^10.1.0",
