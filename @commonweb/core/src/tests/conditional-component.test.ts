@@ -10,18 +10,17 @@ describe('ShowIfComponent', () => {
         document.body.innerHTML =
             // language=HTML
             `
-                <div value="hide"></div>
-                <h4 value="Show!"></h4>
-                <show-if
-                        html="<div>Hello World</div>"
-                        condition="@div:[value]/=/@h4:[value]">
-                </show-if>`;
+                <div parent>
+                    <div value="hide"></div>
+                    <h4 value="Show!"></h4>
+                    <show-if
+                            html="<div projected>Hello World</div>"
+                            condition="@div:[value]/=/@h4:[value]">
+                    </show-if>
+                </div>`;
 
-        const showIfSlotComponent = document.querySelector("show-if")
-            .shadowRoot
-            .querySelector("slot") as HTMLElement;
-
-        expect(showIfSlotComponent.innerHTML).toBe("");
+        const showIfSlotComponent = document.body.querySelector("[projected]") as HTMLElement;
+        expect(showIfSlotComponent).toBe(null);
 
     });
     test('should  render the html pass if the condition is true', () => {
@@ -29,18 +28,17 @@ describe('ShowIfComponent', () => {
         document.body.innerHTML =
             // language=HTML
             `
-                <div value="Show!"></div>
-                <h4 value="Show!"></h4>
-                <show-if
-                        html="<div>Hello World</div>"
-                        condition="@div:[value]/=/@h4:[value]">
-                </show-if>`;
+                <div parent>
+                    <div value="Show!"></div>
+                    <h4 value="Show!"></h4>
+                    <show-if
+                            html="<div projected>Hello World</div>"
+                            condition="@div:[value]/=/@h4:[value]">
+                    </show-if>
+                </div>`;
 
-        const showIfSlotComponent = document.querySelector("show-if")
-            .shadowRoot
-            .querySelector("slot") as HTMLElement;
-
-        expect(showIfSlotComponent.innerHTML).toBe("<div>Hello World</div>");
+        const showIfSlotComponent = document.body.querySelector("[projected]") as HTMLElement;
+        expect(showIfSlotComponent.innerHTML).toBe(`Hello World`);
 
     });
 
@@ -50,20 +48,40 @@ describe('ShowIfComponent', () => {
         document.body.innerHTML =
             // language=HTML
             `
-                <h4 value="ADMIN"></h4>
-                <show-if
-                        html="<div>Hello World</div>"
-                        condition="localstorage=user.role/=/@h4:[value]">
-                </show-if>`;
-
-        const showIfSlotComponent = document.querySelector("show-if")
-            .shadowRoot
-            .querySelector("slot") as HTMLElement;
-
-        expect(showIfSlotComponent.innerHTML).toBe("<div>Hello World</div>");
+                <div parent>
+                    <h4 value="ADMIN"></h4>
+                    <show-if
+                            html="<div projected>Hello World</div>"
+                            condition="localstorage=user.role/=/@h4:[value]">
+                    </show-if>
+                </div>`;
+        const showIfSlotComponent = document.body.querySelector("[projected]") as HTMLElement;
+        expect(showIfSlotComponent.innerHTML).toBe(`Hello World`);
 
     });
 
+    test('[LocalStorage] should  render the html in the parent', () => {
+        changeStorageValue("user", {role: "ADMIN"});
+        document.body.innerHTML =
+            // language=HTML
+            `
+                <h4 value="ADMIN"></h4>
+                <div>
+                    <div parent>
+                        <show-if
+                                html="<div>Hello World</div>"
+                                condition="localstorage=user.role/=/@h4:[value]">
+                        </show-if>
+                    </div>
+                </div>`;
+
+        const showIfSlotComponent = document.body.querySelector("[parent]") as HTMLElement;
+        expect(showIfSlotComponent.children.length).toBe(2);
+        expect(showIfSlotComponent.children[1].tagName).toBe("DIV");
+        expect(showIfSlotComponent.children[1].innerHTML).toBe("Hello World");
+
+
+    });
 
 
 });

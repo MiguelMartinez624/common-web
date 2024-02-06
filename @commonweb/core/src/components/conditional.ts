@@ -41,12 +41,15 @@ export class ShowIfComponent extends HTMLElement {
     private operator: string;
     private rightValue: ElementBind | LocalStorageBind;
 
-    static get observedAttributes(): string[] {
+
+    private insertedNodeRef: Node | null = null;
+
+    public static get observedAttributes(): string[] {
         return ["condition", "html"]
     }
 
     connectedCallback() {
-        this.evaluateCases();
+        // this.updateState(this.getAttribute("condition"));
     }
 
     /*
@@ -59,6 +62,7 @@ export class ShowIfComponent extends HTMLElement {
     * */
     @Attribute("condition")
     public updateState(newState: string) {
+
         if (!newState || newState === "") {
             return;
         }
@@ -76,7 +80,6 @@ export class ShowIfComponent extends HTMLElement {
             this.rightValue.searchElement(this.parentNode);
         }
 
-
         this.evaluateCases();
     }
 
@@ -86,16 +89,130 @@ export class ShowIfComponent extends HTMLElement {
         switch (this.operator) {
             case "=":
                 const result = this.leftValue.value === this.rightValue.value;
-                const slot = this.shadowRoot.querySelector("slot") as HTMLSlotElement;
-                if (!result) {
-                    slot.innerHTML = "";
-                } else {
-                    slot.innerHTML = this.getAttribute("html");
+                const slot = this.projectionContainer;
+                if (!slot) {
+                    console.warn("projection slot null")
+                    return;
                 }
+                if (result === false) {
+                    this.removeContent();
+                } else {
+                    this.projectContent(slot);
 
+                }
                 break;
+        }
+    }
+
+    private removeContent() {
+        if (this.insertedNodeRef) {
+            this.insertedNodeRef.parentNode.removeChild(this.insertedNodeRef);
+            this.insertedNodeRef = null;
+        }
+    }
+
+    private projectContent(slot: HTMLElement) {
+        // Dont inject directly on innerHTML as innerHTML modification will
+        // check the entire elements tree, creating a loop and stackoverflow
+        const template = document.createElement("template");
+        template.innerHTML = this.getAttribute("html");
+        this.insertedNodeRef = template.content.cloneNode(true);
+        slot.appendChild(this.insertedNodeRef);
+    }
+
+    public get projectionContainer(): HTMLElement | null {
+        return this.parentElement;
+    }
+}
+
+
+@WebComponent({
+    selector: 'for-each',
+    template: '',
+})
+export class ForEachComponent extends HTMLElement {
+    @Attribute("component")
+    // componentName will be evaluated as first priority and if its not null
+    // then a component will be created, data pass to it and injected into this
+    // component parent
+    public componentName: string | null = null;
+
+    @Attribute("html")
+    // html will be created into a node and injected into the parent
+    // component
+    public html: string | null = null;
+
+    @Attribute("push-order")
+    // pushOrder decide wherever gonna append to the end or the begining
+    // of the list
+    public pushOrder: "start" | "end" = "end";
+
+
+    public static get observedAttributes(): string[] {
+        return ["html", "component", "push-order", "data"]
+    }
+
+
+    @Attribute("data")
+    public data(data: any[]): void {
+        data.forEach(this.renderElement.bind(this));
+    }
+
+    // Push a element to the projection target
+    public push(data: any): void {
+        this.renderElement(data);
+    }
+
+    private renderElement(data: any) {
+        if (this.componentName) {
+            return this.renderByComponent(data);
+        } else if (this.html) {
+            this.projectContent(data);
         }
 
     }
+
+
+    private renderByComponent(data: any) {
+        const sections = this.componentName.split(":");
+        const component = document.createElement(sections[0]);
+        // passing data as a function to avoid JSON stringify
+        component.setAttribute(sections[1], JSON.stringify(data));
+        if (this.pushOrder === "end") {
+            return this.parentElement.appendChild(component);
+        } else {
+            throw "Feature under development"
+        }
+    }
+
+    private projectContent(data: any) {
+        const sections = this.html.split(":");
+        const [html, attr] = sections;
+        const template = document.createElement("template");
+        template.innerHTML = html;
+        template.content.children.item(0).setAttribute(attr, JSON.stringify(data));
+
+        this.parentElement.appendChild(template.content.cloneNode(true));
+    }
+
 }
+
+
+@WebComponent({
+    selector: 'template-view',
+    template: '',
+})
+export class TemplateView extends HTMLElement {
+    @Attribute("data")
+    // componentName will be evaluated as first priority and if its not null
+    // then a component will be created, data pass to it and injected into this
+    // component parent
+    public data: any | null = null;
+
+    public static get observedAttributes(): string[] {
+        return ["data"]
+    }
+
+}
+
 

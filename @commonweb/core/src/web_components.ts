@@ -43,7 +43,7 @@ function bindTemplateToProperties(node: HTMLElement) {
     * */
 
     const interpolations = new Map<string, TemplateInterpolation[]>();
-    [...node.shadowRoot.children].forEach((child) => {
+    [...node.shadowRoot.children, ...node.children].forEach((child) => {
 
         let innerHTML = child.innerHTML;
         const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
@@ -92,6 +92,7 @@ function updateAttributes(element: any, name: string, newValue: any) {
 
     }
 }
+
 
 export function WebComponent(attr: CustomElementConfig) {
     return function _WebComponent<T extends { new(...args: any[]): {} }>(constr: T) {

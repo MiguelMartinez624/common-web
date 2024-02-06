@@ -5,7 +5,7 @@ import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import {EntityForm} from "@commonweb/forms";
 
 //const hostURL = "http://localhost:8080";
- const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app"
+const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app"
 
 const filters = [
     {"type": "date", "label": "Fecha Desde", "propertyName": "fromDate", "width": "200px"},
@@ -64,19 +64,6 @@ const filters = [
     }
 ];
 
-
-const productsEndpointConfig = {
-    "method": "GET",
-    "resultPath": "content",
-    "source": `${hostURL}/products?page=1&size=100`,
-    "filters": {
-        "page": {
-            "page": 1,
-            "size": 100
-        }
-    }
-
-}
 
 @WebComponent({
     selector: `history-report-page`,

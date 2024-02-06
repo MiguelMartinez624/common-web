@@ -1,4 +1,3 @@
-import {findNodeOnUpTree} from "../dist/lib";
 import {extractData} from "./html_manipulation";
 
 export class TemplateInterpolation {
