@@ -3,6 +3,7 @@ import {ElementBind} from "../bindings/element_bind";
 import {Attribute} from "../attributes";
 import {bindFromString} from "../bindings";
 import {LocalStorageBind} from "../bindings/localstorage_bind";
+import {extractData} from "../html_manipulation";
 
 @WebComponent({
     selector: 'conditional-render-cases',
@@ -147,9 +148,19 @@ export class ForEachComponent extends HTMLElement {
     // of the list
     public pushOrder: "start" | "end" = "end";
 
+    @Attribute("added-sign-duration")
+    // addedTimeDuration time that the special class will be applied to it
+    // is on ms (milliseconds)
+    public addedTimeDuration: 3000;
+
+    @Attribute("identifier-path")
+    // identifierPath the path to a property that will me attached to each prjected element
+    // so it can be easily identified
+    public identifierPath: string = "";
+
 
     public static get observedAttributes(): string[] {
-        return ["html", "component", "push-order", "data"]
+        return ["html", "component", "push-order", "data", "dded-sign-duration"]
     }
 
 
@@ -161,6 +172,16 @@ export class ForEachComponent extends HTMLElement {
     // Push a element to the projection target
     public push(data: any): void {
         this.renderElement(data);
+    }
+
+    // Push a element to the projection target
+    public removeNode(id: string): void {
+        const cssIdentifer = `[loop-id="${id}"   ]`;
+        const nodeToRemove = this.parentElement.querySelector(cssIdentifer);
+        if (!nodeToRemove) {
+            return console.warn("not element under ", cssIdentifer)
+        }
+        nodeToRemove.remove();
     }
 
     private renderElement(data: any) {
@@ -186,21 +207,32 @@ export class ForEachComponent extends HTMLElement {
     }
 
     private projectContent(data: any) {
-        const sections = this.html.split(":");
-        const [html, attr] = sections;
-        const template = document.createElement("template");
-        template.innerHTML = html;
-        template.content.children.item(0).setAttribute(attr, JSON.stringify(data));
+        // Create the template-view as its gonna be required any ways we pass a template down
+        const wrapper = document.createElement("template");
+        wrapper.innerHTML = `<template-view>${this.html}</template-view>`;
+        wrapper.content.children.item(0).setAttribute("loop-id", this.generateIdentifier(data));
 
-        this.parentElement.appendChild(template.content.cloneNode(true));
+        wrapper.content.children.item(0).setAttribute("data", JSON.stringify(data));
+        this.parentElement.appendChild(wrapper.content.cloneNode(true));
     }
 
+    private generateIdentifier(data: any): string {
+        if (this.identifierPath === "") {
+            return typeof data === "string" ? data : JSON.stringify(data);
+        }
+        const id = extractData(this.identifierPath, data);
+        if (!id) {
+            console.warn("identifier not found")
+        }
+        console.log({id})
+        return id;
+    }
 }
 
 
 @WebComponent({
     selector: 'template-view',
-    template: '',
+    template: '<slot></slot> ',
 })
 export class TemplateView extends HTMLElement {
     @Attribute("data")

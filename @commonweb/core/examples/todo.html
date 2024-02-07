@@ -1,1 +1,41 @@
-html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo App</title>
+</head>
+<script src="../dist/lib-pkg.js" async type="text/javascript"></script>
+<body>
+
+<div>
+    <div>
+        <form action="" onsubmit="return false">
+            <input type="text">
+            <button>Click me</button>
+        </form>
+        <bind-element
+                input-src="input:value"
+                from="button:(click)"
+                to="for-each:push">
+        </bind-element>
+        <bind-element
+                value=""
+                from="button:(click)"
+                to="form:reset">
+        </bind-element>
+
+    </div>
+    <ul>
+        <for-each html='
+                <li>{{@host.data}}</h5>
+                <button >Borrame</button>
+                 <bind-element value="{{@host.data}}"  from="button:(click)" to="for-each:removeNode"></bind-element>'
+                  data="[]"></for-each>
+    </ul>
+</div>
+
+</body>
+</html>

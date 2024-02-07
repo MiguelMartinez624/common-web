@@ -14,7 +14,7 @@ const bundle = config => ({
 export default [
     bundle({
         plugins: [esbuild({
-            exclude: ["**/__tests__", "**/*.tsest.ts"]
+            exclude: ["**/__tests__", "**/*.test.ts"]
         })],
         output: [
             {
@@ -27,7 +27,11 @@ export default [
                 format: 'es',
                 sourcemap: false,
             },
-
+            {
+                file: `${name}-pkg.js`,
+                format: "umd",
+                name: "myModule",
+            }
         ],
     }),
     bundle({
