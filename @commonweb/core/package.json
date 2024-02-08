@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.54",
+  "version": "1.0.0-beta.55",
   "name": "@commonweb/core",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "push": "npm run test && npm run build && npm publish --access public",
-    "build": "rollup -c  --watch",
+    "build": "rollup -c",
     "test": "jest"
   },
   "repository": {

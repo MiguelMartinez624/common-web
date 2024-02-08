@@ -151,7 +151,7 @@ export class ForEachComponent extends HTMLElement {
     @Attribute("added-sign-duration")
     // addedTimeDuration time that the special class will be applied to it
     // is on ms (milliseconds)
-    public addedTimeDuration: 3000;
+    public addedTimeDuration: number = 3000;
 
     @Attribute("identifier-path")
     // identifierPath the path to a property that will me attached to each prjected element
@@ -176,7 +176,7 @@ export class ForEachComponent extends HTMLElement {
 
     // Push a element to the projection target
     public removeNode(id: string): void {
-        const cssIdentifer = `[loop-id="${id}"   ]`;
+        const cssIdentifer = `[loop-id="${id}"]`;
         const nodeToRemove = this.parentElement.querySelector(cssIdentifer);
         if (!nodeToRemove) {
             return console.warn("not element under ", cssIdentifer)
@@ -210,10 +210,17 @@ export class ForEachComponent extends HTMLElement {
         // Create the template-view as its gonna be required any ways we pass a template down
         const wrapper = document.createElement("template");
         wrapper.innerHTML = `<template-view>${this.html}</template-view>`;
-        wrapper.content.children.item(0).setAttribute("loop-id", this.generateIdentifier(data));
-
+        const id = this.generateIdentifier(data);
+        wrapper.content.children.item(0).setAttribute("loop-id", id);
+        wrapper.content.children.item(0).classList.add("loop-injected");
         wrapper.content.children.item(0).setAttribute("data", JSON.stringify(data));
+
         this.parentElement.appendChild(wrapper.content.cloneNode(true));
+        setTimeout(() => {
+            const cssIdentifer = `[loop-id="${id}"]`;
+            this.parentElement.querySelector(cssIdentifer)?.classList.remove("loop-injected");
+        }, Number(this.addedTimeDuration));
+
     }
 
     private generateIdentifier(data: any): string {

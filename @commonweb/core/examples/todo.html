@@ -9,8 +9,29 @@
 </head>
 <script src="../dist/lib-pkg.js" async type="text/javascript"></script>
 <body>
+<style>
 
-<div>
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    li {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        background-color: lightblue;
+        margin: 1.4rem 0;
+    }
+    .loop-injected > li{
+        background-color: black;
+    }
+    span {
+        flex: 1;
+    }
+</style>
+<div style="margin: auto;max-width: 500px">
+
     <div>
         <form action="" onsubmit="return false">
             <input type="text">
@@ -28,14 +49,22 @@
         </bind-element>
 
     </div>
-    <ul>
-        <for-each html='
-                <li>{{@host.data}}</h5>
-                <button >Borrame</button>
-                 <bind-element value="{{@host.data}}"  from="button:(click)" to="for-each:removeNode"></bind-element>'
-                  data="[]"></for-each>
-    </ul>
+    <div class="card-section">
+        <ul>
+            <for-each data="[]"></for-each>
+        </ul>
+    </div>
 </div>
+<script>
+    // language=HTML
+    const todoCardTemplate = `
+        <li><span>{{@host.data}}</span>
+            <button>Borrame</button>
+            <bind-element value="{{@host.data}}" from="button:(click)" to="for-each:removeNode"></bind-element>
+        </li>
+    `;
 
+    document.querySelector("for-each").setAttribute("html", todoCardTemplate);
+</script>
 </body>
 </html>

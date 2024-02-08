@@ -143,6 +143,6 @@ describe('Template Interpolation', () => {
         btn.click();
 
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
-        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");
+        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Cambio<!--@host.profile.name--> <span><!--@host.profile.lastname-->A click<!--@host.profile.lastname--></span> ");
     });
 })

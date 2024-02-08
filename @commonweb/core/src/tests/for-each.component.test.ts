@@ -11,7 +11,7 @@ describe('ForEachComponent', () => {
             `
                 <div>
                     <for-each
-                            html="<template-view><h5 projected>{{@host.data}}</h5></template-view>:data"
+                            html="<h5 projected>{{@host.data}}</h5>"
                             data="[1,2,3,4]"></for-each>
                 </div>
 
