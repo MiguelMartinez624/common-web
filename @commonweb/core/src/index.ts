@@ -1,5 +1,6 @@
 import {PROCESSOR_KEY} from "./web_components";
 
+export * from './interpolations';
 export * from './field_decorators';
 export * from './web_components';
 export * from './html_manipulation';

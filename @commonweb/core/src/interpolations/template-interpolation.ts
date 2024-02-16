@@ -1,6 +1,40 @@
-import {extractData} from "./html_manipulation";
+import {extractData} from "../html_manipulation";
+import {Interpolation} from "./index";
 
-export class TemplateInterpolation {
+export function generateTemplateInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
+    childList.forEach((child) => {
+        evaluateTemplateInterpolation(child, root, interpolations);
+    });
+}
+
+// Attributes that are not reflected on the template this only true for components that start empty
+export function evaluateTemplateInterpolation(child: Element, root: Element, interpolations: Map<string, Interpolation[]>) {
+
+    let innerHTML = child.innerHTML;
+    const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
+    for (const match of matches) {
+
+        const propertyPath = match[1];
+        const interpolation = new TemplateInterpolation(root, child, propertyPath, `<!--${propertyPath}-->`);
+        /*
+         * Need to attach this interpolation to the properties
+         * */
+        let attributeName = match[1].replace("@host.", "");
+        const nextDot = attributeName.indexOf(".");
+        if (nextDot > -1) {
+            attributeName = attributeName.slice(0, nextDot)
+        }
+
+        let interpolationsStored = interpolations.get(attributeName);
+        if (!interpolationsStored) {
+            interpolations.set(attributeName, [interpolation]);
+            continue;
+        }
+        interpolationsStored.push(interpolation);
+    }
+}
+
+export class TemplateInterpolation implements Interpolation {
     private prevValue: string;
     private attributesInterpolation: Map<string, string> = new Map();
 
@@ -25,7 +59,10 @@ export class TemplateInterpolation {
                 this.attributesInterpolation.set(attributeName, propertyPath)
             }
         }
+
+
         let newHTML = element.innerHTML.replace(`="{{${propertyPath}}}`, `="${value}`)
+
 
         this.prevValue = value;
         element.innerHTML = newHTML
@@ -35,10 +72,12 @@ export class TemplateInterpolation {
     }
 
     public update(): void {
+
         const value = extractData(this.propertyPath, this.root);
         if (this.prevValue === value) {
             return;
         }
+
         let newHTML = this.element
             .innerHTML
             .replace(`<!--${this.propertyPath}-->${this.prevValue}<!--${this.propertyPath}-->`, `<!--${this.propertyPath}-->${value}<!--${this.propertyPath}-->`);

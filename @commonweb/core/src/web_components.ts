@@ -1,6 +1,7 @@
 import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
-import {TemplateInterpolation} from "./transformer";
+
+import {generateAttributesInterpolations, generateTemplateInterpolations, Interpolation} from "./interpolations";
 
 interface CustomElementConfig {
     selector: string;
@@ -28,6 +29,7 @@ function insertTemplate(attr: CustomElementConfig) {
 
 }
 
+
 /**
  * Need to create transformers from the templates and clear up those markdowns
  * host stand for the component itself (this) and then it comes the property and any key
@@ -37,40 +39,22 @@ function insertTemplate(attr: CustomElementConfig) {
  * native properties
  * <div>{{[CSSSelector].property.key}}</div>
  */
-function bindTemplateToProperties(node: HTMLElement) {
+function bindTemplateToProperties(root: HTMLElement) {
+
+
     /*
     * CHeck properties to create a transform for each binding
     * */
+    const interpolations = new Map<string, Interpolation[]>();
 
-    const interpolations = new Map<string, TemplateInterpolation[]>();
-    [...node.shadowRoot.children, ...node.children].forEach((child) => {
+    // Bind Attribute Interpolations
+    // childs should be the parameter
+    generateAttributesInterpolations(root, [...root.shadowRoot.children, ...root.children], interpolations);
 
-        let innerHTML = child.innerHTML;
-        const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
-        for (const match of matches) {
+    generateTemplateInterpolations(root, [...root.shadowRoot.children, ...root.children], interpolations);
 
-            const propertyPath = match[1];
-            const interpolation = new TemplateInterpolation(node, child, propertyPath, `<!--${propertyPath}-->`);
-            /*
-             * Need to attach this interpolation to the properties
-             * */
-            let attributeName = match[1].replace("@host.", "");
-            const nextDot = attributeName.indexOf(".");
-            if (nextDot > -1) {
-                attributeName = attributeName.slice(0, nextDot)
-            }
 
-            let interpolationsStored = interpolations.get(attributeName);
-            if (!interpolationsStored) {
-                interpolations.set(attributeName, [interpolation]);
-                continue;
-            }
-            interpolationsStored.push(interpolation);
-        }
-
-        (node as any).interpolations = interpolations;
-
-    })
+    (root as any).interpolations = interpolations;
 }
 
 function updateAttributes(element: any, name: string, newValue: any) {
@@ -117,15 +101,15 @@ export function WebComponent(attr: CustomElementConfig) {
 
             }
 
-
             attributeChangedCallback(name, oldValue, newValue) {
                 updateAttributes(this, name, newValue);
 
+                const interpolations = (this as any).interpolations;
                 // if you didn't use the notation wont have this field set.
-                if ((this as any).interpolations) {
-                    const interpolationsList = (this as any).interpolations.get(name);
+                if (interpolations) {
+                    const interpolationsList = interpolations.get(name);
                     if (interpolationsList) {
-                        interpolationsList.forEach((interpolation: TemplateInterpolation) => interpolation.update())
+                        interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
                     }
                 }
 

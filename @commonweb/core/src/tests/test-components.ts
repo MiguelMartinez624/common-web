@@ -52,8 +52,10 @@ export class TestComponentWithAttribute extends HTMLElement {
 
 @WebComponent({
     selector: 'string-template-component',
-    template: '<h4>Hello World! {{@host.name}} <span>{{@host.lastname}}</span> </h4> ' +
-        '<button>Click Me {{@host.save}}</button>'
+    template: `
+    <h4>Hello World! {{@host.name}} <span>{{@host.lastname}}</span> </h4> 
+    <button>Click Me {{@host.save}}</button>
+`
 })
 export class StringTemplateComponent extends HTMLElement {
     public save: string = "YES"
@@ -61,15 +63,15 @@ export class StringTemplateComponent extends HTMLElement {
     public name: string = "Miguel";
 
     public lastname: string = "Martinez";
+
     @EventBind("button:click")
     public updateProfile() {
         this.setAttribute("name", "De evento");
     }
+
     static get observedAttributes() {
         return ["name"]
     }
-
-
 }
 
 @WebComponent({
@@ -90,5 +92,35 @@ export class StringTemplateWithObjAttributeComponent extends HTMLElement {
     public updateProfile() {
         this.setAttribute("profile", JSON.stringify({name: "Cambio", lastname: "A click"}))
     }
+}
+
+
+@WebComponent({
+    selector: 'profile-list-components',
+    template:
+    // language=HTML
+        `
+            <div>
+                <for-each
+                        data="{{@host.profiles}}"
+                        html="<h5 projected>{{@host.data.name}} - {{@host.data.lastname}} </h5>">
+                </for-each>
+            </div>
+
+        `
+})
+export class ProfileListComponent extends HTMLElement {
+
+    @Attribute("profiles")
+    public profiles: { id: number, name: string, lastname: string }[] = [
+        {id: 1, name: "Miguel", lastname: "Martinez"},
+        {id: 2, name: "Manuel", lastname: "Martinez"},
+
+    ];
+
+    static get observedAttributes() {
+        return ["profiles"]
+    }
 
 }
+

@@ -160,13 +160,15 @@ export class ForEachComponent extends HTMLElement {
 
 
     public static get observedAttributes(): string[] {
-        return ["html", "component", "push-order", "data", "dded-sign-duration"]
+        return ["html", "component", "push-order", "data", "added-sign-duration"]
     }
 
 
     @Attribute("data")
     public data(data: any[]): void {
-        data.forEach(this.renderElement.bind(this));
+        if (Array.isArray(data)) {
+            data.forEach(this.renderElement.bind(this));
+        }
     }
 
     // Push a element to the projection target
@@ -207,6 +209,7 @@ export class ForEachComponent extends HTMLElement {
     }
 
     private projectContent(data: any) {
+
         // Create the template-view as its gonna be required any ways we pass a template down
         const wrapper = document.createElement("template");
         wrapper.innerHTML = `<template-view>${this.html}</template-view>`;
@@ -214,7 +217,6 @@ export class ForEachComponent extends HTMLElement {
         wrapper.content.children.item(0).setAttribute("loop-id", id);
         wrapper.content.children.item(0).classList.add("loop-injected");
         wrapper.content.children.item(0).setAttribute("data", JSON.stringify(data));
-
         this.parentElement.appendChild(wrapper.content.cloneNode(true));
         setTimeout(() => {
             const cssIdentifer = `[loop-id="${id}"]`;
