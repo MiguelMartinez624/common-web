@@ -45,7 +45,7 @@ export class TemplateInterpolation implements Interpolation {
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly pattern: string) {
-
+        debugger
         const value = extractData(propertyPath, this.root);
 
         // Get all the attributes that need changes

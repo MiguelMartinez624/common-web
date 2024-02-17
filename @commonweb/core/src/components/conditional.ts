@@ -204,16 +204,19 @@ export class ForEachComponent extends HTMLElement {
         if (!data) {
             return
         }
+
+        const itsTemplate = this.html.startsWith("<template-view");
         // Create the template-view as its gonna be required any ways we pass a template down
-        const wrapper = document.createElement("template");
-        wrapper.innerHTML = `<template-view>${this.html}</template-view>`;
+        const node = document
+            .createRange()
+            .createContextualFragment(itsTemplate ? this.html : `<template-view>${this.html}</template-view>`)
         const id = this.generateIdentifier(data);
-        wrapper.content.children.item(0).setAttribute("loop-id", id);
-        wrapper.content.children.item(0).setAttribute("data", JSON.stringify(data));
+        node.children.item(0).setAttribute("loop-id", id);
+        node.children.item(0).setAttribute("data", JSON.stringify(data));
 
 
         if (mark) {
-            wrapper.content.children.item(0).classList.add("loop-injected");
+            node.children.item(0).classList.add("loop-injected");
             setTimeout(() => {
                 const cssIdentifer = `[loop-id="${id}"]`;
                 const item = this.parentElement.querySelector(cssIdentifer);
@@ -222,7 +225,7 @@ export class ForEachComponent extends HTMLElement {
         }
 
         // insert at the end to make all changes effect
-        this.parentElement.appendChild(wrapper.content.cloneNode(true));
+        this.parentElement.appendChild(node);
 
     }
 
@@ -242,7 +245,8 @@ export class ForEachComponent extends HTMLElement {
 
 @WebComponent({
     selector: 'template-view',
-    template: '<slot></slot> ',
+    template: '<slot></slot>',
+    useShadow: false,
 })
 export class TemplateView extends HTMLElement {
     @Attribute("data")
@@ -258,9 +262,10 @@ export class TemplateView extends HTMLElement {
     public set view(view: string) {
         if (view.startsWith("http:") || view.startsWith("https:")) {
             callRemoteAPI(view, "GET", {})
-                .then((result) => this.setAttribute("view", result))
+                .then((result) => this.view = result)
         } else {
-            this.shadowRoot.innerHTML = view;
+            this.shadowRoot ? this.shadowRoot.innerHTML = view : this.innerHTML = view;
+
             // check the view to create the interpolations
             bindTemplateToProperties(this);
         }

@@ -1,16 +1,20 @@
-<style>
-    .loop-injected > li {
-        background-color: #e36363;
-    }
-</style>
-<div>
 
-    Edad : <h5>{{@host.data.firstName}} {{@host.data.lastName}}</h5>
-    <ul>
-        <for-each
-                identifier-path="name"
-                data="{{@host.data.skills}}"
-                html="<li>{{@host.data.name}}</li>">
-        </for-each>
-    </ul>
-</div>
+<li class="mt-8  p-3 sm:py-4 outline outline-cyan-500 hover:bg-cyan-900 hover:outline-blue-400 cursor-pointer">
+    <div class="flex items-center">
+        <div class="flex-shrink-0">
+            <img class="w-8 h-8 rounded-full" src="/docs/images/people/profile-picture-1.jpg"
+                 alt="Neil image">
+        </div>
+        <div class="flex-1 min-w-0 ms-4">
+            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                Neil Sims
+            </p>
+            <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+                email@windster.com
+            </p>
+        </div>
+        <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
+            $320
+        </div>
+    </div>
+</li>

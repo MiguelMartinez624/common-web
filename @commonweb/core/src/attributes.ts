@@ -5,11 +5,11 @@ const AttributeMapKey = 'attribute_list';
 * */
 export function Attribute(name: string) {
     //TODO can be generic as we repeat it a lot
+    // Register property
     return function (target: any, propertyKey: string) {
         if (!target[AttributeMapKey]) {
             target[AttributeMapKey] = new Map<string, any>();
         }
-
 
         const method = target[propertyKey];
         if (typeof method === "function") {
@@ -17,6 +17,5 @@ export function Attribute(name: string) {
         } else {
             target[AttributeMapKey].set(name, propertyKey);
         }
-
     };
 }
