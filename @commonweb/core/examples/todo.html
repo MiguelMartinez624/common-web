@@ -23,15 +23,19 @@
         background-color: lightblue;
         margin: 1.4rem 0;
     }
-    .loop-injected > li{
+
+    .loop-injected > li {
         background-color: black;
     }
+
     span {
         flex: 1;
     }
 </style>
 <div style="margin: auto;max-width: 500px">
+    <template-view test view="http://localhost:63342/common-web/@commonweb/core/examples/test.html">
 
+    </template-view>
     <div>
         <form action="" onsubmit="return false">
             <input type="text">
@@ -63,7 +67,12 @@
             <bind-element value="{{@host.data}}" from="button:(click)" to="for-each:removeNode"></bind-element>
         </li>
     `;
-
+    document.querySelector("[test]").setAttribute("data", JSON.stringify({
+        id: 1,
+        firstName: "Miguel",
+        lastName: "Martinez",
+        skills: [{name: "Web Frameworks"}, {name: "HTML5"}]
+    }))
     document.querySelector("for-each").setAttribute("html", todoCardTemplate);
 </script>
 </body>

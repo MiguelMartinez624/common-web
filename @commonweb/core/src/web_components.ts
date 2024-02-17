@@ -39,12 +39,7 @@ function insertTemplate(attr: CustomElementConfig) {
  * native properties
  * <div>{{[CSSSelector].property.key}}</div>
  */
-function bindTemplateToProperties(root: HTMLElement) {
-
-
-    /*
-    * CHeck properties to create a transform for each binding
-    * */
+export function bindTemplateToProperties(root: HTMLElement) {
     const interpolations = new Map<string, Interpolation[]>();
 
     // Bind Attribute Interpolations
@@ -52,8 +47,6 @@ function bindTemplateToProperties(root: HTMLElement) {
     generateAttributesInterpolations(root, [...root.shadowRoot.children, ...root.children], interpolations);
 
     generateTemplateInterpolations(root, [...root.shadowRoot.children, ...root.children], interpolations);
-
-
     (root as any).interpolations = interpolations;
 }
 
@@ -103,8 +96,8 @@ export function WebComponent(attr: CustomElementConfig) {
 
             attributeChangedCallback(name, oldValue, newValue) {
                 updateAttributes(this, name, newValue);
-
                 const interpolations = (this as any).interpolations;
+
                 // if you didn't use the notation wont have this field set.
                 if (interpolations) {
                     const interpolationsList = interpolations.get(name);

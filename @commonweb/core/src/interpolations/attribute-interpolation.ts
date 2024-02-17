@@ -56,7 +56,6 @@ export class AttributeInterpolation implements Interpolation {
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly attributeName: string) {
-        debugger
         const value = extractData(propertyPath, this.root);
 
         // objects and arrays will be always pass by setter if posible
@@ -73,7 +72,6 @@ export class AttributeInterpolation implements Interpolation {
     }
 
     public update(): void {
-        debugger
         const value = extractData(this.propertyPath, this.root);
         if (this.prevValue === value) {
             return;

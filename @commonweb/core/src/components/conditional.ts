@@ -1,9 +1,10 @@
-import {WebComponent} from "../web_components";
+import {bindTemplateToProperties, WebComponent} from "../web_components";
 import {ElementBind} from "../bindings/element_bind";
 import {Attribute} from "../attributes";
 import {bindFromString} from "../bindings";
 import {LocalStorageBind} from "../bindings/localstorage_bind";
 import {extractData} from "../html_manipulation";
+import {callRemoteAPI} from "./data-store.componnet";
 
 @WebComponent({
     selector: 'conditional-render-cases',
@@ -160,20 +161,20 @@ export class ForEachComponent extends HTMLElement {
 
 
     public static get observedAttributes(): string[] {
-        return ["html", "component", "push-order", "data", "added-sign-duration"]
+        return ["html", "component", "push-order", "data", "added-sign-duration", "identifier-path"]
     }
 
 
     @Attribute("data")
     public data(data: any[]): void {
         if (Array.isArray(data)) {
-            data.forEach(this.renderElement.bind(this));
+            data.forEach((ele) => this.projectContent(ele, false));
         }
     }
 
     // Push a element to the projection target
     public push(data: any): void {
-        this.renderElement(data);
+        this.projectContent(data, true);
     }
 
     // Push a element to the projection target
@@ -184,15 +185,6 @@ export class ForEachComponent extends HTMLElement {
             return console.warn("not element under ", cssIdentifer)
         }
         nodeToRemove.remove();
-    }
-
-    private renderElement(data: any) {
-        if (this.componentName) {
-            return this.renderByComponent(data);
-        } else if (this.html) {
-            this.projectContent(data);
-        }
-
     }
 
 
@@ -208,20 +200,29 @@ export class ForEachComponent extends HTMLElement {
         }
     }
 
-    private projectContent(data: any) {
-
+    private projectContent(data: any, mark: boolean) {
+        if (!data) {
+            return
+        }
         // Create the template-view as its gonna be required any ways we pass a template down
         const wrapper = document.createElement("template");
         wrapper.innerHTML = `<template-view>${this.html}</template-view>`;
         const id = this.generateIdentifier(data);
         wrapper.content.children.item(0).setAttribute("loop-id", id);
-        wrapper.content.children.item(0).classList.add("loop-injected");
         wrapper.content.children.item(0).setAttribute("data", JSON.stringify(data));
+
+
+        if (mark) {
+            wrapper.content.children.item(0).classList.add("loop-injected");
+            setTimeout(() => {
+                const cssIdentifer = `[loop-id="${id}"]`;
+                const item = this.parentElement.querySelector(cssIdentifer);
+                item?.classList.remove("loop-injected");
+            }, Number(this.addedTimeDuration));
+        }
+
+        // insert at the end to make all changes effect
         this.parentElement.appendChild(wrapper.content.cloneNode(true));
-        setTimeout(() => {
-            const cssIdentifer = `[loop-id="${id}"]`;
-            this.parentElement.querySelector(cssIdentifer)?.classList.remove("loop-injected");
-        }, Number(this.addedTimeDuration));
 
     }
 
@@ -250,8 +251,23 @@ export class TemplateView extends HTMLElement {
     // component parent
     public data: any | null = null;
 
+    @Attribute("view")
+    // componentName will be evaluated as first priority and if its not null
+    // then a component will be created, data pass to it and injected into this
+    // component parent
+    public set view(view: string) {
+        if (view.startsWith("http:") || view.startsWith("https:")) {
+            callRemoteAPI(view, "GET", {})
+                .then((result) => this.setAttribute("view", result))
+        } else {
+            this.shadowRoot.innerHTML = view;
+            // check the view to create the interpolations
+            bindTemplateToProperties(this);
+        }
+    }
+
     public static get observedAttributes(): string[] {
-        return ["data"]
+        return ["data", "view"]
     }
 
 }

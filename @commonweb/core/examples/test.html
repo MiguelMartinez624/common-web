@@ -1,0 +1,16 @@
+<style>
+    .loop-injected > li {
+        background-color: #e36363;
+    }
+</style>
+<div>
+
+    Edad : <h5>{{@host.data.firstName}} {{@host.data.lastName}}</h5>
+    <ul>
+        <for-each
+                identifier-path="name"
+                data="{{@host.data.skills}}"
+                html="<li>{{@host.data.name}}</li>">
+        </for-each>
+    </ul>
+</div>
