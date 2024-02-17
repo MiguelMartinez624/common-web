@@ -57,6 +57,7 @@ export class BindElementComponent extends HTMLElement {
 
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
+
         let data = null
 
         if (this.getAttribute("value")) {

@@ -25,7 +25,6 @@ class ComponentBuilder {
     build(): void {
 
         const attributes = this.attributes;
-        console.log(attributes)
         let raw = class extends HTMLElement {
             constructor(...args) {
                 super();
@@ -33,10 +32,11 @@ class ComponentBuilder {
                 // Need to iniciatailize and append the properties to the class so they can be available
                 // while evaluating interpolations
                 attributes.forEach((attr) => {
-                    Attribute(attr.attributeName)(this, attr.attributeName);
                     for (const {attributeName, defaultValue} of attributes) {
                         this[attributeName] = defaultValue;
                     }
+                    Attribute(attr.attributeName)(this, attr.attributeName);
+
                 });
             }
 

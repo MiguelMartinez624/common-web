@@ -13,7 +13,7 @@ export enum DataFetcherPropsName {
 export class ApiCallComponent extends HTMLElement {
     private auto: any;
     private _type: string;
-    private _source: string;
+    private _source: string = "";
     private _method: 'POST' | 'GET' | 'DELETE' | 'PUT';
 
 
@@ -35,7 +35,6 @@ export class ApiCallComponent extends HTMLElement {
         }
         this.data(filters)
             .then((result) => {
-                console.log({result})
                 const eventSuccess = new CustomEvent(
                     "request-success", {
                         bubbles: true,

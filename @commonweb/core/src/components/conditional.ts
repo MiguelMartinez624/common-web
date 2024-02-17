@@ -4,7 +4,7 @@ import {Attribute} from "../attributes";
 import {bindFromString} from "../bindings";
 import {LocalStorageBind} from "../bindings/localstorage_bind";
 import {extractData} from "../html_manipulation";
-import {callRemoteAPI} from "./data-store.componnet";
+import {callRemoteAPI} from "./api-call.component";
 
 @WebComponent({
     selector: 'conditional-render-cases',
@@ -178,11 +178,11 @@ export class ForEachComponent extends HTMLElement {
     }
 
     // Push a element to the projection target
-    public removeNode(id: string): void {
-        const cssIdentifer = `[loop-id="${id}"]`;
-        const nodeToRemove = this.parentElement.querySelector(cssIdentifer);
+    public cssIdentifier(id: string): void {
+        const cssIdentifier = `[loop-id="${id}"]`;
+        const nodeToRemove = this.parentElement.querySelector(cssIdentifier);
         if (!nodeToRemove) {
-            return console.warn("not element under ", cssIdentifer)
+            return console.warn("not element under ", cssIdentifier)
         }
         nodeToRemove.remove();
     }
