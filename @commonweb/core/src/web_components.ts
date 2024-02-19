@@ -1,7 +1,13 @@
 import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
 
-import {generateAttributesInterpolations, generateTemplateInterpolations, Interpolation} from "./interpolations";
+import {
+    AttributeInterpolation,
+    evaluateInterpolationKey,
+    generateAttributesInterpolations,
+    generateTemplateInterpolations,
+    Interpolation
+} from "./interpolations";
 
 export class CustomElementConfig {
     selector: string;
@@ -51,6 +57,7 @@ export function bindTemplateToProperties(root: HTMLElement) {
     const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
     // Bind Attribute Interpolations
     // childs should be the parameter
+
     generateAttributesInterpolations(root, childrens, interpolations);
 
     generateTemplateInterpolations(root, childrens, interpolations);
@@ -105,15 +112,13 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
 
-
             attributeChangedCallback(name, oldValue, newValue) {
-
                 updateAttributes(this, name, newValue);
                 const interpolations = (this as any).interpolations;
-
                 // if you didn't use the notation wont have this field set.
                 if (interpolations) {
                     const interpolationsList = interpolations.get(name);
+
                     if (interpolationsList) {
                         interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
                     }
@@ -121,7 +126,7 @@ export function WebComponent(attr: CustomElementConfig) {
 
             }
 
-            toggleClass(className:string){
+            toggleClass(className: string) {
                 console.log("lol")
             }
 

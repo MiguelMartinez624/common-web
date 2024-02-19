@@ -1,10 +1,65 @@
 import {extractData} from "../html_manipulation";
 import {Interpolation} from "./index";
 
-export function generateTemplateInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
+/*
+* Evaluate the entire innerHTML to generate TemplateInterpolations
+* */
+export function generateTemplateInterpolations(root: Element, childList: Element[], interpolations: Map<string, Interpolation[]>) {
     childList.forEach((child) => {
-        evaluateTemplateInterpolation(child, root, interpolations);
+        [...child.childNodes]
+            // Are this the only nodes that can contain text like this?
+            .filter(n => n.nodeName === "#text")
+            .forEach((node: HTMLElement) => {
+                let textContent = node.textContent;
+                const matches = textContent.matchAll(/\{\{(.*?)\}\}/g);
+                for (const match of matches) {
+                    const propertyPath = match[1];
+                    const interpolation = new TemplateInterpolation(root, node, propertyPath, `<!--${propertyPath}-->`);
+                    /*
+                     * Need to attach this interpolation to the properties
+                     * */
+                    // TODO this peace of code can be moved to a collection style as is used on many part
+                    let attributeName = match[1].replace("@host.", "");
+                    const nextDot = attributeName.indexOf(".");
+                    if (nextDot > -1) {
+                        attributeName = attributeName.slice(0, nextDot)
+                    }
+
+                    let interpolationsStored = interpolations.get(attributeName);
+                    if (!interpolationsStored) {
+                        interpolations.set(attributeName, [interpolation]);
+                        continue;
+                    }
+                    interpolationsStored.push(interpolation);
+                }
+            })
+        // TODO logic for create tempaltes
+
+        generateTemplateInterpolations(root, [...child.children], interpolations);
+
     });
+    // let innerHTML = (root as HTMLElement).innerText;
+    // const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
+    // for (const match of matches) {
+    //
+    //     const propertyPath = match[1];
+    //     const interpolation = new TemplateInterpolation(root, root, propertyPath, `<!--${propertyPath}-->`);
+    //     /*
+    //      * Need to attach this interpolation to the properties
+    //      * */
+    //     let attributeName = match[1].replace("@host.", "");
+    //     const nextDot = attributeName.indexOf(".");
+    //     if (nextDot > -1) {
+    //         attributeName = attributeName.slice(0, nextDot)
+    //     }
+    //
+    //     let interpolationsStored = interpolations.get(attributeName);
+    //     if (!interpolationsStored) {
+    //         interpolations.set(attributeName, [interpolation]);
+    //         continue;
+    //     }
+    //     interpolationsStored.push(interpolation);
+    // }
 }
 
 // Attributes that are not reflected on the template this only true for components that start empty
@@ -50,22 +105,10 @@ export class TemplateInterpolation implements Interpolation {
         // Get all the attributes that need changes
         // style may not work at lest that we change the whole string
         // for this cases will need to create a custom attribute for style changing
-        const regex = /\w+="{{[\s\S]*?}}/g;
-        const matches = element.innerHTML.match(regex);
-        if (matches) {
-            for (const match of matches) {
-                const attributeName = match.slice(0, match.indexOf("="))
-                this.attributesInterpolation.set(attributeName, propertyPath)
-            }
-        }
-
-
-        let newHTML = element.innerHTML.replace(`="{{${propertyPath}}}`, `="${value}`)
-
 
         this.prevValue = value;
-        element.innerHTML = newHTML
-            .replace(`{{${propertyPath}}}`, `${pattern}${value}${pattern}`);
+        element.textContent = element.textContent
+            .replace(`{{${propertyPath}}}`, `${value}`);
 
 
     }
@@ -78,16 +121,12 @@ export class TemplateInterpolation implements Interpolation {
         }
 
         let newHTML = this.element
-            .innerHTML
-            .replace(`<!--${this.propertyPath}-->${this.prevValue}<!--${this.propertyPath}-->`, `<!--${this.propertyPath}-->${value}<!--${this.propertyPath}-->`);
+            .textContent
+            .replace(this.prevValue, value);
 
-        for (const [attribute] of this.attributesInterpolation.entries()) {
-            newHTML = newHTML
-                .replace(`${attribute}="${this.prevValue}`, `${attribute}="${value}`);
-        }
 
         // clear attributes
-        this.element.innerHTML = newHTML;
+        this.element.textContent = newHTML;
         this.prevValue = value;
     }
 }

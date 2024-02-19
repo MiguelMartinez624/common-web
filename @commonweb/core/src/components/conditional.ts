@@ -178,7 +178,7 @@ export class ForEachComponent extends HTMLElement {
     }
 
     // Push a element to the projection target
-    public cssIdentifier(id: string): void {
+    public removeNode(id: string): void {
         const cssIdentifier = `[loop-id="${id}"]`;
         const nodeToRemove = this.parentElement.querySelector(cssIdentifier);
         if (!nodeToRemove) {
@@ -212,6 +212,7 @@ export class ForEachComponent extends HTMLElement {
             .createContextualFragment(itsTemplate ? this.html : `<template-view>${this.html}</template-view>`)
         const id = this.generateIdentifier(data);
         node.children.item(0).setAttribute("loop-id", id);
+        // TODO insert via setter instead
         node.children.item(0).setAttribute("data", JSON.stringify(data));
 
 
@@ -253,6 +254,7 @@ export class TemplateView extends HTMLElement {
     // componentName will be evaluated as first priority and if its not null
     // then a component will be created, data pass to it and injected into this
     // component parent
+    //TODO make setter
     public data: any | null = null;
 
     @Attribute("view")
@@ -275,6 +277,22 @@ export class TemplateView extends HTMLElement {
         return ["data", "view"]
     }
 
+}
+
+
+@WebComponent({
+    selector: 'toggable-element',
+    template: '<slot></slot>',
+})
+export class ToggableElement extends HTMLElement {
+    public show(): void {
+        this.removeAttribute("hidden")
+    }
+
+    public hide(): void {
+        this.setAttribute("hidden", "true");
+
+    }
 }
 
 

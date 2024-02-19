@@ -13,7 +13,9 @@ class ComponentBuilder {
 
     constructor(
         private readonly config: CustomElementConfig,
-        private readonly attributes: any[] = []) {
+        private readonly attributes: any[] = [],
+        private readonly methods: any[] = [],
+        private readonly initStack: any[] = []) {
     }
 
 
@@ -22,22 +24,43 @@ class ComponentBuilder {
         return this;
     }
 
+    with_method(methodName: string, handler: any): ComponentBuilder {
+        this.methods.push({methodName, handler});
+        return this;
+    }
+
+    on_init(handler: any): ComponentBuilder {
+        this.initStack.push(handler);
+        return this;
+    }
+
+
     build(): void {
 
-        const attributes = this.attributes;
+        const {attributes, methods, initStack} = this;
         let raw = class extends HTMLElement {
             constructor(...args) {
                 super();
 
-                // Need to iniciatailize and append the properties to the class so they can be available
+                methods.forEach(({methodName, handler}) => {
+                    this[methodName] = handler.bind(this);
+                })
+                // Need to initialize and append the properties to the class so they can be available
                 // while evaluating interpolations
                 attributes.forEach((attr) => {
+
+                    // Attach before all attributes and methods
                     for (const {attributeName, defaultValue} of attributes) {
                         this[attributeName] = defaultValue;
                     }
-                    Attribute(attr.attributeName)(this, attr.attributeName);
 
+                    // then create the binding
+                    Attribute(attr.attributeName)(this, attr.attributeName);
                 });
+            }
+
+            connectedCallback() {
+                initStack.forEach((f) => f.apply(this))
             }
 
             public static get observedAttributes(): string[] {
