@@ -12,7 +12,7 @@
 <style>
     /* width */
     ::-webkit-scrollbar {
-        width: 10px;
+        width: 2px;
     }
 
     /* Track */
@@ -47,73 +47,23 @@
 </style>
 <body class="bg-slate-900 p-4 text-slate-50">
 <div class="flex gap-4 justify-center">
-    <div class="w-[40%] outline outline-cyan-900 p-4  margin-auto  justify-center">
-        <div class="mb-[2em]">
-            <web-form>
-                <form action="" onsubmit="return false">
-                    <div class=" ">
-                        <div class="flex my-3 gap-4">
-                            <form-field class="w-full" placeholder="Ej. Comprar Comida" property="name" type="text"
-                                        label="Name"></form-field>
-                            <form-field class="w-full" placeholder="Ej. 233" property="amount" format="number"
-                                        label="Amount"></form-field>
+    <div class="w-[60%] outline outline-cyan-900 p-4  margin-auto  justify-center">
+        <h5>TODO</h5>
+        <ul class="list-disc p-5">
+            <li class="py-4">Hacer modelos de rutina con tipos, que grupo trabaja, que se encesita para hacerlo, quizas
+                una breve
+                descripcion escripta y un gif del movimiento
+            </li>
+            <li class="py-4">Separ a componente mas peque;o cada bloque para renderizarlo dentro de un for each</li>
+            <li class="py-4">Manejar el espacio para los botonees de accion abajo</li>
+            <li class="py-4">Mobile first</li>
+            <li class="py-4">Cacheo  de los ejercicios del dia</li>
 
-                        </div>
-                        <div class="flex my-3 gap-4">
-                            <form-field class="w-full" property="date" format="date"
-                                        label="Date"></form-field>
-                            <form-select
-                                    property="category"
-                                    data='[{"value":"joystick", "label":"Gaming"},{"value":"kitchen", "label":"Food"}]'
-                                    class="w-full" property="category"
-                                    placeholder="Seleccione una..."
-                                    label="Category"
-                                    label-path="label"
-                                    value-path="value">
-                            </form-select>
-                        </div>
-                        <div class="flex gap-4">
-                            <form-field class="w-full" property="description" format="teext"
-                                        label="Description"></form-field>
-
-                        </div>
-
-                        <button class="my-3 w-[100%] bg-blue-500 border border-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg p-2 ">
-                            Agregar
-                        </button>
-                    </div>
-
-                </form>
-            </web-form>
-            <bind-element
-                    from="button:(click)"
-                    to="web-form:submit">
-            </bind-element>
-            <bind-element
-                    from="web-form:(submit)"
-                    to="for-each:push">
-            </bind-element>
-            <bind-element
-                    value=""
-                    from="button:(click)"
-                    to="web-form:reset">
-            </bind-element>
-
-        </div>
-        <div class="flow-root  ">
-            <ul role="list" class=" p-3  h-[40vh] overflow-y-scroll divide-y divide-gray-200 dark:divide-gray-700">
-                <for-each
-                        identifier-path="name"
-                        html='<template-view view="http://localhost:63342/common-web/@commonweb/core/examples/todo-item.html"></template-view>'
-                        data="[]">
-                </for-each>
-            </ul>
-        </div>
+        </ul>
     </div>
 
 
-    <div class="w-[40%] outline outline-cyan-900 p-4  margin-auto  justify-center">
-        <show-if></show-if>
+    <div class="rounded-lg max-w-[332px] max-h-[632px] outline  outline-cyan-900 p-4  margin-auto  justify-center">
         <template-view
                 details
                 view="http://localhost:63342/common-web/@commonweb/core/examples/workout-details.html">

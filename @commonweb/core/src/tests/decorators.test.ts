@@ -103,7 +103,6 @@ describe('Template Interpolation', () => {
         document.body.innerHTML = `<string-template-component></string-template-component>`;
         const component = document.body.querySelector("string-template-component");
 
-
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
         expect(currentH4Content).toBe("Hello World! <!--@host.name-->Miguel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
     });
@@ -128,14 +127,17 @@ describe('Template Interpolation', () => {
         expect(currentH4Content).toBe("Hello World! <!--@host.name-->De evento<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
     });
 
-    test('should update interpolated obj', () => {
+    test('should update interpolated obj', async () => {
         document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
+        expect(document.body).not.toBeNull()
         const component = document.body.querySelector("string-template-obj-component");
+        expect(component.shadowRoot).not.toBeNull()
 
 
         const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
         expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");
     });
+
     test('should allow event binding and interpolation interpolated obj', () => {
         document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
         const component = document.body.querySelector("string-template-obj-component");

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script framework src="../dist/lib-pkg.js" async type="text/javascript"></script>
+</head>
+<body>
+<pulpo-calendar>
+    <template content>
+        <div>
+
+            <h4>{{@host.data.event.ordersCompleted}} Ordenes Completadas</h4>
+        </div>
+    </template>
+</pulpo-calendar>
+
+</body>
+<script>
+    document.querySelector("[framework]").onload = () => {
+
+        function generateMonthDaysArray(startDate, endDate) {
+            const months = [];
+            let startMonth = new Date(startDate).getMonth();
+            const endMonth = new Date(endDate).getMonth();
+            const startYear = new Date(startDate).getFullYear();
+            const endYear = new Date(endDate).getFullYear();
+            const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+            for (let year = startYear; year <= endYear; year++) {
+                for (let month = startMonth; month <= endMonth; month++) {
+                    const monthName = new Date(year, month, 1).toLocaleDateString("es-ES", {month: "long"});
+                    const days = [];
+
+                    for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+                        days.push({
+                            weekDay: diasSemana[new Date(year, month, day).getDay()],
+                            day: day,
+                            date: new Date(year, month, day).toLocaleDateString("es-ES"),
+                        });
+                    }
+
+                    months.push({
+                        month: monthName,
+                        days,
+                    });
+                }
+
+                startMonth = 0;
+            }
+
+            return months;
+        }
+
+        window
+            .RegisterWebComponent({
+                // language=CSS
+                style: `
+                    .day {
+                        border: 1px solid lightgray;
+                        height: 12vw;
+                        max-height: 125px;
+                    }
+
+                    .day-counter {
+                        padding: 5px;
+                    }
+
+                    .week-day {
+                        border: 1px solid lightgray;
+
+                    }
+
+                    .grid {
+                        display: grid;
+                        grid-template-columns: repeat(7, 1fr);
+                        grid-gap: 0em;
+                    }
+                `,
+                selector: 'pulpo-calendar',
+                // language=HTML
+                template: ``,
+                // so we can take global style rules
+            })
+            .with_attribute("template", "")
+            .with_attribute("data", function (data) {
+                const dayTemplate = this.querySelector("template");
+                //Sort
+                const sortedByDate = data.sort(({date: dateA}, {date: dateB}) => {
+                    const a = new Date(dateA);
+                    const b = new Date(dateB);
+                    return a - b; // Ordena ascendente
+                    // return b - a; // Ordena descendente
+
+                });
+                const months = generateMonthDaysArray(sortedByDate[0][this['date-path']], sortedByDate[sortedByDate.length - 1][this['date-path']]);
+                // For each month need to add a Month
+                // for each day of the month ned to add a Day
+                for (const month of months) {
+                    // need to merge days
+                    const merged = month.days.map(({day, weekDay}) => {
+                        const event = data.find(t => new Date(t[this['date-path']]).getDate() + 1 === day);
+                        return {day, weekDay, event}
+                    })
+
+
+                    const calendarDayTemplate = `
+                        <div class='day'>
+                            <div class='day-counter'>{{@host.data.day}}</div>
+                            <div>${dayTemplate.innerHTML}</div>
+                        </div>`;
+                    const weekDaysTemplate = `<h4 class='week-day'>{{@host.data}}</h3>`
+                    const monthTemplate =
+                        //language=HTML
+                            `
+                                <div class="grid">
+                                    <for-each daysweek
+                                              html="${weekDaysTemplate}">
+                                    </for-each>
+                                </div>
+                                <div class='grid'>
+                                    <for-each main html="${calendarDayTemplate}">
+                                    </for-each>
+                                </div>
+                            `
+
+                    const node = document.createRange().createContextualFragment(monthTemplate);
+                    const forEach = node.querySelector("for-each[main]");
+                    forEach.data(merged);
+                    const forEachDays = node.querySelector("for-each[daysweek]");
+                    forEachDays.data([
+                        merged[0].weekDay,
+                        merged[1].weekDay,
+                        merged[2].weekDay,
+                        merged[3].weekDay,
+                        merged[4].weekDay,
+                        merged[5].weekDay,
+                        merged[6].weekDay,
+
+                    ])
+
+                    this.shadowRoot.appendChild(node);
+                }
+
+            })
+            .with_attribute("date-path", 'date')// path to property that is gonna be used as the day
+            .build();
+
+    }
+
+
+</script>
+
+<script>
+    setTimeout(() => {
+        const mockData = [
+            {
+                "date": "2024-02-06T00:55:07.418Z",
+                "ordersCreated": 5,
+                "ordersCompleted": 0,
+                "orders": [
+                    {
+                        "orderCode": "PV-45",
+                        "orderId": "65c1836b88c192ab8083b8c0",
+                        "products": [
+                            {
+                                "productId": "65668d0c407c5ec43db19e55",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            },
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 6400,
+                        "status": "InPreparation"
+                    },
+                    {
+                        "orderCode": "PV-46",
+                        "orderId": "65c210aa4050cc1960881b01",
+                        "products": [
+                            {
+                                "productId": "65bc504df3b9084ecb42df41",
+                                "productName": "PAVLOVA O",
+                                "quantity": 1,
+                                "totalSell": 4900
+                            }
+                        ],
+                        "totalPrice": 4900,
+                        "status": "Completed"
+                    },
+                    {
+                        "orderCode": "PV-47",
+                        "orderId": "65c2256d0429b4728e5a4dfa",
+                        "products": [
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            },
+                            {
+                                "productId": "65bc5292f3b9084ecb42df57",
+                                "productName": "CORAZON 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 6400,
+                        "status": "InPreparation"
+                    },
+                    {
+                        "orderCode": "PV-48",
+                        "orderId": "65c226f60429b4728e5a4dfb",
+                        "products": [
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 3200,
+                        "status": "Completed"
+                    },
+                    {
+                        "orderCode": "PV-49",
+                        "orderId": "65c2271d0429b4728e5a4dfc",
+                        "products": [
+                            {
+                                "productId": "65bc5292f3b9084ecb42df57",
+                                "productName": "CORAZON 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 3200,
+                        "status": "Completed"
+                    }
+                ],
+                "ordersToDeliver": 0
+            },
+            {
+                "date": "2024-02-07T21:11:33.755Z",
+                "ordersCreated": 1,
+                "ordersCompleted": 1,
+                "orders": [
+                    {
+                        "orderCode": "PV-50",
+                        "orderId": "65c3f205a4ac4a91fcc39726",
+                        "products": [
+                            {
+                                "productId": "65bc4b6cf3b9084ecb42df2f",
+                                "productName": "PAVLOVA 40 CM",
+                                "quantity": 1,
+                                "totalSell": 7000
+                            },
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3700
+                            }
+                        ],
+                        "totalPrice": 10700,
+                        "status": "Completed"
+                    }
+                ],
+                "ordersToDeliver": 0
+            },
+            {
+                "date": "2024-02-08T22:13:28.079Z",
+                "ordersCreated": 2,
+                "ordersCompleted": 0,
+                "orders": [
+                    {
+                        "orderCode": "PV-51",
+                        "orderId": "65c55208ab26e3f8bd4b211c",
+                        "products": [
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 2,
+                                "totalSell": 4700
+                            }
+                        ],
+                        "totalPrice": 9400,
+                        "status": "InPreparation"
+                    },
+                    {
+                        "orderCode": "PV-52",
+                        "orderId": "65c55296ab26e3f8bd4b211d",
+                        "products": [
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 2,
+                                "totalSell": 4800
+                            }
+                        ],
+                        "totalPrice": 9600,
+                        "status": "Created"
+                    }
+                ],
+                "ordersToDeliver": 0
+            },
+            {
+                "date": "2024-02-09T17:03:24.996Z",
+                "ordersCreated": 2,
+                "ordersCompleted": 0,
+                "orders": [
+                    {
+                        "orderCode": "PV-53",
+                        "orderId": "65c65adc2b2574b14f6f3a18",
+                        "products": [
+                            {
+                                "productId": "65bc4f3af3b9084ecb42df37",
+                                "productName": "PAVLOVA E",
+                                "quantity": 1,
+                                "totalSell": 4900
+                            },
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 8100,
+                        "status": "Created"
+                    },
+                    {
+                        "orderCode": "PV-54",
+                        "orderId": "65c6768b2b2574b14f6f3a19",
+                        "products": [
+                            {
+                                "productId": "65bc4b1ef3b9084ecb42df2d",
+                                "productName": "PAVLOVA 20 CM",
+                                "quantity": 2,
+                                "totalSell": 4700
+                            }
+                        ],
+                        "totalPrice": 9400,
+                        "status": "Created"
+                    }
+                ],
+                "ordersToDeliver": 0
+            },
+            {
+                "date": "2024-02-13T18:52:00.349Z",
+                "ordersCreated": 1,
+                "ordersCompleted": 0,
+                "orders": [
+                    {
+                        "orderCode": "PV-55",
+                        "orderId": "65cbba509067c8ca2d96e084",
+                        "products": [
+                            {
+                                "productId": "65bc5292f3b9084ecb42df57",
+                                "productName": "CORAZON 20 CM",
+                                "quantity": 1,
+                                "totalSell": 3200
+                            }
+                        ],
+                        "totalPrice": 3200,
+                        "status": "Created"
+                    }
+                ],
+                "ordersToDeliver": 0
+            }
+        ];
+        console.log(document.querySelector("pulpo-calendar"))
+        document.querySelector("pulpo-calendar").data(mockData);
+    }, 300)
+</script>
+</html>

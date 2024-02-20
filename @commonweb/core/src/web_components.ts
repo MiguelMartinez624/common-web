@@ -1,11 +1,19 @@
 import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
-import {TemplateInterpolation} from "./transformer";
 
-interface CustomElementConfig {
+import {
+    AttributeInterpolation,
+    evaluateInterpolationKey,
+    generateAttributesInterpolations,
+    generateTemplateInterpolations,
+    Interpolation
+} from "./interpolations";
+
+export class CustomElementConfig {
     selector: string;
     template: string;
     style?: string;
+    useShadow?: boolean = true;
 }
 
 const validateSelector = (selector: string) => {
@@ -19,14 +27,20 @@ export const PROCESSOR_KEY: string = '_webcommon_components_processors';
 function insertTemplate(attr: CustomElementConfig) {
     //TODO casted may no be required
     const casted = (this as unknown as HTMLElement)
-    const shadowRoot = casted.attachShadow({mode: 'open'});
-    const template = document.createElement("template");
+    if (!attr.useShadow) {
+        casted.innerHTML = attr.style ?
+            `<style>${attr.style}</style>${attr.template}` : attr.template;
+    } else {
+        const shadowRoot = casted.attachShadow({mode: 'open'});
+        const template = document.createElement("template");
 
-    template.innerHTML = attr.style ?
-        `<style>${attr.style}</style>${attr.template}` : attr.template;
-    shadowRoot.appendChild(template.content.cloneNode(true));
+        template.innerHTML = attr.style ?
+            `<style>${attr.style}</style>${attr.template}` : attr.template;
+        shadowRoot.appendChild(template.content.cloneNode(true));
 
+    }
 }
+
 
 /**
  * Need to create transformers from the templates and clear up those markdowns
@@ -37,40 +51,17 @@ function insertTemplate(attr: CustomElementConfig) {
  * native properties
  * <div>{{[CSSSelector].property.key}}</div>
  */
-function bindTemplateToProperties(node: HTMLElement) {
-    /*
-    * CHeck properties to create a transform for each binding
-    * */
+export function bindTemplateToProperties(root: HTMLElement) {
+    const interpolations = new Map<string, Interpolation[]>();
 
-    const interpolations = new Map<string, TemplateInterpolation[]>();
-    [...node.shadowRoot.children, ...node.children].forEach((child) => {
+    const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
+    // Bind Attribute Interpolations
+    // childs should be the parameter
 
-        let innerHTML = child.innerHTML;
-        const matches = innerHTML.matchAll(/\{\{(.*?)\}\}/g);
-        for (const match of matches) {
+    generateAttributesInterpolations(root, childrens, interpolations);
 
-            const propertyPath = match[1];
-            const interpolation = new TemplateInterpolation(node, child, propertyPath, `<!--${propertyPath}-->`);
-            /*
-             * Need to attach this interpolation to the properties
-             * */
-            let attributeName = match[1].replace("@host.", "");
-            const nextDot = attributeName.indexOf(".");
-            if (nextDot > -1) {
-                attributeName = attributeName.slice(0, nextDot)
-            }
-
-            let interpolationsStored = interpolations.get(attributeName);
-            if (!interpolationsStored) {
-                interpolations.set(attributeName, [interpolation]);
-                continue;
-            }
-            interpolationsStored.push(interpolation);
-        }
-
-        (node as any).interpolations = interpolations;
-
-    })
+    generateTemplateInterpolations(root, childrens, interpolations);
+    (root as any).interpolations = interpolations;
 }
 
 function updateAttributes(element: any, name: string, newValue: any) {
@@ -97,6 +88,9 @@ function updateAttributes(element: any, name: string, newValue: any) {
 export function WebComponent(attr: CustomElementConfig) {
     return function _WebComponent<T extends { new(...args: any[]): {} }>(constr: T) {
 
+        if (attr.useShadow === undefined) {
+            attr.useShadow = true
+        }
         validateSelector(attr.selector)
 
         let component = class extends constr {
@@ -119,16 +113,26 @@ export function WebComponent(attr: CustomElementConfig) {
 
 
             attributeChangedCallback(name, oldValue, newValue) {
-                updateAttributes(this, name, newValue);
 
+                updateAttributes(this, name, newValue);
+                this.checkInterpolationsFor(name);
+
+            }
+
+            public checkInterpolationsFor(name) {
+                const interpolations = (this as any).interpolations;
                 // if you didn't use the notation wont have this field set.
-                if ((this as any).interpolations) {
-                    const interpolationsList = (this as any).interpolations.get(name);
+                if (interpolations) {
+                    const interpolationsList = interpolations.get(name);
+
                     if (interpolationsList) {
-                        interpolationsList.forEach((interpolation: TemplateInterpolation) => interpolation.update())
+                        interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
                     }
                 }
+            }
 
+            toggleClass(className: string) {
+                console.log("lol")
             }
 
         }

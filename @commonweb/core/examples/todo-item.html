@@ -1,0 +1,29 @@
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
+<li class="mt-8 flex justify-between outline outline-cyan-500 hover:bg-cyan-900 hover:outline-blue-400 cursor-pointer">
+    <div main class="flex items-center flex-1  p-3 sm:py-4">
+        <div class="flex-shrink-0">
+            <span class="material-symbols-outlined">{{@host.data.category}}</span>
+
+        </div>
+        <div class="flex-1 min-w-0 ms-4">
+            <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+                {{@host.data.name}} - {{@host.data.date}}
+            </p>
+            <p
+                    title="{{@host.data.description}}"
+                    class="w-[200px] truncate text-sm text-gray-500 truncate dark:text-gray-400">
+                {{@host.data.description}}
+            </p>
+        </div>
+        <div class="inline-flex flex-0.2 items-center text-base font-semibold text-gray-900 dark:text-white">
+            ${{@host.data.amount}}
+        </div>
+    </div>
+    <bind-element input-src="template-view:data" from="[main]:(click)" to="template-view[details]:setData"></bind-element>
+
+    <div>
+        <button class="bg-red-500 p-4 h-[100%] w-[60px]">X</button>
+        <bind-element value="{{@host.data.name}}" from="button:(click)" to="for-each:removeNode"></bind-element>
+    </div>
+</li>
