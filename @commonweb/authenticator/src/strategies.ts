@@ -33,6 +33,7 @@ export class CredentialsStrategy extends HTMLElement {
 export class FirebaseStrategy extends HTMLElement {
     private signInWithEmailAndPassword: any;
     private auth: any;
+    // TODO insert bia configuration to the stategy
     private firebaseConfig = {
         apiKey: "AIzaSyAzbjXwIa_9u5FppOkd6AHGyNujjcEkOus",
         authDomain: "pulpo-70538.firebaseapp.com",

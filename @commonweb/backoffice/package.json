@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.32",
+  "version": "1.0.0-beta.35",
   "name": "@commonweb/backoffice-app",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
@@ -23,9 +23,9 @@
   },
   "dependencies": {
     "@commonweb/components": "^1.0.0-beta.17",
-    "@commonweb/core": "^1.0.0-beta.54",
+    "@commonweb/core": "^1.0.0-beta.55",
     "@commonweb/data": "^1.0.0-beta.483",
-    "@commonweb/forms": "^1.0.0-beta.55",
+    "@commonweb/forms": "^1.0.0-beta.56a",
     "@commonweb/router": "^1.0.0-beta.43"
   },
   "devDependencies": {

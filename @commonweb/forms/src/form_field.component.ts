@@ -53,12 +53,17 @@ export interface DataFetcherConfiguration {
     }
 )
 export class FormField extends HTMLElement {
+    connectedCallback() {
+
+    }
 
     private handler: (value: string) => void | null;
 
     static get observedAttributes() {
-        return ["label", "placeholder", "type", "property-name"]
+        return ["label", "placeholder", "type", "property-name", "value"]
     }
+
+
 
     @Attribute("label")
     public changeLabel(label: string) {

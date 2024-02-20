@@ -179,13 +179,15 @@ export class EntityForm extends HTMLElement {
 
                 } else {
                     // Appending regular input types
-                    let formField = document.createElement("form-field")
+                    let formField: FormField = document.createElement("form-field") as FormField
 
                     formField.setAttribute("label", value.label);
                     formField.setAttribute("property-name", value.propertyName);
                     formField.setAttribute("type", value.type);
                     formField.style.width = String(value.width || "100%");
-
+                    if (value.defaultValue) {
+                        formField.setValue(value.defaultValue)
+                    }
                     this.mainElement.appendChild(formField)
                 }
 

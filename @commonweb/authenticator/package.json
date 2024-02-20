@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "name": "@commonweb/authenticator-app",
   "main": "dist/lib.js",
   "module": "dist/lib.mjs",
@@ -25,7 +25,7 @@
     "@commonweb/components": "^1.0.0-beta.17",
     "@commonweb/core": "^1.0.0-beta.54",
     "@commonweb/data": "^1.0.0-beta.483",
-    "@commonweb/forms": "^1.0.0-beta.55"
+    "@commonweb/forms": "^1.0.0-beta.56a"
   },
   "devDependencies": {
     "rollup-plugin-commonjs": "^10.1.0",

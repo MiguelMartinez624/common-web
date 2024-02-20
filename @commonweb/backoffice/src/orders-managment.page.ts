@@ -2,7 +2,7 @@ import {Attribute, EventBind, EventBindAll, WebComponent} from "@commonweb/core"
 import {DataFetcher, DataFetcherConfiguration} from "@commonweb/data";
 import "@commonweb/forms";
 
- const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
+const hostURL = "https://pavlova-backend-natp7refrq-uc.a.run.app";
 // const hostURL = "http://localhost:8080"
 
 const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration = (status: string) => {
@@ -26,27 +26,36 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
         gap: 11px;justify-content: end;">
         <div>
         <entity-form configurations='${JSON.stringify([
-            {"type": "date", "label": "Fecha de Entrega", "propertyName": "deliveryDate", "width": "200px"},
-            {
-                "type": "select", "label": "Ciudad", "propertyName": "city", "width": "200px",
-                "valuePath": "id",
-                "labelPath": "name",
-                "options": [
-                    {"name": "Seleccione una Sucursal", "id": null},
-    
-                ],
-                "optionsLoader": {
-                    "method": "POST",
-                    "resultPath": "content",
-                    "source": `${hostURL}/branches/search`,
-                    "filters": {
-                        "page": {
-                            "page": 1,
-                            "size": 100
-                        }
+        {
+            "type": "date",
+            "label": "Fecha de Entrega",
+            "propertyName": "deliveryDate",
+            "width": "200px",
+            "defaultValue": new Date().toISOString().split('T')[0]
+        },
+        {
+            "type": "select", "label": "Ciudad", "propertyName": "city", "width": "200px",
+            "valuePath": "id",
+            "labelPath": "name",
+            "options": [
+                {"name": "Seleccione una Sucursal", "id": null},
+
+            ],
+            "optionsLoader": {
+                "method": "POST",
+                "resultPath": "content",
+                "source": `${hostURL}/branches/search`,
+                "filters": {
+                    "query": {
+                        "zones": []
+                    },
+                    "page": {
+                        "page": 1,
+                        "size": 100
                     }
                 }
-            }])}'>
+            }
+        }])}'>
             </entity-form>
             </div>
             <bind-element from="tt-button[search]:(click)" to="entity-form:submit"></bind-element>
@@ -105,11 +114,9 @@ const ordersRequestConfiguration: (status: string) => DataFetcherConfiguration =
      </div>
     </conditional-render-cases>
 
-        
+    <snackbar-component type="success" success>Orden actualizada</snackbar-component>
 
-<snackbar-component>
-    No puede realizar cambio de estatus
-</snackbar-component>
+    <snackbar-component type="error" error> No puede realizar cambio de estatus</snackbar-component>
 
     `,
     selector: 'orders-page'
@@ -140,7 +147,7 @@ export class OrdersBoardComponent extends HTMLElement {
                     "date": null,
                     "status": "Created",
                     "deliveryDate": data.deliveryDate,
-                    "city": data.city === "null" ? null : data.city
+                    "storeId": data.city === "null" ? null : data.city
 
                 },
                 "page": {
@@ -158,7 +165,7 @@ export class OrdersBoardComponent extends HTMLElement {
                     "date": null,
                     "status": "InPreparation",
                     "deliveryDate": data.deliveryDate,
-                    "city": data.city === "null" ? null : data.city
+                    "storeId": data.city === "null" ? null : data.city
                 },
                 "page": {
                     "page": 1,
@@ -174,7 +181,7 @@ export class OrdersBoardComponent extends HTMLElement {
                     "date": null,
                     "status": "Completed",
                     "deliveryDate": data.deliveryDate,
-                    "city": data.city === "null" ? null : data.city
+                    "storeId": data.city === "null" ? null : data.city
                 },
                 "page": {
                     "page": 1,
@@ -212,12 +219,13 @@ export class OrdersBoardComponent extends HTMLElement {
                 }));
                 fetcher.execute({});
                 fetcher.addEventListener("request-success", () => {
+                    this.shadowRoot.querySelector("snackbar-component[success]").toggle();
                     listTarget.shadowRoot.querySelector("slot").appendChild(element);
                     ev.preventDefault();
                 });
 
                 fetcher.addEventListener("request-failed", () => {
-                    this.shadowRoot.querySelector("snackbar-component").toggle();
+                    this.shadowRoot.querySelector("snackbar-component[error]").toggle();
 
                 })
 
@@ -394,25 +402,49 @@ export class OrderCardComponent extends HTMLElement {
 }
 
 @WebComponent({
-    style: `:host{display:flex;justify-content:space-between;border-bottom: 1px solid #7070708a;padding:1em 0px;}`,
+    // language=CSS
+    style: `:host {
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1px solid #7070708a;
+        padding: 1em 0px;
+    }`,
+    // language=HTML
     template: `
-       
-               <div product-name>Cacaguate</div>
-               <div style="display: flex;gap:1em;">Cantidad:  <div style="font-weight: bold" quantity>2</div></div>
-       
+        <div style="display: flex;justify-content: space-between;">
+            <div product-name>Cacaguate</div>
+            <div style="display: flex;gap:1em;">Cantidad:
+                <div style="font-weight: bold" quantity>2</div>
+            </div>
+        </div>
+        <div>
+            <h5>Extras</h5>
+            <ul extras>
+            </ul>
+        </div>
+
     `,
     selector: 'product-item-component'
 })
 export class ProductItemComponent extends HTMLElement {
+    public product = {
+        extras: [{name: "Producto 1"}, {name: "Producto 2"}]
+    };
+
     static get observedAttributes(): string[] {
         return ["data"]
     }
 
     @Attribute("data")
     public data(order: any) {
+        this.product = order;
+        console.log(this.product)
         this.shadowRoot.querySelector("[product-name]").innerHTML = order.name;
-
         this.shadowRoot.querySelector("[quantity]").innerHTML = order.quantity;
+        const extrasList = this.shadowRoot.querySelector("ul[extras]")
+        this.product.extras.forEach((p)=>{
+            extrasList.innerHTML += `<li>${p.name}</li>`
+        })
     }
 
 }
