@@ -12,7 +12,7 @@
 <style>
     /* width */
     ::-webkit-scrollbar {
-        width: 10px;
+        width: 2px;
     }
 
     /* Track */
@@ -47,78 +47,42 @@
 </style>
 <body class="bg-slate-900 p-4 text-slate-50">
 <div class="flex gap-4 justify-center">
-    <div class="w-[40%] outline outline-cyan-900 p-4  margin-auto  justify-center">
-        <div class="mb-[2em]">
-            <web-form>
-                <form action="" onsubmit="return false">
-                    <div class=" ">
-                        <div class="flex my-3 gap-4">
-                            <form-field class="w-full" placeholder="Ej. Comprar Comida" property="name" type="text"
-                                        label="Name"></form-field>
-                            <form-field class="w-full" placeholder="Ej. 233" property="amount" format="number"
-                                        label="Amount"></form-field>
+    <div class="w-[60%] outline outline-cyan-900 p-4  margin-auto  justify-center">
+        <h5>TODO</h5>
+        <ul class="list-disc p-5">
+            <li class="py-4">Proteger ruta con este login, user localstorage clasico par tokens</li>
+            <li class="py-4">ver si crear routing or si usar switch case para hacer estilo pop/push
+                de las vistas, NOTA afectaria a la larga en el desktop?? focus mobile only?
+            </li>
+            <li class="py-4">Usuario seran auto gestionados, quizas no hace falta login con facebook y otra tool</li>
+            <li class="py-4">Metodo para recuperar contrase;a ??</li>
 
-                        </div>
-                        <div class="flex my-3 gap-4">
-                            <form-field class="w-full" property="date" format="date"
-                                        label="Date"></form-field>
-                            <form-select
-                                    property="category"
-                                    data='[{"value":"joystick", "label":"Gaming"},{"value":"kitchen", "label":"Food"}]'
-                                    class="w-full" property="category"
-                                    placeholder="Seleccione una..."
-                                    label="Category"
-                                    label-path="label"
-                                    value-path="value">
-                            </form-select>
-                        </div>
-                        <div class="flex gap-4">
-                            <form-field class="w-full" property="description" format="teext"
-                                        label="Description"></form-field>
-
-                        </div>
-
-                        <button class="my-3 w-[100%] bg-blue-500 border border-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg p-2 ">
-                            Agregar
-                        </button>
-                    </div>
-
-                </form>
-            </web-form>
-            <bind-element
-                    from="button:(click)"
-                    to="web-form:submit">
-            </bind-element>
-            <bind-element
-                    from="web-form:(submit)"
-                    to="for-each:push">
-            </bind-element>
-            <bind-element
-                    value=""
-                    from="button:(click)"
-                    to="web-form:reset">
-            </bind-element>
-
-        </div>
-        <div class="flow-root  ">
-            <ul role="list" class=" p-3  h-[40vh] overflow-y-scroll divide-y divide-gray-200 dark:divide-gray-700">
-                <for-each
-                        identifier-path="name"
-                        html='<template-view view="http://localhost:63342/common-web/@commonweb/core/examples/todo-item.html"></template-view>'
-                        data="[]">
-                </for-each>
-            </ul>
-        </div>
+        </ul>
     </div>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"/>
 
+    <div class="rounded-lg w-[332px] h-[632px] outline  outline-cyan-900 flex  margin-auto items-center  justify-center">
+        <div class="m-auto w-[100%] p-5">
+            <div class="flex justify-center text-3xl gap-3 mb-20">
+                <span class="material-symbols-outlined">exercise</span>
+                ChinoFitness
+            </div>
+            <web-form>
+                <div class="my-4">
+                    <form-field format="text" placeholder="aaron@domain.com"
+                                label="Usuario / Email"></form-field>
+                </div>
+                <div class="my-2">
+                    <form-field class="my-4" placeholder="*******" format="password" label="Contraseña"></form-field>
+                </div>
+            </web-form>
+            <button class="my-3 w-[100%] bg-blue-500 border border-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg p-2 ">
+                login
+            </button>
+            <p class="text-xs text">Si aun no estas registrado que esperas contacta a Alepo</p>
 
-    <div class="w-[40%] outline outline-cyan-900 p-4  margin-auto  justify-center">
-        <show-if></show-if>
-        <template-view
-                details
-                view="http://localhost:63342/common-web/@commonweb/core/examples/workout-details.html">
-
-        </template-view>
+        </div>
     </div>
 
     <!--    <api-call method="GET"></api-call>-->
@@ -157,14 +121,21 @@
 
         window
             .RegisterWebComponent({
+                //language=css
+                style: `
+                    :host {
+                        display: block;
+                    }`,
                 selector: 'form-field',
                 // language=HTML
                 template: `
+
                     <label for="">{{@host.label}}</label>
                     <input
                             placeholder="{{@host.placeholder}}"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            type="{{@host.format}}">`,
+                            type="{{@host.format}}">
+                `,
                 useShadow: false,
 
                 // so we can take global style rules,

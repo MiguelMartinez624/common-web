@@ -129,138 +129,32 @@ export class ShowIfComponent extends HTMLElement {
 
 
 @WebComponent({
-    selector: 'for-each',
-    template: '',
-})
-export class ForEachComponent extends HTMLElement {
-    @Attribute("component")
-    // componentName will be evaluated as first priority and if its not null
-    // then a component will be created, data pass to it and injected into this
-    // component parent
-    public componentName: string | null = null;
-
-    @Attribute("html")
-    // html will be created into a node and injected into the parent
-    // component
-    public html: string | null = null;
-
-    @Attribute("push-order")
-    // pushOrder decide wherever gonna append to the end or the begining
-    // of the list
-    public pushOrder: "start" | "end" = "end";
-
-    @Attribute("added-sign-duration")
-    // addedTimeDuration time that the special class will be applied to it
-    // is on ms (milliseconds)
-    public addedTimeDuration: number = 3000;
-
-    @Attribute("identifier-path")
-    // identifierPath the path to a property that will me attached to each prjected element
-    // so it can be easily identified
-    public identifierPath: string = "";
-
-
-    public static get observedAttributes(): string[] {
-        return ["html", "component", "push-order", "data", "added-sign-duration", "identifier-path"]
-    }
-
-
-    @Attribute("data")
-    public data(data: any[]): void {
-        if (Array.isArray(data)) {
-            data.forEach((ele) => this.projectContent(ele, false));
-        }
-    }
-
-    // Push a element to the projection target
-    public push(data: any): void {
-        this.projectContent(data, true);
-    }
-
-    // Push a element to the projection target
-    public removeNode(id: string): void {
-        const cssIdentifier = `[loop-id="${id}"]`;
-        const nodeToRemove = this.parentElement.querySelector(cssIdentifier);
-        if (!nodeToRemove) {
-            return console.warn("not element under ", cssIdentifier)
-        }
-        nodeToRemove.remove();
-    }
-
-
-    private renderByComponent(data: any) {
-        const sections = this.componentName.split(":");
-        const component = document.createElement(sections[0]);
-        // passing data as a function to avoid JSON stringify
-        component.setAttribute(sections[1], JSON.stringify(data));
-        if (this.pushOrder === "end") {
-            return this.parentElement.appendChild(component);
-        } else {
-            throw "Feature under development"
-        }
-    }
-
-    private projectContent(data: any, mark: boolean) {
-        if (!data) {
-            return
-        }
-
-        const itsTemplate = this.html.startsWith("<template-view");
-        // Create the template-view as its gonna be required any ways we pass a template down
-        const node = document
-            .createRange()
-            .createContextualFragment(itsTemplate ? this.html : `<template-view>${this.html}</template-view>`)
-        const id = this.generateIdentifier(data);
-        node.children.item(0).setAttribute("loop-id", id);
-        // TODO insert via setter instead
-        node.children.item(0).setAttribute("data", JSON.stringify(data));
-
-
-        if (mark) {
-            node.children.item(0).classList.add("loop-injected");
-            setTimeout(() => {
-                const cssIdentifer = `[loop-id="${id}"]`;
-                const item = this.parentElement.querySelector(cssIdentifer);
-                item?.classList.remove("loop-injected");
-            }, Number(this.addedTimeDuration));
-        }
-
-        // insert at the end to make all changes effect
-        this.parentElement.appendChild(node);
-
-    }
-
-    private generateIdentifier(data: any): string {
-        if (this.identifierPath === "") {
-            return typeof data === "string" ? data : JSON.stringify(data);
-        }
-        const id = extractData(this.identifierPath, data);
-        if (!id) {
-            console.warn("identifier not found")
-        }
-        console.log({id})
-        return id;
-    }
-}
-
-
-@WebComponent({
     selector: 'template-view',
     template: '<slot></slot>',
     useShadow: false,
 })
 export class TemplateView extends HTMLElement {
+    // componentName will be evaluated as first priority and if its not null
+    // then a component will be created, data pass to it and injected into this
+    // component parent
     @Attribute("data")
-    // componentName will be evaluated as first priority and if its not null
-    // then a component will be created, data pass to it and injected into this
-    // component parent
-    //TODO make setter
-    public data: any | null = null;
+    public data: any | null;
 
-    @Attribute("view")
     // componentName will be evaluated as first priority and if its not null
     // then a component will be created, data pass to it and injected into this
     // component parent
+    @Attribute("set-data")
+    public setData(d: any) {
+        this.data = d;
+        // Manually calling check template interpolations as there was not attributecall
+        // because we are passing the data via setter that doen't trigger the attributeChangeCallbacl
+        this['checkInterpolationsFor']("data");
+    }
+
+    // componentName will be evaluated as first priority and if its not null
+    // then a component will be created, data pass to it and injected into this
+    // component parent
+    @Attribute("view")
     public set view(view: string) {
         if (view.startsWith("http:") || view.startsWith("https:")) {
             callRemoteAPI(view, "GET", {})

@@ -20,6 +20,7 @@
             ${{@host.data.amount}}
         </div>
     </div>
+    <bind-element input-src="template-view:data" from="[main]:(click)" to="template-view[details]:setData"></bind-element>
 
     <div>
         <button class="bg-red-500 p-4 h-[100%] w-[60px]">X</button>

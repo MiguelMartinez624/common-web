@@ -100,8 +100,7 @@ export class TemplateInterpolation implements Interpolation {
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly pattern: string) {
-        const value = extractData(propertyPath, this.root);
-
+        const value = extractData(propertyPath, this.root) || "";
         // Get all the attributes that need changes
         // style may not work at lest that we change the whole string
         // for this cases will need to create a custom attribute for style changing
@@ -115,7 +114,7 @@ export class TemplateInterpolation implements Interpolation {
 
     public update(): void {
 
-        const value = extractData(this.propertyPath, this.root);
+        const value = extractData(this.propertyPath, this.root) || "";
         if (this.prevValue === value) {
             return;
         }

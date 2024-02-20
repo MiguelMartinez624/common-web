@@ -16,10 +16,8 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
                 // }
             }
         }
-
-
         [...child.attributes]
-            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null)
+            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null || (a.value as string).startsWith("@view:"))
             .forEach(({name, value}) => {
                 // push interpolation
                 const propertyPath = value.replace("{{", "").replace("}}", "");
@@ -44,7 +42,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
 
 // Attributes that are not reflected on the template this only true for components that start empty
 export function evaluateInterpolationKey(child: Element, node: Element, key: string, interpolations: Map<string, Interpolation[]>) {
-    if(!child.getAttribute(key)){
+    if (!child.getAttribute(key)) {
         return;
     }
     const matches = child.getAttribute(key).matchAll(/\{\{(.*?)\}\}/g);
@@ -83,7 +81,7 @@ export class AttributeInterpolation implements Interpolation {
         public readonly propertyPath: string,
         public readonly attributeName: string) {
 
-        const value = extractData(propertyPath, this.root);
+        const value = extractData(propertyPath, this.root) || "";
         // first interpolation need to replace the code
 
         // objects and arrays will be always pass by setter if posible

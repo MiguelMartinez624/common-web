@@ -113,7 +113,13 @@ export function WebComponent(attr: CustomElementConfig) {
 
 
             attributeChangedCallback(name, oldValue, newValue) {
+
                 updateAttributes(this, name, newValue);
+                this.checkInterpolationsFor(name);
+
+            }
+
+            public checkInterpolationsFor(name) {
                 const interpolations = (this as any).interpolations;
                 // if you didn't use the notation wont have this field set.
                 if (interpolations) {
@@ -123,7 +129,6 @@ export function WebComponent(attr: CustomElementConfig) {
                         interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
                     }
                 }
-
             }
 
             toggleClass(className: string) {
