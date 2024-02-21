@@ -131,6 +131,17 @@ export function WebComponent(attr: CustomElementConfig) {
                 }
             }
 
+            public checkAllInterpolations() {
+                const interpolations = (this as any).interpolations;
+                // if you didn't use the notation wont have this field set.
+                if (interpolations) {
+                    for (const [key, interpolationList] of interpolations) {
+                        interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
+
+                    }
+                }
+            }
+
             toggleClass(className: string) {
                 console.log("lol")
             }

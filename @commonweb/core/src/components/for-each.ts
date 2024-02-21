@@ -1,6 +1,6 @@
 import {WebComponent} from "../web_components";
 import {Attribute} from "../attributes";
-import {extractData} from "../html_manipulation";
+import {extractData, findNodeOnUpTree} from "../html_manipulation";
 import {TemplateView} from "./conditional";
 
 @WebComponent({
@@ -15,6 +15,8 @@ export class ForEachComponent extends HTMLElement {
     // component parent
     public componentName: string | null = null;
 
+    @Attribute("target")
+    public target: string = "";
 
     @Attribute("push-order")
     // pushOrder decide wherever gonna append to the end or the begining
@@ -33,7 +35,7 @@ export class ForEachComponent extends HTMLElement {
 
 
     public static get observedAttributes(): string[] {
-        return ["html", "component", "push-order", "data", "added-sign-duration", "identifier-path"]
+        return ["html", "component", "push-order", "data", "added-sign-duration", "identifier-path", "target"]
     }
 
     private _html: string = '';
@@ -42,6 +44,9 @@ export class ForEachComponent extends HTMLElement {
     // html will be created into a node and injected into the parent
     // component
     public set html(html: string) {
+        if (html === "") {
+            return
+        }
         this._html = html;
         this._clear(this._data);
         this._render(this._data);
@@ -52,10 +57,10 @@ export class ForEachComponent extends HTMLElement {
     private _data: any[] = [];
 
     @Attribute("data")
-    public data(data: any[]): void {
-        this._data = data;
-        this._clear(data);
-        this._render(data);
+    public set data(d: any[]) {
+        this._data = d;
+        this._clear(d);
+        this._render(d);
     }
 
     // Push a element to the projection target
@@ -112,11 +117,25 @@ export class ForEachComponent extends HTMLElement {
             }, Number(this.addedTimeDuration));
         }
 
+        const recipient = this.target !== "" ? findNodeOnUpTree(this.target, this) : this.parentElement;
+        if (this.target !== "") {
+            // TODO fix for loops using templates only to get interpolation
+            node.children.item(0)['checkAllInterpolations']();
+            const fragment: DocumentFragment = document
+                .createRange()
+                .createContextualFragment(node.children.item(0).innerHTML);
+            console.log(fragment.children[0])
+            fragment.children[0].setAttribute("loop-id", id);
+            return recipient.appendChild(fragment);
+        }
+
+
         // insert at the end to make all changes effect
-        this.parentElement.appendChild(node);
+        recipient.appendChild(node);
 
     }
 
+    // Revisar bien el For Each porq no esta pasando las propiedades aba
     private generateIdentifier(data: any): string {
         if (this.identifierPath === "") {
             return typeof data === "string" ? data : JSON.stringify(data);
@@ -125,16 +144,21 @@ export class ForEachComponent extends HTMLElement {
         if (!id) {
             console.warn("identifier not found")
         }
-        return id;
+        return id.split(" ").join("-").trim();
     }
 
     private _clear(data: any[]) {
+        if (!this._html) {
+            return
+        }
         if (Array.isArray(data) && this._html !== "") {
-            data.forEach((ele) => this.removeNode(extractData(this.identifierPath, ele)));
+            data.forEach((ele) => this.removeNode(this.generateIdentifier(ele)));
         }
     }
 
     private _render(data: any[]) {
+        if (!this._html) {
+        }
         if (Array.isArray(data) && this._html !== "") {
             data.forEach((ele) => this.projectContent(ele, false));
         }

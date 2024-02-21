@@ -1,0 +1,35 @@
+<div class="mt-2">
+    <div class="flex  py-2 gap-5">
+        <div class="flex flex-col items-center">
+            <span class="material-symbols-outlined">
+                settings_accessibility
+            </span>
+            <div class="w-[1px] mt-4 bg-white h-[100%]"></div>
+        </div>
+        <div>
+            <div class="flex items-center gap-5">
+                <!--   Ver como hacer para que esto tome otro valor-->
+                <strong> {{@host.data.type}}</strong>
+                <span class="flex items-center text-sm text-gray-400">
+             <span style="font-size:1rem;" class="material-symbols-outlined ">timer</span> {{@host.data.minutesDuration}} min</span>
+            </div>
+            <div class=" text-sm">
+                <h4 class="py-1">{{@host.data.setCounts}} Sets</h4>
+                <for-each
+                        target="ul"
+                        data="{{@host.data.exercises}}"
+                        identifier-path="exerciseName"
+                        html="<li class='py-2 w-100'>
+                                <strong class='mr-2 w-20'>{{@host.data.reps}}</strong>
+                                <span class='w-80 underline'>{{@host.data.exerciseName}}</span>
+                            </li>">
+                </for-each>
+                <ul class="px-5 text-sm">
+
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+

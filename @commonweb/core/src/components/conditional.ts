@@ -167,6 +167,9 @@ export class TemplateView extends HTMLElement {
         }
     }
 
+    public setView(view: string) {
+        this.view = view;
+    }
     public static get observedAttributes(): string[] {
         return ["data", "view"]
     }
