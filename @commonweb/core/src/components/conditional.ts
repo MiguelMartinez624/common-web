@@ -128,53 +128,6 @@ export class ShowIfComponent extends HTMLElement {
 }
 
 
-@WebComponent({
-    selector: 'template-view',
-    template: '<slot></slot>',
-    useShadow: false,
-})
-export class TemplateView extends HTMLElement {
-    // componentName will be evaluated as first priority and if its not null
-    // then a component will be created, data pass to it and injected into this
-    // component parent
-    @Attribute("data")
-    public data: any | null;
-
-    // componentName will be evaluated as first priority and if its not null
-    // then a component will be created, data pass to it and injected into this
-    // component parent
-    @Attribute("set-data")
-    public setData(d: any) {
-        this.data = d;
-        // Manually calling check template interpolations as there was not attributecall
-        // because we are passing the data via setter that doen't trigger the attributeChangeCallbacl
-        this['checkInterpolationsFor']("data");
-    }
-
-    // componentName will be evaluated as first priority and if its not null
-    // then a component will be created, data pass to it and injected into this
-    // component parent
-    @Attribute("view")
-    public set view(view: string) {
-        if (view.startsWith("http:") || view.startsWith("https:")) {
-            callRemoteAPI(view, "GET", {})
-                .then((result) => this.view = result)
-        } else {
-            this.shadowRoot ? this.shadowRoot.innerHTML = view : this.innerHTML = view;
-
-            // check the view to create the interpolations
-            bindTemplateToProperties(this);
-        }
-    }
-
-    public setView(view: string) {
-        this.view = view;
-    }
-    public static get observedAttributes(): string[] {
-        return ["data", "view"]
-    }
-
-}
 
 
 @WebComponent({

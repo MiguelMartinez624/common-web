@@ -1,0 +1,51 @@
+<data-context state="{{@host.data}}">
+
+    <div class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <div class="flex text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <div scope="col" class="flex-1 px-6 py-3">
+                Imagen
+            </div>
+            <div scope="col" class="flex-1 px-6 py-3">
+                Product name
+            </div>
+            <div scope="col" class="flex-1 px-6 py-3">
+                Category
+            </div>
+            <div scope="col" class="flex-1 px-6 py-3">
+                Price
+            </div>
+            <div scope="col" class="flex-1 px-6 py-3">
+                Action
+            </div>
+        </div>
+        <div>
+            <template for-each="{{@host.data}}">
+                <div class="flex bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <div scope="row"
+                         class="flex-1 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <img src="{{@host.data.thumbnailUrl}}" alt="">
+                    </div>
+                    <div scope="row"
+                         class="flex-1 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{@host.data.name}}
+                    </div>
+                    <div scope="row"
+                         class="flex-1 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{@host.data.category}}
+                    </div>
+                    <div scope="row"
+                         class="flex-1 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        {{@host.data.price}}
+                    </div>
+                    <div scope="row"
+                         class="flex-1 px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <button class="bg-blue-500 p-3">Editar</button>
+                    </div>
+
+                </div>
+            </template>
+
+        </div>
+    </div>
+    </div>
+</data-context>

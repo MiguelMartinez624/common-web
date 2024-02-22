@@ -34,6 +34,7 @@ export class BindElementComponent extends HTMLElement {
     }
 
     private bindElements() {
+
         const fromSelector = this.getAttribute("from");
         const toSelector = this.getAttribute("to");
         if (!fromSelector || !toSelector || this.binded) {
@@ -43,6 +44,7 @@ export class BindElementComponent extends HTMLElement {
         const triggerQuery = new ElementBind(fromSelector);
         const triggerElement: any = triggerQuery.searchElement(this);
         if (!triggerElement) {
+            console.warn("not foound")
             return;
         }
         switch (triggerQuery.propertyType) {
@@ -57,7 +59,7 @@ export class BindElementComponent extends HTMLElement {
 
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
-        debugger
+
         let data = null
 
         if (this.getAttribute("value")) {

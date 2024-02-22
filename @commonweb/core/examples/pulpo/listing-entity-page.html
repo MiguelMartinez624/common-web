@@ -1,0 +1,27 @@
+<div>
+    <bind-element value="table" from="api-call[data]:(request-success)" to="[content]:[state]"></bind-element>
+    <bind-element value="loading" from="api-call[data]:(loading)" to="[content]:[state]"></bind-element>
+    <bind-element value="error" from="api-call[data]:(request-failed)" to="[content]:[state]"></bind-element>
+    <bind-element input-path="detail.data.content" from="api-call[data]:(request-success)"
+                  to="template-view:setData"></bind-element>
+
+    <api-call
+            data
+            auto="true"
+            method="GET"
+            src="https://pavlova-backend-natp7refrq-uc.a.run.app/products?size=100&page=1">
+    </api-call>
+
+    <conditional-render-cases content case="loading">
+        <div case="loading">
+            Cargando...
+        </div>
+        <div case="table">
+            <template-view
+                    data="{{@host.data}}"
+                    src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/products-table.html">
+            </template-view>
+
+        </div>
+    </conditional-render-cases>
+</div>

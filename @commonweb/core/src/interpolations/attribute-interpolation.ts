@@ -3,7 +3,6 @@ import {Interpolation} from "./index";
 
 export function generateAttributesInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
     childList.forEach((child) => {
-        //TODO generate attributrs with thos too mother fucker
 
 
         // like for-each
@@ -19,6 +18,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
         [...child.attributes]
             .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null || (a.value as string).startsWith("@view:"))
             .forEach(({name, value}) => {
+
                 // push interpolation
                 const propertyPath = value.replace("{{", "").replace("}}", "");
                 let attributeName = propertyPath.replace("@host.", "");
@@ -37,6 +37,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
 
 
         generateAttributesInterpolations(root, [...child.children], interpolations);
+
     });
 }
 
@@ -101,9 +102,10 @@ export class AttributeInterpolation implements Interpolation {
 
 
     private updateValue(value: string) {
-        if (typeof value === "object" && typeof this.element[this.attributeName] === "function") {
+        const toUpdate =  this.element[this.attributeName];
+        if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
-            this.element[this.attributeName](value)
+            toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {
             // Required??
             this.element[this.attributeName] = value;

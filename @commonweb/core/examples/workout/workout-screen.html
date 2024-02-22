@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Todo App</title>
 </head>
-<script src="https://cdn.tailwindcss.com"></script>
+<script async src="https://cdn.tailwindcss.com"></script>
 
 <style>
     html, body {
@@ -98,13 +98,29 @@
 
 
     <div class="phone  w-[332px] h-[632px] bg-slate-700 p-4 margin-auto  justify-center">
-        <div class="notch-container">
+        <div  class="notch-container">
             <div class="notch"></div>
         </div>
+
         <template-view
                 details
-                data='[]'
-                view="http://localhost:63342/common-web/@commonweb/core/examples/workout/workout-details.html">
+                data='[ {
+                "name": "Chino Hibrido Funcional",
+                "overAllMinutesDuration": "67",
+                "trainingBlocks": [
+                    {
+                        "type": "Warm Up",
+                        "minutesDuration": "30",
+                        "setCounts": "3",
+                        "exercises": [
+                            {"reps": "10s", "exerciseName": "Cuban press con banda"},
+                            {"reps": "10", "exerciseName": "Push up 3 seg para baja"},
+                            {"reps": "30s", "exerciseName": "Plank hold con una mano"},
+                            {"reps": "30s", "exerciseName": "Plank hold con otra mano"}
+                        ]
+                    }]
+            }]'
+                src="http://localhost:63342/common-web/@commonweb/core/examples/workout/workout-details.html">
 
         </template-view>
     </div>
@@ -126,10 +142,10 @@
                         "minutesDuration": "30",
                         "setCounts": "3",
                         "exercises": [
-                            {"reps": "10 seg", "exerciseName": "Cuban press con banda"},
+                            {"reps": "10s", "exerciseName": "Cuban press con banda"},
                             {"reps": "10", "exerciseName": "Push up 3 seg para baja"},
-                            {"reps": "30 seg", "exerciseName": "Plank hold con una mano"},
-                            {"reps": "30 seg", "exerciseName": "Plank hold con otra mano"}
+                            {"reps": "30s", "exerciseName": "Plank hold con una mano"},
+                            {"reps": "30s", "exerciseName": "Plank hold con otra mano"}
                         ]
                     }]
             }

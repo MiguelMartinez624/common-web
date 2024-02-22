@@ -5,28 +5,34 @@ export enum DataFetcherPropsName {
     Source = "source",
 }
 
-
+// Meter dentro los estados de llamada y eso
 @WebComponent({
     selector: 'api-call',
-    template: ''
+    template: '<slot></slot>'
 })
 export class ApiCallComponent extends HTMLElement {
-    private auto: any;
     private _type: string;
     private _source: string = "";
     private _method: 'POST' | 'GET' | 'DELETE' | 'PUT';
 
+    @Attribute("auto")
+    public auto: boolean = false;
 
     @Attribute("method")
     public set method(method: 'POST' | 'GET' | 'DELETE' | 'PUT') {
         this._method = method;
-        this.execute({})
+        if (this.auto) {
+            this.execute({})
+        }
     }
 
-    @Attribute("source")
-    public set source(source: string) {
+    @Attribute("src")
+    public set src(source: string) {
+
         this._source = source;
-        this.execute({})
+        if (this.auto) {
+            this.execute({})
+        }
     }
 
     public execute(filters: any) {
@@ -35,6 +41,7 @@ export class ApiCallComponent extends HTMLElement {
         }
         this.data(filters)
             .then((result) => {
+                console.log("success")
                 const eventSuccess = new CustomEvent(
                     "request-success", {
                         bubbles: true,
@@ -103,7 +110,7 @@ export class ApiCallComponent extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["method", DataFetcherPropsName.Source, "auto", "result-path", "subscribed-key", "payload"];
+        return ["method", "src", "auto", "result-path", "subscribed-key", "payload"];
     }
 }
 

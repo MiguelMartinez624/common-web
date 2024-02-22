@@ -112,6 +112,7 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
 
+
             attributeChangedCallback(name, oldValue, newValue) {
 
                 updateAttributes(this, name, newValue);
