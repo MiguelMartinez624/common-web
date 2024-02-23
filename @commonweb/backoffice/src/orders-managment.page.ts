@@ -442,7 +442,7 @@ export class ProductItemComponent extends HTMLElement {
         this.shadowRoot.querySelector("[product-name]").innerHTML = order.name;
         this.shadowRoot.querySelector("[quantity]").innerHTML = order.quantity;
         const extrasList = this.shadowRoot.querySelector("ul[extras]")
-        this.product.extras.forEach((p)=>{
+        this.product.extras.forEach((p) => {
             extrasList.innerHTML += `<li>${p.name}</li>`
         })
     }
@@ -455,47 +455,59 @@ const formatter = new Intl.NumberFormat('en-US', {
 });
 
 @WebComponent({
+    // language=HTML
     template: `
-       <div style="display: flex;height: 100%">
-    <div class="detail-section right">
-        <div>
-            <h4 style="margin-top: 5px;margin-bottom: 0px;">Codigo de Orden</h4>
-            <div code></div>
-        </div>
-        <div>
-            <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div mode></div></span>
-            </div>
-        </div>
-        <div class="field rows">
-          <h4 style="margin-top: 5px;margin-bottom: 0px;">Direccion</h4>
-            <div address></div>
-        </div>
+        <div style="display: flex;height: 100%">
+            <div class="detail-section right">
+                <div>
+                    <h4 style="margin-top: 5px;margin-bottom: 0px;">Codigo de Orden</h4>
+                    <div code></div>
+                </div>
+                <div>
+                    <div class="field centered between"><span class="centered"> <span> Modo:</span>  <div
+                            mode></div></span>
+                    </div>
+                </div>
+                <div class="field rows">
+                    <h4 style="margin-top: 5px;margin-bottom: 0px;">Direccion</h4>
+                    <div address></div>
+                </div>
 
-        <div>
-            <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
-            <div class="field "><span> Telefono:</span>
-                <div phone></div>
+                <div>
+                    <h4 style="margin-top: 5px;margin-bottom: 5px;">Informacion de Contacto</h4>
+                    <div class="field "><span> Telefono:</span>
+                        <div phone></div>
+                    </div>
+                    <div class="field "><span>Email: </span>
+                        <div email></div>
+                    </div>
+                </div>
+
+                <h4>Items</h4>
+                <div style="margin-top: 10px" products>
+                </div>
+
+                <div style="display:flex;justify-content: end;margin-top: 1em" total></div>
             </div>
-            <div class="field "><span>Email: </span>
-                <div email></div>
+            <div class="detail-section">
+                <h3>Recibo</h3>
+                <div>
+                    <div class="field "><span> Metodo de Pago:</span>
+                        <div paymentMethod></div>
+                    </div>
+                    <div class="field "><span> Referencia:</span>
+                        <div reference></div>
+                    </div>
+                    <div class="field "><span> Telefono:</span>
+                        <div phoneEmitter></div>
+                    </div>
+                </div>
+                <div style="display: flex;justify-content: center;">
+                    <img style="width: 400px; height: 250px" receipt src="" alt="receipt">
+                </div>
             </div>
         </div>
-    
-    <h4>Items</h4>
-    <div style="margin-top: 10px" products>
-    </div>
-
-    <div style="display:flex;justify-content: end;margin-top: 1em" total></div>
-</div>
-    <div class="detail-section">
-    <h3>Recibo</h3>
-    <div style="display: flex;justify-content: center;">
-        <img style="width: 400px;
-    height: 250px" receipt src="" alt="receipt">
-    </div>
-    </div>
-</div>
-`,
+    `,
     selector: 'order-details-component',
     style: `
     .right{border-right:1px solid var(--border-line-color, rgba(28, 28, 28, 0.30))}
@@ -532,8 +544,11 @@ export class OrderDetailsComponent extends HTMLElement {
 
         this.shadowRoot.querySelector("[total]").innerHTML = formatter.format(total);
 
-        const createEvent = order.eventHistory.find(ev => ev.type === "created");
-        this.shadowRoot.querySelector("[receipt]").src = createEvent.payload.receiptURL
+        this.shadowRoot.querySelector("[receipt]")?.src = order.payment_details.receiptURL;
+        this.shadowRoot.querySelector("[reference]")?.innerHTML = order.payment_details.reference;
+        this.shadowRoot.querySelector("[paymentMethod]")?.innerHTML = order.payment_details.method;
+        this.shadowRoot.querySelector("[phoneEmitter]")?.innerHTML = order.payment_details.phoneEmitter;
+
     }
 
 }

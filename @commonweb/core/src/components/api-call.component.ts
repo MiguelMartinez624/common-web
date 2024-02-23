@@ -76,7 +76,7 @@ export class ApiCallComponent extends HTMLElement {
         switch (sourceType) {
             case "https" :
             case "http"  :
-                return await callRemoteAPI(this._source, method, filters);
+                return await callRemoteAPI(this._source, method, filters, this.Payload);
             case "localstorage":
                 return this.callLocalStorage(this._source, method, filters);
 
@@ -115,10 +115,10 @@ export class ApiCallComponent extends HTMLElement {
 }
 
 
-export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
+export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any, payload?: any) {
     const result = await fetch(source, {
         method: method,
-        body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...this.Payload}) : null,
+        body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...payload}) : null,
         headers: {
             "Content-Type": "application/json",
         }

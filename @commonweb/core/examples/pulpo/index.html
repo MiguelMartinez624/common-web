@@ -15,19 +15,86 @@
         width: 100%;
     }
 
+    .header {
+        height: 60px;
+    }
+
+    .content {
+        padding: 1rem 3rem;
+        background: #dbdbdb75;
+        height: calc(92%);
+    }
+
+    .layout {
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .sidebar {
+        display: flex;
+        width: 100%;
+        background: var(--bg-primary);
+        flex: 0.2;
+        transition-property: flex;
+        transition-duration: 0.5s;
+        justify-center: center;
+        overflow: hidden;
+    }
+
+    .sidebar.collapsed {
+        transition-property: flex;
+        transition-duration: 0.5s;
+        flex: 0;
+    }
+
+    .collapsed {
+        flex: 0;
+
+    }
 </style>
 <body>
-
-<div>
-    <div>
-
-    </div>
-    <div>
+<div class="layout">
+    <div class="sidebar">
         <template-view
-                data='{"entity":"products"}'
-                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/listing-entity-page.html"
+                data='{"routes":[
+                    {"name":"Productos","route":"products","icon":"restaurant"},
+                    {"name":"Tiendas", "route":"stores","icon":"storefront"}
+                ]}'
+                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/sidebar.html"
         ></template-view>
     </div>
+    <div style="flex:1;overflow:hidden;">
+        <div class="header">
+            TOCa
+        </div>
+        <div class="content">
+            <!-- Usaer templates para los conditional asi evita ser renderizado           -->
+            <conditional-render-cases routes case="products">
+                <div case="stores">
+                    <template>
+                        <template-view
+                                data='{"entity":"products"}'
+                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/stores/listing-page.html"
+                        ></template-view>
+                    </template>
+                </div>
+                <div case="products">
+                    <template>
+                        <template-view
+                                data='{"entity":"products"}'
+                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/products/listing-page.html"
+                        ></template-view>
+                    </template>
+                </div>
+            </conditional-render-cases>
+
+
+        </div>
+    </div>
+
 </div>
 
 

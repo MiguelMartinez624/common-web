@@ -8,6 +8,7 @@ import {
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
+import {resolveLoop} from "./directives";
 
 export class CustomElementConfig {
     selector: string;
@@ -100,6 +101,14 @@ export function WebComponent(attr: CustomElementConfig) {
 
                 insertTemplate.call(this, attr);
 
+                if ((this as unknown as HTMLElement)?.shadowRoot) {
+                    (this as unknown as HTMLElement)?.shadowRoot.querySelectorAll("[for-each]")
+                        .forEach((childWithLoop)=>{
+                            resolveLoop(childWithLoop);
+                        })
+
+                }
+
                 bindTemplateToProperties(this as unknown as HTMLElement)
 
                 syncWithStorage(this as unknown as HTMLElement);
@@ -109,8 +118,8 @@ export function WebComponent(attr: CustomElementConfig) {
                         .forEach(processor => processor(this));
                 }
 
-            }
 
+            }
 
 
             attributeChangedCallback(name, oldValue, newValue) {

@@ -1,5 +1,7 @@
 import {WebComponent} from "../web_components";
 import {Attribute} from "../attributes";
+import {resolveLoop} from "../directives";
+import {extractData} from "../html_manipulation";
 
 @WebComponent({
     selector: `data-context`,
@@ -10,7 +12,7 @@ export class DataContext extends HTMLElement {
 
     public _ctx: any;
 
-    public get state(): any  {
+    public get state(): any {
         return this._ctx;
     }
 
@@ -26,6 +28,10 @@ export class DataContext extends HTMLElement {
     }
 
     connectedCallback() {
-        console.log({context: this})
+        this.querySelectorAll("[for-each]").forEach((element) => {
+            // enhance
+            resolveLoop(element)
+
+        })
     }
 }

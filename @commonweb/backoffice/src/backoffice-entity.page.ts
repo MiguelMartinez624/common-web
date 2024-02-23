@@ -52,7 +52,7 @@ const DEFAULT_QUERY = {
                 <bind-element value="loading" from="data-fetcher[data]:(loading)"  to="conditional-render-cases:[state]"></bind-element>
                 <bind-element value="error" from="data-fetcher[data]:(request-failed)"  to="conditional-render-cases:[state]"></bind-element>
 
-               <conditional-render-cases style="height: 100%;width: 100%" state="loading">
+               <conditional-render-cases style="height: 95%;width: 100%:overflow-y:auto; " state="loading">
                   <div case="table"><go-table ></go-table></div>
                     <div style="height: 100%;width: 100%" case="loading">
                         <div  style="display: flex;align-items: center;justify-content: center;height: 300px;flex-direction: column">
