@@ -30,6 +30,10 @@ export function resolveLoop(loopInitialzier: any) {
 
             });
         }
+
+        loopInitialzier["push"] = function (value: any) {
+            const t = interpolateAndRender(loopInitialzier, value, recipient);
+        }
     }
 
     if (loopInitialzier['for-each'] !== undefined && !Array.isArray(loopInitialzier["for-each"])) {
@@ -37,6 +41,8 @@ export function resolveLoop(loopInitialzier: any) {
     }
 
     const recipient = loopInitialzier.parentElement;
+    console.log({recipient})
+
     loopInitialzier['for-each']?.forEach((value) => {
         const t = interpolateAndRender(loopInitialzier, value, recipient);
         // check if in the nested tempalte there are more for-each to be handle

@@ -16,7 +16,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
             }
         }
         [...child.attributes]
-            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null || (a.value as string).startsWith("@view:"))
+            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null )
             .forEach(({name, value}) => {
 
                 // push interpolation
@@ -102,6 +102,11 @@ export class AttributeInterpolation implements Interpolation {
 
 
     private updateValue(value: string) {
+        if(this.attributeName === "for-each"){
+            console.log("from interpolation");
+            console.log(value)
+
+        }
         const toUpdate =  this.element[this.attributeName];
         if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?

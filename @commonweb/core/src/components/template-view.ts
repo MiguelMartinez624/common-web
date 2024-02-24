@@ -2,12 +2,25 @@ import {bindTemplateToProperties, WebComponent} from "../web_components";
 import {Attribute} from "../attributes";
 import {callRemoteAPI} from "./api-call.component";
 import {extractData} from "../html_manipulation";
+import {resolveLoop} from "../directives";
+
+export abstract class Template extends HTMLElement {
+    protected syncLoopsData() {
+        [...this.querySelectorAll("[for-each]"), ...this.shadowRoot.querySelectorAll("[for-each]")]
+            .forEach((childWithLoop) => {
+                if (!childWithLoop["pushAll"]) {
+                    resolveLoop(childWithLoop)
+                }
+            })
+    }
+}
+
 
 @WebComponent({
     selector: 'template-view',
     template: '<slot></slot>',
 })
-export class TemplateView extends HTMLElement {
+export class TemplateView extends Template {
     private _data: any;
     private _show: any;
 
@@ -28,6 +41,7 @@ export class TemplateView extends HTMLElement {
     // component parent
     @Attribute("data")
     public set data(data: any) {
+        console.log({data})
         this['checkInterpolationsFor']("show");
         this._data = data;
     }
@@ -50,8 +64,15 @@ export class TemplateView extends HTMLElement {
         if (!this.attributes.getNamedItem("for-each")) {
             this['checkInterpolationsFor']("show");
             this['checkInterpolationsFor']("data");
-
         }
+
+        // passdown to for-each manually
+        [...this.shadowRoot.querySelectorAll("[for-each]"), ...this.querySelectorAll("[for-each]")]
+            .forEach((childLoop) => {
+                // check interpolations from each element
+                (childLoop as any).pushAll(this.data)
+
+            })
     }
 
 
@@ -82,20 +103,20 @@ export class TemplateView extends HTMLElement {
                 if (!this.attributes.getNamedItem("for-each")) {
                     this.innerHTML = result;
                     bindTemplateToProperties(this);
-                    // See how preven the request to the template
-                    // console.log(this.show)
+                    // See how prevent the request to the template
+                    // do before?
                     if (this._show) {
-
                         const render = extractData(this._show, this.data);
                         if (!render) {
                             this.setAttribute("hidden", "true")
                         }
                     }
 
+                    this.syncLoopsData();
+
                 }
                 // This shoul be taked by the global handler
-                const event = new CustomEvent(
-                    "lazyload-template", {detail: {emitter: this}});
+                const event = new CustomEvent("lazyload-template", {detail: {emitter: this}});
                 window.dispatchEvent(event);
                 this.dispatchEvent(new CustomEvent("template-changed", {bubbles: true}))
             })
@@ -109,5 +130,9 @@ export class TemplateView extends HTMLElement {
 
     public static get observedAttributes(): string[] {
         return ["show", "data", "view", "src"]
+    }
+
+    connectedCallback() {
+        // this.syncLoopsData()
     }
 }

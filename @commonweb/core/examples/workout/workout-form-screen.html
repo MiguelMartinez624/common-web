@@ -85,13 +85,9 @@
 <body class="bg-slate-500 p-4 text-slate-50">
 <div class="flex gap-4 justify-center">
     <div class="w-[60%] outline outline-cyan-900 p-4  margin-auto  justify-center">
-        <web-form>
-            <textarea
-                    class="bg-gray-50 h-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    name="" id="" cols="30" rows="30"></textarea>
-            <bind-element input-path="target.value" from="textarea:(keyup)"
-                          to="template-view[screen]:setView"></bind-element>
-        </web-form>
+        <ul>
+            <li>Como mostrar esto para crear las rutinas</li>
+        </ul>
         <script></script>
     </div>
 
@@ -100,7 +96,7 @@
             <div class="notch"></div>
         </div>
         <div>
-            <div class="w-full max-w-md  rounded-lg shadow p-4">
+            <div class="w-full max-w-md overflow-auto h-[80%]  rounded-lg shadow p-4">
                 <!--                              <template-view screen></template-view>-->
                 <web-form>
                     <form-field property="name" label="Nombre de Rutina"></form-field>
@@ -109,13 +105,18 @@
                         <button class="bg-blue-700 w-full p-3">Agregar</button>
                         <bind-element
                                 from="button:(click)"
-                                to="for-each:push"
-                                value="1"></bind-element>
+                                to="[for-each]:push"
+                                value="1">
+                        </bind-element>
 
-                        <for-each
-                                data="[]"
-                                html="http://localhost:63342/common-web/@commonweb/examples/workout/workout-block-form.html">
-                        </for-each>
+                        <template for-each="[]">
+                            <web-form>
+                                <form-field label="Ejercicio" property="exersiceName"></form-field>
+                                <form-field label="Repeticiones" property="reps"></form-field>
+
+                            </web-form>
+                        </template>
+
                     </section>
                 </web-form>
             </div>

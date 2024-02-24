@@ -94,16 +94,18 @@ export class BindElementComponent extends HTMLElement {
         if (!targetElement) {
             return;
         }
+        const field = targetElement[targetQuery.propertyName];
 
         switch (targetQuery.propertyType) {
             case "method":
                 // For method call
-                if (targetElement[targetQuery.propertyName]) {
-                    targetElement[targetQuery.propertyName](data)
-                }
+                targetElement[targetQuery.propertyName](data)
+
                 break;
             case "attribute":
-                targetElement.setAttribute(targetQuery.propertyName, data)
+                // check foe setter
+                typeof field === "function" ? targetElement[targetQuery.propertyName] = data : targetElement.setAttribute(targetQuery.propertyName, data);
+
                 break;
             default:
                 console.error(`[${targetQuery.propertyType}] method under development`)

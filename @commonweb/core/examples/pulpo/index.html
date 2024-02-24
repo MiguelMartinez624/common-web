@@ -17,11 +17,12 @@
 
     .header {
         height: 60px;
+        border-bottom: 2px solid #f2f2f2;
     }
 
     .content {
         padding: 1rem 3rem;
-        background: #dbdbdb75;
+        background: white
         height: calc(92%);
     }
 
@@ -42,6 +43,7 @@
         transition-duration: 0.5s;
         justify-center: center;
         overflow: hidden;
+        border-right: 2px solid #f2f2f2;
     }
 
     .sidebar.collapsed {
@@ -61,7 +63,9 @@
         <template-view
                 data='{"routes":[
                     {"name":"Productos","route":"products","icon":"restaurant"},
-                    {"name":"Tiendas", "route":"stores","icon":"storefront"}
+                    {"name":"Tiendas", "route":"stores","icon":"storefront"},
+                    {"name":"Calendario de Ordenes", "route":"orders-calendar","icon":"sell"}
+
                 ]}'
                 src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/sidebar.html"
         ></template-view>
@@ -72,7 +76,7 @@
         </div>
         <div class="content">
             <!-- Usaer templates para los conditional asi evita ser renderizado           -->
-            <conditional-render-cases routes case="products">
+            <conditional-render-cases routes case="orders-calendar">
                 <div case="stores">
                     <template>
                         <template-view
@@ -89,6 +93,14 @@
                         ></template-view>
                     </template>
                 </div>
+                <div case="orders-calendar">
+                    <template>
+                        <template-view
+                                data='{"entity":"products"}'
+                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/reports/orders-calendar.html"
+                        ></template-view>
+                    </template>
+                </div>
             </conditional-render-cases>
 
 
@@ -100,6 +112,173 @@
 
 <script src="../../dist/lib-pkg.js" type="text/javascript"></script>
 <script async src="../form.plugin.js" type="text/javascript"></script>
+<script async>
 
+    function generateMonthDaysArray(startDate, endDate) {
+        const months = [];
+        let startMonth = new Date(startDate).getMonth();
+        const endMonth = new Date(endDate).getMonth();
+        const startYear = new Date(startDate).getFullYear();
+        const endYear = new Date(endDate).getFullYear();
+        const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
+        for (let year = startYear; year <= endYear; year++) {
+            for (let month = startMonth; month <= endMonth; month++) {
+                const monthName = new Date(year, month, 1).toLocaleDateString("es-ES", {month: "long"});
+                const days = [];
+
+                for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+                    days.push({
+                        weekDay: diasSemana[new Date(year, month, day).getDay()],
+                        day: day,
+                        date: new Date(year, month, day).toLocaleDateString("es-ES"),
+                    });
+                }
+
+                months.push({
+                    month: monthName,
+                    days,
+                });
+            }
+
+            startMonth = 0;
+        }
+
+        return months;
+    }
+
+    window
+        .RegisterWebComponent({
+            // language=CSS
+            style: `
+                .day {
+                    border: 1px solid lightgray;
+                    height: 10vh;
+                    width: 10vh;
+                    max-height: 125px;
+                }
+
+                .day-counter {
+                    padding: 5px;
+                }
+
+                .week-day {
+                    border: 1px solid lightgray;
+
+                }
+
+                .grid {
+                    display: grid;
+                    grid-template-columns: repeat(7, 10vh);
+                    grid-gap: 0em;
+                }
+            `,
+            selector: 'pulpo-calendar',
+            // language=HTML
+            template: `
+                <!--                <data-context>-->
+                <template-view>
+                    <div class="main-calendar">
+                        <template for-each="{{@host.data.months}}">
+                            <div calendar-days class="grid">
+                                <template for-each="{{@host.data.daysOfWeek}}">
+                                    <h4 class='week-day'>{{@host.data}}</h3>
+                                </template>
+                            </div>
+                            <div class='grid'>
+                                <template day-template for-each="{{@host.data.days}}">
+                                    <div class='day'>
+                                        <div data="{{@host.data}}" class='day-counter'>{{@host.data.day}}</div>
+                                        <div>
+                                            <template-view
+                                                    show="event"
+                                                    data="{{@host.data}}"
+                                                    src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/reports/calendar-day.html">
+
+                                            </template-view>
+                                        </div>
+                                        <bind-element input-src="template-view:[data]" from="div.day:(click)"
+                                                      to="@host:bubbleUp">
+                                            <bind-element>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template-view>
+                <!--                </data-context>-->
+
+            `,
+            // so we can take global style rules
+        })
+        .with_attribute("html", "<h4>{{@host.data.event.ordersCompleted}} Ordenes Completadas</h4>\n>")
+        .with_attribute("template", "")
+        .with_attribute("months", function (data) {
+            const main = this.shadowRoot.querySelector("template-view");
+            main.setData(data);
+
+        })
+        .with_method("bubbleUp", function (value) {
+            this.dispatchEvent(new CustomEvent("day-clicked", {detail: value}))
+            console.log(value)
+        })
+        .with_attribute("daysOfWeek", [])
+        .with_attribute("data", function (data) {
+            if (!data || data.length === 0) {
+                return;
+            }
+
+            //Sort
+            const sortedByDate = data.sort(({date: dateA}, {date: dateB}) => {
+                const a = new Date(dateA);
+                const b = new Date(dateB);
+                return a - b; // Ordena ascendente
+                // return b - a; // Ordena descendente
+
+            });
+            const months = generateMonthDaysArray(sortedByDate[0][this['date-path']], sortedByDate[sortedByDate.length - 1][this['date-path']]);
+            // For each month need to add a Month
+            // for each day of the month ned to add a Day
+            const monthsData = []
+            for (const month of months) {
+                // need to merge days
+                const merged = month.days.map(({day, weekDay}) => {
+                    const event = data.find(t => new Date(t[this['date-path']]).getDate() + 1 === day);
+                    return {day, weekDay, event}
+                })
+
+
+                // const forEach = node.querySelector("for-each[main]");
+                // forEach.data(merged);
+                // const forEachDays = node.querySelector("for-each[daysweek]");
+                const daysOfWeek = [
+                    merged[0].weekDay,
+                    merged[1].weekDay,
+                    merged[2].weekDay,
+                    merged[3].weekDay,
+                    merged[4].weekDay,
+                    merged[5].weekDay,
+                    merged[6].weekDay,
+
+                ];
+
+                monthsData.push(
+                    {
+                        days: merged,
+                        daysOfWeek,
+                    }
+                )
+                // this.shadowRoot.querySelector("data-context").state = toPass;
+
+            }
+
+            this['months'](monthsData)
+
+        })
+        .with_attribute("date-path", 'date')// path to property that is gonna be used as the day
+        .build();
+
+
+</script>
 </body>
 </html>

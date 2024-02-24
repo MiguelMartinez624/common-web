@@ -90,7 +90,6 @@ if (!window[PROCESSOR_KEY]) {
 // Revisar bien el For Each porq no esta pasando las propiedades aba
 
 
-
 (function () {
 
 
@@ -99,22 +98,20 @@ if (!window[PROCESSOR_KEY]) {
     * on the incoming template
     * */
 
-    window.addEventListener("lazyload-template", (ev: CustomEvent) => {
-
-        // check for for-each
-        const emitter = ev.detail.emitter;
-        if (emitter["for-each"]) {
-            resolveLoop(emitter)
-        }
-        emitter.querySelectorAll("[for-each]").forEach((child) => {
-            resolveLoop(child)
-        })
-
-
-
-    });
-
-    document.querySelectorAll("[for-each]")
-        .forEach(resolveLoop);
+    // window.addEventListener("lazyload-template", (ev: CustomEvent) => {
+    //     // check for for-each
+    //     const emitter = ev.detail.emitter;
+    //     if (emitter["for-each"]) {
+    //         resolveLoop(emitter)
+    //     }
+    //     emitter.querySelectorAll("[for-each]").forEach((child) => {
+    //         resolveLoop(child)
+    //     })
+    //
+    //
+    // });
+    //
+    // document.querySelectorAll("[for-each]")
+    //     .forEach(resolveLoop);
 
 })()

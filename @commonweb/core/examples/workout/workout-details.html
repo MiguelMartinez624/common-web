@@ -11,11 +11,12 @@
         </span>
     </div>
     <div class="overflow-y-auto h-[95%]">
-        <template-view
-                for-each="{{@host.data.trainingBlocks}}"
-                src="http://localhost:63342/common-web/@commonweb/core/examples/workout/workout-block.html">
-        </template-view>
-
+        <template  for-each="{{@host.data.trainingBlocks}}">
+            <template-view
+                    data="{{@host.data}}"
+                    src="http://localhost:63342/common-web/@commonweb/core/examples/workout/workout-block.html">
+            </template-view>
+        </template>
 
     </div>
 </div>
