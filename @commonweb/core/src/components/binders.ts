@@ -104,7 +104,8 @@ export class BindElementComponent extends HTMLElement {
                 break;
             case "attribute":
                 // check foe setter
-                typeof field === "function" ? targetElement[targetQuery.propertyName] = data : targetElement.setAttribute(targetQuery.propertyName, data);
+                // TODO see how to remove this stringify
+                typeof field === "function" ? targetElement[targetQuery.propertyName] = data : targetElement.setAttribute(targetQuery.propertyName, JSON.stringify(data));
 
                 break;
             default:

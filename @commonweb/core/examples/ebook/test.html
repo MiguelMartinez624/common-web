@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo App</title>
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./dark-theme.css">
+<style>
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        font-family: Roboto, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    }
+
+    .header {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        color: var(--fg);
+        background: var(--bg);
+    }
+
+    .content {
+        padding: 1rem 3rem;
+        color: var(--fg);
+        background: var(--bg);
+        height: calc(92%);
+    }
+
+    .layout {
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .sidebar {
+        display: flex;
+        width: 100%;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg);
+        flex: 0.2;
+        transition-property: flex;
+        transition-duration: 0.5s;
+        justify-center: center;
+        overflow: hidden;
+
+    &
+    a {
+        color: var(--sidebar-fg);
+    }
+
+    }
+
+    .sidebar.collapsed {
+        transition-property: flex;
+        transition-duration: 0.5s;
+        flex: 0;
+    }
+
+    li {
+        list-style: none
+    }
+
+
+    .collapsed {
+        flex: 0;
+
+    }
+</style>
+<body>
+<static-template
+        data='[
+        {"name":"Miguel","skills":["Javascript","RUst"]},
+        {"name":"manuel","skills":["Javascript","RUst"]}]'>
+    <ul>
+        <template for-each="{{@host.data}}">
+            <li>{{@host.data.name}}
+            <div>
+                <ul>
+                    <template for-each="{{@host.data.skills}}">
+                        <li>{{@host.data}}</li>
+                    </template>
+                </ul>
+            </div>
+            </li>
+        </template>
+    </ul>
+</static-template>
+
+<script src="../../dist/lib-pkg.js" type="text/javascript"></script>
+
+</body>
+</html>

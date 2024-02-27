@@ -21,6 +21,7 @@ export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, r
 // TODO hacer el for each a partir de la data, con interpolacion? no
 //
 export function resolveLoop(looper: any) {
+
     // Donde se inyectaran
     const recipient = looper.parentElement;
 
@@ -30,7 +31,6 @@ export function resolveLoop(looper: any) {
             if (!Array.isArray(items)) {
                 return;
             }
-            console.log({looper: this, items}, "pushing all")
 
             items.forEach((value) => {
                 debugger

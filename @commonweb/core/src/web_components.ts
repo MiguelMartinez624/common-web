@@ -101,14 +101,6 @@ export function WebComponent(attr: CustomElementConfig) {
 
                 insertTemplate.call(this, attr);
 
-                if ((this as unknown as HTMLElement)?.shadowRoot) {
-                    (this as unknown as HTMLElement)?.shadowRoot.querySelectorAll("[for-each]")
-                        .forEach((childWithLoop)=>{
-                            resolveLoop(childWithLoop);
-                        })
-
-                }
-
                 bindTemplateToProperties(this as unknown as HTMLElement)
 
                 syncWithStorage(this as unknown as HTMLElement);
@@ -130,6 +122,7 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
             public checkInterpolationsFor(name) {
+
                 const interpolations = (this as any).interpolations;
                 // if you didn't use the notation wont have this field set.
                 if (interpolations) {

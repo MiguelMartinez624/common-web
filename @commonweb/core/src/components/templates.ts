@@ -4,6 +4,10 @@ import {callRemoteAPI} from "./api-call.component";
 import {extractData} from "../html_manipulation";
 import {resolveLoop} from "../directives";
 
+TODO need to understand when the attribute changes get call
+TODO investigate
+
+
 export abstract class Template extends HTMLElement {
 
     // local reference/cache for the input
@@ -15,6 +19,7 @@ export abstract class Template extends HTMLElement {
     public set data(data: any) {
         this._data = data;
         this.syncLoopsData();
+
     }
 
     public get data(): any {
@@ -31,6 +36,7 @@ export abstract class Template extends HTMLElement {
     protected enhanceClassChange() {
         [...this.querySelectorAll("[toggle]"), ...this.shadowRoot.querySelectorAll("[toggle]")]
             .forEach((child) => {
+                console.log({child})
                 if (!child["toggleClass"]) {
                     child["toggleClass"] = (className: string) => {
                         child.classList.toggle(className);
@@ -45,8 +51,9 @@ export abstract class Template extends HTMLElement {
     protected checkShowIfDirective() {
         [...this.querySelectorAll("[show-if]"), ...this.shadowRoot.querySelectorAll("[show-if]")]
             .forEach((child) => {
+                console.log(child)
                 const value = extractData(child.getAttribute("show-if"), this.data);
-                if (value) {
+                if (!value) {
                     child.setAttribute("hidden", "automatic")
                 }
             });
@@ -63,10 +70,38 @@ export abstract class Template extends HTMLElement {
 })
 export class StaticTemplate extends Template {
 
+    public updateData(data) {
+        this.data = data;
+
+        // Cada vez q se teo el data deberia revisar esto? no creeria yo
+        // // Check before syncing so we have all the data
+        this["checkAllInterpolations"]();
+
+        // Do on init or when change?
+
+        // // Enhansament for the content
+        this.syncLoopsData();
+        this.enhanceClassChange();
+        this.checkShowIfDirective();
+    }
 
     public static get observedAttributes(): string[] {
         return ["data"]
     }
+
+    connectedCallback() {
+
+        // // Check before syncing so we have all the data
+        this["checkAllInterpolations"]();
+
+        // Do on init or when change?
+
+        // // Enhansament for the content
+        this.syncLoopsData();
+        this.enhanceClassChange();
+
+    }
+
 }
 
 /*
@@ -78,6 +113,7 @@ export class StaticTemplate extends Template {
     template: '<slot></slot>',
 })
 export class LazyTemplate extends Template {
+
     /*
     * use for pull template (html) remotely
     * make specific tempalte
@@ -89,12 +125,16 @@ export class LazyTemplate extends Template {
         callRemoteAPI(newSrc, "GET", {})
             .then((result) => {
                 // check the view to create the interpolations
-                this.shadowRoot.querySelector("slot").innerHTML = result;
+                this.innerHTML = result;
                 bindTemplateToProperties(this);
+                // Check before syncing so we have all the data
+                this["checkAllInterpolations"]();
 
                 // Enhansament for the content
                 this.syncLoopsData();
                 this.enhanceClassChange();
+                this.checkShowIfDirective();
+
 
             })
     }

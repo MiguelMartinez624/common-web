@@ -179,7 +179,7 @@
             // language=HTML
             template: `
                 <!--                <data-context>-->
-                <static-template for-each="{{@host.months}}">
+                <static-template data="[]" main>
                     <div class="main-calendar">
                         <template for-each="{{@host.data}}">
                             <div calendar-days class="grid">
@@ -193,7 +193,6 @@
                                         <div data="{{@host.data}}" class='day-counter'>{{@host.data.day}}</div>
                                         <div>
                                             <lazy-template
-                                                    show="event"
                                                     data="{{@host.data}}"
                                                     src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/reports/calendar-day.html">
 
@@ -214,7 +213,11 @@
             // so we can take global style rules
         })
         .with_attribute("template", "")
-        .with_attribute("months", [])
+        .with_attribute("months", function (data) {
+            debugger
+            this.shadowRoot.querySelector("[main]").updateData(data);
+
+        })
         .with_method("bubbleUp", function (value) {
             this.dispatchEvent(new CustomEvent("day-clicked", {detail: value}))
             console.log(value)
@@ -268,8 +271,7 @@
                 // this.shadowRoot.querySelector("data-context").state = toPass;
 
             }
-            console.log(monthsData)
-            this['months'] = monthsData;
+            this['months'](monthsData);
 
         })
         .with_attribute("date-path", 'date')// path to property that is gonna be used as the day

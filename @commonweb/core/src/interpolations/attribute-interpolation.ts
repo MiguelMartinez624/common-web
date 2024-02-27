@@ -36,11 +36,12 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
             })
 
 
-        if (root !== child && !["LAZY-TEMPLATE", "STATIC-TEMPLATE"].includes(child.tagName)) {
+        // if (root !== child && ["LAZY-TEMPLATE", "STATIC-TEMPLATE"].includes(child.tagName)) {
+        //     generateAttributesInterpolations(child, [...child.children], interpolations);
+        // } else {
             generateAttributesInterpolations(root, [...child.children], interpolations);
-        } else {
-            console.log({child})
-        }
+
+        // }
 
     });
 }
@@ -86,11 +87,11 @@ export class AttributeInterpolation implements Interpolation {
         public readonly propertyPath: string,
         public readonly attributeName: string) {
 
-        const value = extractData(propertyPath, this.root) || "";
+        // const value = extractData(propertyPath, this.root) || "";
         // first interpolation need to replace the code
 
         // objects and arrays will be always pass by setter if posible
-        this.updateValue(value);
+        // this.updateValue(value);
 
     }
 
@@ -105,9 +106,13 @@ export class AttributeInterpolation implements Interpolation {
     }
 
 
-    private updateValue(value: string) {
+    private updateValue(value: any) {
 
         const toUpdate = this.element[this.attributeName];
+        if(this.attributeName === "for-each" && this.element["pushAll"]){
+            this.element["pushAll"](value);
+            return;
+        }
         if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
