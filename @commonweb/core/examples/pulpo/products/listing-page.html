@@ -17,10 +17,10 @@
             Cargando...
         </div>
         <div case="table">
-            <template-view
+            <lazy-template
                     data="{{@host.data}}"
-                    src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/products/products-table.html">
-            </template-view>
+                    src="./products/products-table.html">
+            </lazy-template>
         </div>
     </conditional-render-cases>
 </div>

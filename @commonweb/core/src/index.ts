@@ -1,8 +1,5 @@
-import {bindTemplateToProperties, CustomElementConfig, PROCESSOR_KEY, WebComponent} from "./web_components";
+import {CustomElementConfig, PROCESSOR_KEY, WebComponent} from "./web_components";
 import {Attribute} from "./attributes";
-import {extractData} from "./html_manipulation";
-import {TemplateView} from "./components";
-import {resolveLoop} from "./directives";
 
 export * from './interpolations';
 export * from './web_components';
@@ -87,31 +84,4 @@ if (!window[PROCESSOR_KEY]) {
     window[PROCESSOR_KEY] = [];
 }
 
-// Revisar bien el For Each porq no esta pasando las propiedades aba
 
-
-(function () {
-
-
-    /*
-    * This should be called each time a new content is loaded to handle the directives
-    * on the incoming template
-    * */
-
-    // window.addEventListener("lazyload-template", (ev: CustomEvent) => {
-    //     // check for for-each
-    //     const emitter = ev.detail.emitter;
-    //     if (emitter["for-each"]) {
-    //         resolveLoop(emitter)
-    //     }
-    //     emitter.querySelectorAll("[for-each]").forEach((child) => {
-    //         resolveLoop(child)
-    //     })
-    //
-    //
-    // });
-    //
-    // document.querySelectorAll("[for-each]")
-    //     .forEach(resolveLoop);
-
-})()

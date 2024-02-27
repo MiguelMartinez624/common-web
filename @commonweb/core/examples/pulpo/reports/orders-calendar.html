@@ -1,3 +1,4 @@
+
 <div class="flex gap-4 flex-col h-[90%] overflow-auto">
 
 
@@ -11,7 +12,7 @@
     <div class="flex">
         <div class="w-[65%] p-6 bg-[#ffffff] shadow-xl rounded-3xl">
 
-            <pulpo-calendar data=' [
+            <pulpo-calendar data='[
             {
                 "date": "2024-02-06T00:55:07.418Z",
                 "ordersCreated": 5,
@@ -237,14 +238,14 @@
                       to="template-view[order-list]:setData"></bind-element>
 
         <div class="w-[30%] p-6 bg-[#ffffff] shadow-xl rounded-xl">
-            <template-view data="[]" order-list>
+            <static-template data="[]" order-list>
                 <ul>
                     <template for-each="{{@host.data}}">
                         <li>{{@host.data.orderCode}}</li>
                     </template>
                 </ul>
 
-            </template-view>
+            </static-template>
         </div>
     </div>
 </div>

@@ -60,45 +60,47 @@
 <body>
 <div class="layout">
     <div class="sidebar">
-        <template-view
+        <lazy-template
                 data='{"routes":[
                     {"name":"Productos","route":"products","icon":"restaurant"},
                     {"name":"Tiendas", "route":"stores","icon":"storefront"},
                     {"name":"Calendario de Ordenes", "route":"orders-calendar","icon":"sell"}
 
                 ]}'
-                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/sidebar.html"
-        ></template-view>
+                src="./sidebar.html"
+        ></lazy-template>
     </div>
     <div style="flex:1;overflow:hidden;">
         <div class="header">
-            TOCa
+            <span menu-toggle class="material-symbols-outlined">
+                dock_to_right
+            </span>
+            <bind-element value="collapsed" from="spa[menu-toggle]:(click)" to=".sidebar:toggleClass"></bind-element>
         </div>
         <div class="content">
             <!-- Usaer templates para los conditional asi evita ser renderizado           -->
             <conditional-render-cases routes case="orders-calendar">
                 <div case="stores">
                     <template>
-                        <template-view
+                        <lazy-template
                                 data='{"entity":"products"}'
-                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/stores/listing-page.html"
-                        ></template-view>
+                                src="./stores/listing-page.html"
+                        ></lazy-template>
                     </template>
                 </div>
                 <div case="products">
                     <template>
-                        <template-view
+                        <lazy-template
                                 data='{"entity":"products"}'
-                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/products/listing-page.html"
-                        ></template-view>
+                                src="./products/listing-page.html"
+                        ></lazy-template>
                     </template>
                 </div>
                 <div case="orders-calendar">
                     <template>
-                        <template-view
-                                data='{"entity":"products"}'
-                                src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/reports/orders-calendar.html"
-                        ></template-view>
+                        <lazy-template
+                                src="./reports/orders-calendar.html"
+                        ></lazy-template>
                     </template>
                 </div>
             </conditional-render-cases>
@@ -177,9 +179,9 @@
             // language=HTML
             template: `
                 <!--                <data-context>-->
-                <template-view>
+                <static-template for-each="{{@host.months}}">
                     <div class="main-calendar">
-                        <template for-each="{{@host.data.months}}">
+                        <template for-each="{{@host.data}}">
                             <div calendar-days class="grid">
                                 <template for-each="{{@host.data.daysOfWeek}}">
                                     <h4 class='week-day'>{{@host.data}}</h3>
@@ -190,12 +192,12 @@
                                     <div class='day'>
                                         <div data="{{@host.data}}" class='day-counter'>{{@host.data.day}}</div>
                                         <div>
-                                            <template-view
+                                            <lazy-template
                                                     show="event"
                                                     data="{{@host.data}}"
                                                     src="http://localhost:63342/common-web/@commonweb/core/examples/pulpo/reports/calendar-day.html">
 
-                                            </template-view>
+                                            </lazy-template>
                                         </div>
                                         <bind-element input-src="template-view:[data]" from="div.day:(click)"
                                                       to="@host:bubbleUp">
@@ -205,19 +207,14 @@
                             </div>
                         </template>
                     </div>
-                </template-view>
+                </static-template>
                 <!--                </data-context>-->
 
             `,
             // so we can take global style rules
         })
-        .with_attribute("html", "<h4>{{@host.data.event.ordersCompleted}} Ordenes Completadas</h4>\n>")
         .with_attribute("template", "")
-        .with_attribute("months", function (data) {
-            const main = this.shadowRoot.querySelector("template-view");
-            main.setData(data);
-
-        })
+        .with_attribute("months", [])
         .with_method("bubbleUp", function (value) {
             this.dispatchEvent(new CustomEvent("day-clicked", {detail: value}))
             console.log(value)
@@ -271,8 +268,8 @@
                 // this.shadowRoot.querySelector("data-context").state = toPass;
 
             }
-
-            this['months'](monthsData)
+            console.log(monthsData)
+            this['months'] = monthsData;
 
         })
         .with_attribute("date-path", 'date')// path to property that is gonna be used as the day

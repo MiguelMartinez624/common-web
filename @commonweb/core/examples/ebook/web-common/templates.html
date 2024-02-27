@@ -1,0 +1,106 @@
+<div class="overflow-y-auto h-[80vh] p-2">
+    <h1 class="text-3xl font-bold mb-8">Templates Elements</h1>
+
+    En esta seccion veremos el principal elemento que es la base de construccion del framework.
+
+    <div class="rounded mt-4 outline max-w-[500px] outline-offset-2 p-4 bg-slate-800 outline-cyan-600  h-[fit-content]">
+        <h1 class="text-lg font-bold mb-3">Content</h1>
+        <ul class="ml-4">
+            <li class=my-1"><a href="">Usage</a></li>
+            <li class=my-1">Template properties</li>
+            <li class="my-1">Template lazy loading content</li>
+            <li class="my-1"><a href="#depth">Template in depth</a></li>
+
+        </ul>
+    </div>
+
+    <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+
+    <section>
+
+
+        <strong class="text-2xl block ">Template</strong>
+        <br>
+        Template es la clase abstracta principal que sirve como base para el resto de plantillas en la biblioteca.
+        Su
+        función principal es resolver las directivas principales del framework dentro del árbol de elementos hijos.
+        <br>
+        <br>
+        Existen dos tipos de Templates pricipales que veremos a continuacion que son StaticTemplate y LazyTemplate sus
+        nombres
+        son bastante descriptivos en cuanto a su principal y quizas unica diferencia.
+        </p>
+        <br>
+        <strong class="text-xl block ">Directivas</strong>
+
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">for-each</td>
+                <td class="border border-slate-700 p-4">Renderiza un template definido por cada uno de los elementos en
+                    el contexto dato
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">show-if</td>
+                <td class="border border-slate-700 p-4">Evalua la condicion para ocultar/mostrar el elemento segun el
+                    resultado
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <strong class="text-xl block ">Atributos</strong>
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">context</td>
+                <td class="border border-slate-700 p-4"> Contexto de datos que seran usados en el template y propagados
+                    en la interpolacion
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+    <section>
+        <strong class="text-2xl block ">Static Template</strong>
+
+        <br>
+        Es un CustomElement que extiende de la clase Template heredando todas las funcionalidades de esta, agregando
+        tambien
+        un contexto de informacion al arbol de elementos, permitiendo la interpolacion de valores tanto atributos como
+        de texto
+        dentro de las vistas.
+        <br>
+        <br>
+
+
+        <pre class="bg-[#282c34]  w-[fit-content] p-4 outline outline-cyan-900">&lt;static-template context='{"name":"World"}'&gt; <br>  &lt;h4&gt;Hello &#123;@host.data.name&#125;&lt;/h4&gt;<br>&lt;/static-template&gt;</pre>
+        <br>
+        El resultado del previo snipped seria el siguiente :
+        <br>
+        <br>
+        <pre class="bg-[#282c34] w-[fit-content] p-4 outline outline-cyan-900">&lt;static-template context='{"name":"World"}'&gt; <br>  &lt;h4&gt;Hello World&lt;/h4&gt;<br>&lt;/static-template&gt;</pre>
+        <br>
+        como podemos ver el valor de <strong>&#123;@host.data.name&#125;</strong> ha sido remplazado por
+        <strong>World</strong> algo muy comun en las actuales
+        librerias/frameworks web como Angular o React, para mas detalle ver la seccion Template Interpolation
+        <br>
+
+    </section>
+</div>

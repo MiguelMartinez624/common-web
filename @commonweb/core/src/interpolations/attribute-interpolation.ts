@@ -16,7 +16,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
             }
         }
         [...child.attributes]
-            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null )
+            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null)
             .forEach(({name, value}) => {
 
                 // push interpolation
@@ -36,7 +36,11 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
             })
 
 
-        generateAttributesInterpolations(root, [...child.children], interpolations);
+        if (root !== child && !["LAZY-TEMPLATE", "STATIC-TEMPLATE"].includes(child.tagName)) {
+            generateAttributesInterpolations(root, [...child.children], interpolations);
+        } else {
+            console.log({child})
+        }
 
     });
 }
@@ -102,12 +106,8 @@ export class AttributeInterpolation implements Interpolation {
 
 
     private updateValue(value: string) {
-        if(this.attributeName === "for-each"){
-            console.log("from interpolation");
-            console.log(value)
 
-        }
-        const toUpdate =  this.element[this.attributeName];
+        const toUpdate = this.element[this.attributeName];
         if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)

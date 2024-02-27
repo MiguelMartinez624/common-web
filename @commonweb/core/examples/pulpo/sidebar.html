@@ -30,7 +30,8 @@
                         <span class="material-symbols-outlined">
                 {{@host.data.icon}}
                      </span>
-                        <span class="ms-3">{{@host.data.name}}</span>
+                        <span  class="ms-3">{{@host.data.name}}</span>
+
                         <bind-element value="{{@host.data.route}}" from="a:(click)"
                                       to="conditional-render-cases[routes]:changeCase"></bind-element>
                     </a>
