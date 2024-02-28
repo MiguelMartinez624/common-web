@@ -29,8 +29,8 @@
                     <div sub-childs toggle class="hidden">
 
                         <ul class="mt-3  pl-5 ">
-                            <template for-each="{{@host.data.childs}}">
-                                <li  toggle class="border-l-2 py-1 border-gray-300 cursor-pointer hover:border-gray-500">
+                            <template loop-key="route" for-each="{{@host.data.childs}}">
+                                <li  toggle class="border-l-2 py-1 border-gray-500 cursor-pointer hover:text-slate-50 hover:border-slate-50">
                                     <span class="ms-3">{{@host.data.name}}</span>
 
                                     <bind-element value="border-gray-500" from="li:(click)"

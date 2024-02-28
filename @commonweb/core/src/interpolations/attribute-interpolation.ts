@@ -80,18 +80,10 @@ export class AttributeInterpolation implements Interpolation {
     private prevValue: string;
 
     constructor(
-        // TODO root is taking the parent but hwat happents when the parent is a some of the componentn?
-        // root should reference the component no the parent
         public readonly root: Element,
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly attributeName: string) {
-
-        // const value = extractData(propertyPath, this.root) || "";
-        // first interpolation need to replace the code
-
-        // objects and arrays will be always pass by setter if posible
-        // this.updateValue(value);
 
     }
 
@@ -109,6 +101,7 @@ export class AttributeInterpolation implements Interpolation {
     private updateValue(value: any) {
 
         const toUpdate = this.element[this.attributeName];
+        console.log({toUpdate})
         if(this.attributeName === "for-each" && this.element["pushAll"]){
             this.element["pushAll"](value);
             return;
@@ -118,6 +111,7 @@ export class AttributeInterpolation implements Interpolation {
             toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {
             // Required??
+
             this.element[this.attributeName] = value;
         } else {
             this.element.setAttribute(this.attributeName, value);

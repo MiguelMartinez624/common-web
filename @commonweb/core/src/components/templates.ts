@@ -4,8 +4,6 @@ import {callRemoteAPI} from "./api-call.component";
 import {extractData} from "../html_manipulation";
 import {resolveLoop} from "../directives";
 
-TODO need to understand when the attribute changes get call
-TODO investigate
 
 
 export abstract class Template extends HTMLElement {
@@ -36,7 +34,6 @@ export abstract class Template extends HTMLElement {
     protected enhanceClassChange() {
         [...this.querySelectorAll("[toggle]"), ...this.shadowRoot.querySelectorAll("[toggle]")]
             .forEach((child) => {
-                console.log({child})
                 if (!child["toggleClass"]) {
                     child["toggleClass"] = (className: string) => {
                         child.classList.toggle(className);
@@ -51,7 +48,6 @@ export abstract class Template extends HTMLElement {
     protected checkShowIfDirective() {
         [...this.querySelectorAll("[show-if]"), ...this.shadowRoot.querySelectorAll("[show-if]")]
             .forEach((child) => {
-                console.log(child)
                 const value = extractData(child.getAttribute("show-if"), this.data);
                 if (!value) {
                     child.setAttribute("hidden", "automatic")
