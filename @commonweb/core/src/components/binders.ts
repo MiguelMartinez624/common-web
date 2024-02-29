@@ -59,6 +59,12 @@ export class BindElementComponent extends HTMLElement {
 
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
+        // We get the trigger here
+        const targetQuery = new ElementBind(this.getAttribute("to"));
+        const targetElement = targetQuery.searchElement(this) as HTMLElement;
+        if (!targetElement) {
+            return;
+        }
 
         let data = null
 
@@ -88,12 +94,7 @@ export class BindElementComponent extends HTMLElement {
         else if (ev.detail) {
             data = ev.detail.data;
         }
-        // We get the trigger here
-        const targetQuery = new ElementBind(this.getAttribute("to"));
-        const targetElement = targetQuery.searchElement(this) as HTMLElement;
-        if (!targetElement) {
-            return;
-        }
+
         const field = targetElement[targetQuery.propertyName];
 
         switch (targetQuery.propertyType) {

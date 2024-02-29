@@ -64,7 +64,7 @@
                 data='{"routes":[
                     {"name":"Productos","route":"products","icon":"restaurant"},
                     {"name":"Tiendas", "route":"stores","icon":"storefront"},
-                    {"name":"Calendario de Ordenes", "route":"orders-calendar","icon":"sell"}
+                    {"name":"Calendario", "route":"orders-calendar","icon":"sell"}
 
                 ]}'
                 src="./sidebar.html"
@@ -158,6 +158,7 @@
                     height: 10vh;
                     width: 10vh;
                     max-height: 125px;
+                    overflow: hidden;
                 }
 
                 .day-counter {
@@ -179,7 +180,7 @@
             // language=HTML
             template: `
                 <!--                <data-context>-->
-                <static-template data="[]" main>
+                <static-template main>
                     <div class="main-calendar">
                         <template for-each="{{@host.data}}">
                             <div calendar-days class="grid">
@@ -214,8 +215,12 @@
         })
         .with_attribute("template", "")
         .with_attribute("months", function (data) {
-            debugger
-            this.shadowRoot.querySelector("[main]").updateData(data);
+            this._months = data;
+            // this.shadowRoot.querySelector("[main]")['wireTemplate']();
+            if (this.shadowRoot) {
+                this.shadowRoot.querySelector("[main]").changeAttributeAndUpdate("data", data);
+
+            }
 
         })
         .with_method("bubbleUp", function (value) {
@@ -275,6 +280,10 @@
 
         })
         .with_attribute("date-path", 'date')// path to property that is gonna be used as the day
+        .on_init(function () {
+            this.shadowRoot.querySelector("[main]").changeAttributeAndUpdate("data", this._months);
+
+        })
         .build();
 
 

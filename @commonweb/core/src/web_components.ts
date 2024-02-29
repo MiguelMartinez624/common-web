@@ -1,9 +1,7 @@
-import {attemptBindEvents} from "./events";
 import {syncWithStorage} from "./storage";
 
 import {
-    AttributeInterpolation,
-    evaluateInterpolationKey,
+
     generateAttributesInterpolations,
     generateTemplateInterpolations,
     Interpolation
@@ -15,6 +13,7 @@ export class CustomElementConfig {
     template: string;
     style?: string;
     useShadow?: boolean = true;
+    directives?: any[] = [];
 }
 
 const validateSelector = (selector: string) => {
@@ -80,8 +79,79 @@ function updateAttributes(element: any, name: string, newValue: any) {
             // so we can index the property on the target
             element[handler] = valueToPass;
         }
+    }
+}
 
 
+export class FrameworkComponent extends HTMLElement {
+
+    public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
+    public directives: Function[] = [];
+
+    /*
+    * changeAttributeAndUpdate will call the update handler for the attribute you setup
+    * that was attached under the @Attribute
+    *
+    * will manually trigger the check interpolation for the attribute name, as the HTMLElement attributeCallback
+    * is only call on setAttribute method call
+    * */
+    changeAttributeAndUpdate(attrName: string, newValue: any) {
+        updateAttributes(this, attrName, newValue);
+        this.checkInterpolationsFor(attrName);
+
+        // Need to rerun directives for the for each;
+        if (this['directives']) {
+            this['directives'].forEach(d => d.call(this))
+        }
+    }
+
+    public evaluateDirectives(): void {
+        this.directives.forEach(d => d.call(this))
+    }
+
+    updateAttributes(name: string, newValue: any) {
+        if ((this as any).attribute_list) {
+            const handler = (this as any).attribute_list.get(name);
+            if (!handler) {
+                return;
+            }
+            const valueToPass = typeof newValue === 'string' && isJSON(newValue) ? JSON.parse(newValue) : newValue;
+            // if the content is a object
+            if (typeof handler === "function") {
+                handler.apply(this, [valueToPass])
+            } else {
+                // in this case handler is the property name no a value actually
+                // so we can index the property on the target
+                this[handler] = valueToPass;
+            }
+        }
+    }
+
+    public checkInterpolations() {
+        bindTemplateToProperties(this);
+    }
+
+
+    public checkInterpolationsFor(name) {
+        const interpolations = this.interpolations;
+        // if you didn't use the notation wont have this field set.
+        if (interpolations) {
+            const interpolationsList = interpolations.get(name);
+            if (interpolationsList) {
+                interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
+            }
+        }
+    }
+
+    // Run al interpolations
+    public checkAllInterpolations() {
+        const interpolations = this.interpolations;
+        // if you didn't use the notation wont have this field set.
+        if (interpolations) {
+            for (const [key, interpolationList] of interpolations) {
+                interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
+            }
+        }
     }
 }
 
@@ -95,39 +165,55 @@ export function WebComponent(attr: CustomElementConfig) {
         validateSelector(attr.selector)
 
         let component = class extends constr {
-
             constructor(...args: any[]) {
                 super(...args)
 
-                insertTemplate.call(this, attr);
-
-                bindTemplateToProperties(this as unknown as HTMLElement)
-
-                syncWithStorage(this as unknown as HTMLElement);
-                attemptBindEvents((this as unknown as HTMLElement));
-                if (window[PROCESSOR_KEY]) {
-                    window[PROCESSOR_KEY]
-                        .forEach(processor => processor(this));
+                if (this instanceof FrameworkComponent) {
+                    // Whats the different for a framework component ?.
+                    (this as FrameworkComponent).directives = attr.directives;
                 }
-
-
             }
 
 
             attributeChangedCallback(name, oldValue, newValue) {
-
                 updateAttributes(this, name, newValue);
                 this.checkInterpolationsFor(name);
+            }
+
+
+            /**
+             * Check and run all the directives
+             *
+             * */
+            public wireTemplate() {
+                // Enhance with directives
+                if (this['directives']) {
+                    this['directives'].forEach(d => d.call(this))
+                }
+                if (this instanceof FrameworkComponent) {
+                    // Whats the different for a framework component ?.
+                    (this as FrameworkComponent).checkInterpolations();
+
+                }
 
             }
 
-            public checkInterpolationsFor(name) {
 
+            public connectedCallback() {
+                insertTemplate.call(this, attr);
+                this.wireTemplate();
+                syncWithStorage(this as unknown as HTMLElement);
+                this["checkAllInterpolations"]();
+                if (super["connectedCallback"]) {
+                    super["connectedCallback"]();
+                }
+            }
+
+            public checkInterpolationsFor(name) {
                 const interpolations = (this as any).interpolations;
                 // if you didn't use the notation wont have this field set.
                 if (interpolations) {
                     const interpolationsList = interpolations.get(name);
-
                     if (interpolationsList) {
                         interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
                     }
@@ -140,14 +226,10 @@ export function WebComponent(attr: CustomElementConfig) {
                 if (interpolations) {
                     for (const [key, interpolationList] of interpolations) {
                         interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
-
                     }
                 }
             }
 
-            toggleClass(className: string) {
-                console.log("lol")
-            }
 
         }
 

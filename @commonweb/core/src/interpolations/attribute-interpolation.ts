@@ -39,7 +39,7 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
         // if (root !== child && ["LAZY-TEMPLATE", "STATIC-TEMPLATE"].includes(child.tagName)) {
         //     generateAttributesInterpolations(child, [...child.children], interpolations);
         // } else {
-            generateAttributesInterpolations(root, [...child.children], interpolations);
+        generateAttributesInterpolations(root, [...child.children], interpolations);
 
         // }
 
@@ -54,6 +54,7 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
     const matches = child.getAttribute(key).matchAll(/\{\{(.*?)\}\}/g);
     for (const match of matches) {
         const propertyPath = match[1];
+        // TODO use the @to indicate WHO is gonna be the root source for the data
         let attributeName = match[1].replace("@host.", "");
 
         const interpolation = new AttributeInterpolation(node, child, propertyPath, key);
@@ -64,7 +65,6 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
         if (nextDot > -1) {
             attributeName = attributeName.slice(0, nextDot)
         }
-        // child.innerHTML = child.innerHTML.replace(`="{{${propertyPath}}}`, `=""`)
         let interpolationsStored = interpolations.get(attributeName);
         if (!interpolationsStored) {
             interpolations.set(attributeName, [interpolation]);
@@ -99,19 +99,12 @@ export class AttributeInterpolation implements Interpolation {
 
 
     private updateValue(value: any) {
-
         const toUpdate = this.element[this.attributeName];
-        console.log({toUpdate})
-        if(this.attributeName === "for-each" && this.element["pushAll"]){
-            this.element["pushAll"](value);
-            return;
-        }
         if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {
             // Required??
-
             this.element[this.attributeName] = value;
         } else {
             this.element.setAttribute(this.attributeName, value);

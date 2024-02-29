@@ -76,25 +76,26 @@
     }
 </style>
 <body>
-<static-template
-        data='[
+<div>
+    <static-template
+            data='[
         {"name":"Miguel","skills":["Javascript","RUst"]},
         {"name":"manuel","skills":["Javascript","RUst"]}]'>
-    <ul>
-        <template for-each="{{@host.data}}">
-            <li>{{@host.data.name}}
-            <div>
-                <ul>
-                    <template for-each="{{@host.data.skills}}">
-                        <li>{{@host.data}}</li>
-                    </template>
-                </ul>
-            </div>
-            </li>
-        </template>
-    </ul>
-</static-template>
-
+        <ul>
+            <template for-each="{{@host.data}}">
+                <li>{{@host.data.name}}
+                    <div>
+                        <ul>
+                            <template for-each="{{@host.data.skills}}">
+                                <li>{{@host.data}}</li>
+                            </template>
+                        </ul>
+                    </div>
+                </li>
+            </template>
+        </ul>
+    </static-template>
+</div>
 <script src="../../dist/lib-pkg.js" type="text/javascript"></script>
 
 </body>

@@ -30,7 +30,7 @@
         padding: 1rem 3rem;
         color: var(--fg);
         background: var(--bg);
-        height: calc(92%);
+        height: calc(95%);
     }
 
     .layout {
@@ -51,11 +51,25 @@
         transition-duration: 0.5s;
         justify-center: center;
         overflow: hidden;
-
+    }
 
     a {
         color: var(--sidebar-fg);
     }
+
+
+    @media only screen and (max-width: 768px) {
+        .sidebar {
+            width: 100%;
+            right: 0;
+            position: fixed;
+            display: block;
+        }
+
+        .collapsed {
+            left: 0;
+            display: none;
+        }
 
     }
 
@@ -72,13 +86,20 @@
 
     .collapsed {
         flex: 0;
+    }
+
+    .close {
+        position: absolute;
+        right: 10px;
+        cursor: pointer;
 
     }
+
 </style>
 <body>
 <static-template>
-    <div class="layout">
-        <div toggle class="sidebar">
+    <div class="layout ">
+        <div toggle class="sidebar ">
             <lazy-template
                     data='{ "routes":[
                      { "moduleName":"Common Web", "moduleIcon":"web" ,
@@ -101,12 +122,15 @@
              <span menu-toggle class="cursor-pointer material-symbols-outlined">
                 dock_to_right
             </span>
+
+                <input type="text">
+
                 <bind-element value="collapsed" from="span[menu-toggle]:(click)"
                               to=".sidebar:toggleClass"></bind-element>
 
 
             </div>
-            <div class="content px-40 leading-8">
+            <div class="content lg:px-40 sm:px-20 leading-8">
                 <!-- Usaer templates para los conditional asi evita ser renderizado           -->
                 <conditional-render-cases routes case="web-common-templates">
                     <div case="web-common-install">
