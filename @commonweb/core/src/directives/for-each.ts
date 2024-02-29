@@ -1,6 +1,6 @@
-import {bindTemplateToProperties, FrameworkComponent} from "../web_components";
-import {StaticTemplate, Template} from "../components";
-import {extractData, findAllChildrensBySelector, findNodeOnUpTree} from "../html_manipulation";
+import {StaticTemplate} from "../components";
+import {extractData, findAllChildrensBySelector} from "../html_manipulation";
+import {FrameworkComponent} from "../framework-component";
 
 
 export const FOR_EACH_DIRECTIVE = "for-each";

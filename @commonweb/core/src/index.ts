@@ -1,5 +1,7 @@
-import {CustomElementConfig, FrameworkComponent, PROCESSOR_KEY, WebComponent} from "./web_components";
+import {CustomElementConfig, WebComponent} from "./web_components";
 import {Attribute} from "./attributes";
+import {FrameworkComponent} from "./framework-component";
+export * from './framework-component';
 
 export * from './interpolations';
 export * from './web_components';

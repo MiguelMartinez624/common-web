@@ -1,7 +1,8 @@
-import {FrameworkComponent, WebComponent} from "../web_components";
+import {WebComponent} from "../web_components";
 import {Attribute} from "../attributes";
 import {callRemoteAPI} from "./api-call.component";
-import {checkShowIfDirective, enhanceClassChange, forEachDirective, resolveLoop} from "../directives";
+import {checkShowIfDirective, enhanceClassChange, forEachDirective} from "../directives";
+import {FrameworkComponent} from "../framework-component";
 
 
 /*

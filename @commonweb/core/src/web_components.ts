@@ -6,7 +6,6 @@ import {
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
-import {resolveLoop} from "./directives";
 
 export class CustomElementConfig {
     selector: string;
@@ -83,77 +82,6 @@ function updateAttributes(element: any, name: string, newValue: any) {
 }
 
 
-export class FrameworkComponent extends HTMLElement {
-
-    public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
-    public directives: Function[] = [];
-
-    /**
-     * changeAttributeAndUpdate will call the update handler for the attribute you setup
-     * that was attached under the @Attribute
-     *
-     * will manually trigger the check interpolation for the attribute name, as the HTMLElement attributeCallback
-     * is only call on setAttribute method call
-     * */
-    changeAttributeAndUpdate(attrName: string, newValue: any) {
-        updateAttributes(this, attrName, newValue);
-        this.checkInterpolationsFor(attrName);
-
-        this.evaluateDirectives();
-
-    }
-
-    public evaluateDirectives(): void {
-        this.directives.forEach(d => d.call(this))
-    }
-
-    updateAttributes(name: string, newValue: any) {
-        if ((this as any).attribute_list) {
-            const handler = (this as any).attribute_list.get(name);
-            if (!handler) {
-                return;
-            }
-            const valueToPass = typeof newValue === 'string' && isJSON(newValue) ? JSON.parse(newValue) : newValue;
-            // if the content is a object
-            if (typeof handler === "function") {
-                handler.apply(this, [valueToPass])
-            } else {
-                // in this case handler is the property name no a value actually
-                // so we can index the property on the target
-                this[handler] = valueToPass;
-            }
-        }
-    }
-
-    public checkInterpolations() {
-        bindTemplateToProperties(this);
-    }
-
-
-    public checkInterpolationsFor(name) {
-        const interpolations = this.interpolations;
-        // if you didn't use the notation wont have this field set.
-        if (interpolations) {
-            const interpolationsList = interpolations.get(name);
-            if (interpolationsList) {
-                interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
-            }
-        }
-    }
-
-    // Run al interpolations
-    public checkAllInterpolations() {
-        const interpolations = this.interpolations;
-        // if you didn't use the notation wont have this field set.
-        if (interpolations) {
-            for (const [key, interpolationList] of interpolations) {
-                interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
-            }
-        }
-    }
-}
-
-
 export function WebComponent(attr: CustomElementConfig) {
     return function _WebComponent<T extends { new(...args: any[]): {} }>(constr: T) {
 
@@ -164,12 +92,11 @@ export function WebComponent(attr: CustomElementConfig) {
 
         let component = class extends constr {
             constructor(...args: any[]) {
-                super(...args)
+                super(...args);
 
-                if (this instanceof FrameworkComponent) {
                     // Whats the different for a framework component ?.
-                    (this as FrameworkComponent).directives = attr.directives;
-                }
+                    (this as any).directives = attr.directives;
+
             }
 
 
@@ -188,9 +115,9 @@ export function WebComponent(attr: CustomElementConfig) {
                 if (this['directives']) {
                     this['directives'].forEach(d => d.call(this))
                 }
-                if (this instanceof FrameworkComponent) {
+                if (this['checkInterpolations']) {
                     // Whats the different for a framework component ?.
-                    (this as FrameworkComponent).checkInterpolations();
+                    (this as any).checkInterpolations();
 
                 }
 
