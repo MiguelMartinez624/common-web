@@ -1,31 +1,31 @@
 import {extractData} from "../html_manipulation";
 import {Interpolation} from "./index";
 
+
+/**
+ * Recursively generates interpolation objects for attributes within a root element and its children.
+ *
+ * @param {Element} root - The root element to start with.
+ * @param {any[]} childList - A list of child elements to process.
+ * @param {Map<string, Interpolation[]>} interpolations - A Map to store created interpolations by attribute name.
+ */
 export function generateAttributesInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
     childList.forEach((child) => {
 
-
-        // like for-each
         const attributes: Map<string, any> = (child as any).attribute_list;
         if (attributes) {
             for (const [key, value] of attributes) {
-                // so should all of this be function?
-                // if (typeof value === "function") {
                 evaluateInterpolationKey(child, root, key, interpolations);
-                // }
             }
         }
         [...child.attributes]
             .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null)
             .forEach(({name, value}) => {
 
-                // push interpolation
                 const propertyPath = value.replace("{{", "").replace("}}", "");
                 let attributeName = propertyPath.replace("@host.", "");
-                // root.innerHTML = root.innerHTML.replace(`="{{${propertyPath}}}`, `=""`)
-                // (child as any).attribute_list.set(name, name);
-                const interpolation = new AttributeInterpolation(root, child, propertyPath, name);
 
+                const interpolation = new AttributeInterpolation(root, child, propertyPath, name);
                 let interpolationsStored = interpolations.get(attributeName);
                 if (!interpolationsStored) {
                     interpolations.set(attributeName, [interpolation]);
@@ -33,20 +33,20 @@ export function generateAttributesInterpolations(root: Element, childList: any[]
                 }
                 interpolationsStored.push(interpolation);
 
-            })
+            });
 
-
-        // if (root !== child && ["LAZY-TEMPLATE", "STATIC-TEMPLATE"].includes(child.tagName)) {
-        //     generateAttributesInterpolations(child, [...child.children], interpolations);
-        // } else {
         generateAttributesInterpolations(root, [...child.children], interpolations);
-
-        // }
-
     });
 }
 
-// Attributes that are not reflected on the template this only true for components that start empty
+/**
+ * Evaluates a specific attribute key with interpolation syntax for a given element.
+ *
+ * @param {Element} child - The element with the attribute to evaluate.
+ * @param {Element} node - The root node for data extraction.
+ * @param {string} key - The attribute key to evaluate.
+ * @param {Map<string, Interpolation[]>} interpolations - The Map to store created interpolations.
+ */
 export function evaluateInterpolationKey(child: Element, node: Element, key: string, interpolations: Map<string, Interpolation[]>) {
     if (!child.getAttribute(key)) {
         return;
@@ -76,6 +76,9 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
 }
 
 
+/**
+ * Represents an interpolation for an attribute, handling its updates.
+ */
 export class AttributeInterpolation implements Interpolation {
     private prevValue: string;
 

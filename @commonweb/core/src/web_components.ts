@@ -88,21 +88,19 @@ export class FrameworkComponent extends HTMLElement {
     public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
     public directives: Function[] = [];
 
-    /*
-    * changeAttributeAndUpdate will call the update handler for the attribute you setup
-    * that was attached under the @Attribute
-    *
-    * will manually trigger the check interpolation for the attribute name, as the HTMLElement attributeCallback
-    * is only call on setAttribute method call
-    * */
+    /**
+     * changeAttributeAndUpdate will call the update handler for the attribute you setup
+     * that was attached under the @Attribute
+     *
+     * will manually trigger the check interpolation for the attribute name, as the HTMLElement attributeCallback
+     * is only call on setAttribute method call
+     * */
     changeAttributeAndUpdate(attrName: string, newValue: any) {
         updateAttributes(this, attrName, newValue);
         this.checkInterpolationsFor(attrName);
 
-        // Need to rerun directives for the for each;
-        if (this['directives']) {
-            this['directives'].forEach(d => d.call(this))
-        }
+        this.evaluateDirectives();
+
     }
 
     public evaluateDirectives(): void {

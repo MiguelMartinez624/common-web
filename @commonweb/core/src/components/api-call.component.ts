@@ -41,7 +41,6 @@ export class ApiCallComponent extends HTMLElement {
         }
         this.data(filters)
             .then((result) => {
-                console.log("success")
                 const eventSuccess = new CustomEvent(
                     "request-success", {
                         bubbles: true,
@@ -50,7 +49,6 @@ export class ApiCallComponent extends HTMLElement {
                 this.dispatchEvent(eventSuccess);
             })
             .catch((err) => {
-                console.log({err})
                 this.dispatchEvent(new CustomEvent("request-failed"));
             });
     }

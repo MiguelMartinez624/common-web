@@ -1,15 +1,15 @@
 import {bindTemplateToProperties, FrameworkComponent} from "../web_components";
-import {Template} from "../components";
-import {extractData, findNodeOnUpTree} from "../html_manipulation";
+import {StaticTemplate, Template} from "../components";
+import {extractData, findAllChildrensBySelector, findNodeOnUpTree} from "../html_manipulation";
 
 
 export const FOR_EACH_DIRECTIVE = "for-each";
 
 
 // This actions to create a tempalte infly and anilize a tempalte
-export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, recipient: HTMLElement) {
+export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, recipient: HTMLElement): HTMLElement {
     // Create the template to apply interpolation
-    const templateView = document.createElement("static-template") as Template;
+    const templateView = document.createElement("static-template") as StaticTemplate;
     templateView.innerHTML = loopInitialzier.innerHTML;
     templateView.data = value;
     const identifier = extractData(loopInitialzier.getAttribute("loop-key") || "", value);
@@ -19,13 +19,7 @@ export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, r
 
 }
 
-
-// TODO hacer el for each a partir de la data, con interpolacion? no
-//
 export function resolveLoop(looper: any) {
-
-    // Donde se inyectaran
-    const recipient = looper.parentElement;
 
     // Extending method to add pushAll
     if (!looper.getAttribute("loop-enhanced")) {
@@ -68,4 +62,10 @@ function pushAll(items: any[]) {
 function push(value: any) {
     const recipient = this.parentElement;
     const t = interpolateAndRender(this, value, recipient);
+}
+
+
+export function forEachDirective() {
+    findAllChildrensBySelector(this, "[for-each]")
+        .forEach(resolveLoop)
 }

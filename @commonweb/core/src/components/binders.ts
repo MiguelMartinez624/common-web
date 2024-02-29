@@ -89,9 +89,9 @@ export class BindElementComponent extends HTMLElement {
         if (this.getAttribute("value")) {
             const value = this.getAttribute("value");
             if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                return = value;
+                return value;
             } else if (isJSON(value)) {
-                return = JSON.parse(value);
+                return JSON.parse(value);
             }
         }
 
@@ -104,16 +104,16 @@ export class BindElementComponent extends HTMLElement {
             }
 
             const field = elementSource[sourceInputQuery.propertyName]
-            return = typeof field === 'function' ? field() : field;
+            return typeof field === 'function' ? field() : field;
 
         }
         // get the value from the event
         if (this.getAttribute("input-path")) {
-            return = extractData(this.getAttribute("input-path"), ev);
+            return extractData(this.getAttribute("input-path"), ev);
         }
         // Default path from CustomEvents
         if (ev.detail) {
-            return = ev.detail.data;
+            return ev.detail.data;
         }
     }
 }

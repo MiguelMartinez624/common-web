@@ -78,9 +78,3 @@ class ComponentBuilder {
 window['RegisterWebComponent'] = (config: CustomElementConfig) => {
     return new ComponentBuilder(config);
 }
-// if there are not any processor yet start the empty array;
-if (!window[PROCESSOR_KEY]) {
-    window[PROCESSOR_KEY] = [];
-}
-
-
