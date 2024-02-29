@@ -66,48 +66,18 @@ export class BindElementComponent extends HTMLElement {
             return;
         }
 
-        let data = null
-
-        if (this.getAttribute("value")) {
-            const value = this.getAttribute("value");
-            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-                data = value;
-            } else if (isJSON(value)) {
-                data = JSON.parse(value);
-            }
-        } else if (this.getAttribute("input-src")) {
-            const sourceInputQuery = new ElementBind(this.getAttribute("input-src"));
-            const elementSource = sourceInputQuery.searchElement(this);
-            if (!elementSource) {
-                return;
-            }
-
-            const field = elementSource[sourceInputQuery.propertyName]
-            data = typeof field === 'function' ? field() : field;
-
-        }
-        // get the value from the event
-        else if (this.getAttribute("input-path")) {
-            data = extractData(this.getAttribute("input-path"), ev);
-        }
-        // Default path from CustomEvents
-        else if (ev.detail) {
-            data = ev.detail.data;
-        }
-
+        const data = this.getPayload(ev)
         const field = targetElement[targetQuery.propertyName];
 
         switch (targetQuery.propertyType) {
             case "method":
                 // For method call
                 targetElement[targetQuery.propertyName](data)
-
                 break;
             case "attribute":
                 // check foe setter
                 // TODO see how to remove this stringify
                 typeof field === "function" ? targetElement[targetQuery.propertyName] = data : targetElement.setAttribute(targetQuery.propertyName, JSON.stringify(data));
-
                 break;
             default:
                 console.error(`[${targetQuery.propertyType}] method under development`)
@@ -115,4 +85,35 @@ export class BindElementComponent extends HTMLElement {
 
     }
 
+    private getPayload(ev: CustomEvent) {
+        if (this.getAttribute("value")) {
+            const value = this.getAttribute("value");
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+                return = value;
+            } else if (isJSON(value)) {
+                return = JSON.parse(value);
+            }
+        }
+
+        if (this.getAttribute("input-src")) {
+            // From other element
+            const sourceInputQuery = new ElementBind(this.getAttribute("input-src"));
+            const elementSource = sourceInputQuery.searchElement(this);
+            if (!elementSource) {
+                return;
+            }
+
+            const field = elementSource[sourceInputQuery.propertyName]
+            return = typeof field === 'function' ? field() : field;
+
+        }
+        // get the value from the event
+        if (this.getAttribute("input-path")) {
+            return = extractData(this.getAttribute("input-path"), ev);
+        }
+        // Default path from CustomEvents
+        if (ev.detail) {
+            return = ev.detail.data;
+        }
+    }
 }

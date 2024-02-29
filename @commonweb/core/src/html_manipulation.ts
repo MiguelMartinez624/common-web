@@ -14,13 +14,6 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     return queryResult;
 }
 
-export function findManyNodeOnUpTree(selector: string, element: any): NodeListOf<Node> {
-    let queryResult: NodeListOf<Node> = (element as HTMLElement).querySelectorAll(selector);
-    if (queryResult.length === 0 && element.parentNode !== null) {
-        queryResult = findManyNodeOnUpTree(selector, element.parentNode)
-    }
-    return queryResult;
-}
 
 export function extractData(resultPath: string, result: any) {
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
