@@ -131,4 +131,5 @@ dist
 
 ./.idea
 
+@commonweb/core/examples
 ./@commonweb/core/examples
