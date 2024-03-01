@@ -1,18 +1,27 @@
 import {Interpolation} from "./interpolations";
 import {bindTemplateToProperties, isJSON} from "./web_components";
 
-export class FrameworkComponent extends HTMLElement {
 
+/**
+ * @class FrameworkComponent
+ * @extends HTMLElement
+ *
+ * Base class for creating custom components within the framework.
+ */
+
+export class FrameworkComponent extends HTMLElement {
+    /**
+     * A map of interpolations, mapping attribute names to lists of Interpolation instances.
+     * @type {Map<string, Interpolation[]>}
+     */
     public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
-    public directives: Function[] = [];
 
     /**
-     * changeAttributeAndUpdate will call the update handler for the attribute you setup
-     * that was attached under the @Attribute
-     *
-     * will manually trigger the check interpolation for the attribute name, as the HTMLElement attributeCallback
-     * is only call on setAttribute method call
-     * */
+     * An array of functions that represent the component's directives.
+     * @type {Function[]}
+     */
+    public directives: Function[] = [];
+
     changeAttributeAndUpdate(attrName: string, newValue: any) {
         this.updateAttributes(attrName, newValue);
         this.checkInterpolationsFor(attrName);

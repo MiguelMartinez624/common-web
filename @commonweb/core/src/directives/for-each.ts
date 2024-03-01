@@ -1,5 +1,5 @@
 import {StaticTemplate} from "../components";
-import {extractData, findAllChildrensBySelector} from "../html_manipulation";
+import {extractData, findAllChildrensBySelector, findNodeOnUpTree} from "../html_manipulation";
 import {FrameworkComponent} from "../framework-component";
 
 
@@ -20,7 +20,6 @@ export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, r
 }
 
 export function resolveLoop(looper: any) {
-
     // Extending method to add pushAll
     if (!looper.getAttribute("loop-enhanced")) {
         looper["pushAll"] = pushAll;
@@ -34,11 +33,13 @@ export function resolveLoop(looper: any) {
         const key = looper.getAttribute("for-each")
             .replace("{{", "")
             .replace("}}", "");
-        const host = looper.getRootNode() || looper.parentElement;
-        if (host instanceof FrameworkComponent) {
-            const data = extractData(key, host);
-            looper['pushAll'](data);
-        }
+
+        // Need to find the element so to dhat we will do this
+        const contextualParent = key.slice(key.indexOf("@") + 1, key.indexOf("."));
+        const host = findNodeOnUpTree(contextualParent, looper);
+        const data = extractData(key.slice(key.indexOf(".") + 1), host);
+        looper['pushAll'](data);
+
     }
 
 }
