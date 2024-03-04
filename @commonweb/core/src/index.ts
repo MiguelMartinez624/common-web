@@ -1,6 +1,6 @@
 import {CustomElementConfig, WebComponent} from "./web_components";
 import {Attribute} from "./attributes";
-import {FrameworkComponent} from "./framework-component";
+
 export * from './framework-component';
 
 export * from './interpolations';
@@ -8,7 +8,9 @@ export * from './web_components';
 export * from './html_manipulation';
 export * from './storage';
 export * from './attributes';
-export * from './components';
+export * from './directives';
+export * from './bindings';
+
 
 class ComponentBuilder {
 
@@ -39,7 +41,7 @@ class ComponentBuilder {
     build(): void {
 
         const {attributes, methods, initStack} = this;
-        let raw = class extends FrameworkComponent {
+        let raw = class extends HTMLElement {
             constructor(...args) {
                 super();
 

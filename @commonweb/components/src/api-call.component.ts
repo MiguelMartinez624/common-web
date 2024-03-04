@@ -1,17 +1,12 @@
-import {WebComponent} from "../web_components";
-import {Attribute} from "../attributes";
 
-export enum DataFetcherPropsName {
-    Source = "source",
-}
 
-// Meter dentro los estados de llamada y eso
+import {Attribute, WebComponent} from "@commonweb/core";
+
 @WebComponent({
     selector: 'api-call',
     template: '<slot></slot>'
 })
 export class ApiCallComponent extends HTMLElement {
-    private _type: string;
     private _source: string = "";
     private _method: 'POST' | 'GET' | 'DELETE' | 'PUT';
 

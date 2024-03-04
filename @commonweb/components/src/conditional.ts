@@ -1,5 +1,7 @@
-import {WebComponent} from "../web_components";
-import {Attribute} from "../attributes";
+import {
+    Attribute,
+    WebComponent
+} from "@commonweb/core";
 
 
 @WebComponent({

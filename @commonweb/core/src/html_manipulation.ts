@@ -8,12 +8,28 @@
  * @returns {Node | null} The nearest ancestor node matching the selector,
  *   or null if not found.
  */
+import {FrameworkComponent} from "./framework-component";
+
 export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     /*
     * Search the root element is the web component itself
     * */
+
     if (selector === "@host") {
-        return (element.getRootNode() as any)?.host
+        let queryResult = element.parentNode as Node;
+        if (queryResult.parentNode !== null && !(queryResult instanceof FrameworkComponent)) {
+            queryResult = findNodeOnUpTree(selector, queryResult)
+        }
+
+        return queryResult
+    }
+
+    if (selector === "@parent") {
+        return (element.parentNode)
+    }
+    // if not one of the key workds resplace
+    if (selector[0] === "@") {
+        selector = selector.slice(selector.indexOf("@") + 1);
     }
 
     let queryResult: Node = (element as HTMLElement).querySelector(selector);

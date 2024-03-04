@@ -1,9 +1,9 @@
 {
   "version": "1.0.0-beta.55-nighty",
-  "name": "@commonweb/core",
-  "main": "dist/core.js",
-  "module": "dist/core.mjs",
-  "typings": "dist/core.d.ts",
+  "name": "@commonweb/components",
+  "main": "dist/components.js",
+  "module": "dist/components.mjs",
+  "typings": "dist/components.d.ts",
   "type": "module",
   "files": [
     "dist"
@@ -14,6 +14,9 @@
     "push": "npm run test && npm run build && npm publish --access public",
     "build": "rollup -c --watch",
     "test": "jest"
+  },
+  "dependencies": {
+    "@commonweb/core": "npm:dist@*"
   },
   "repository": {
     "type": "git",
