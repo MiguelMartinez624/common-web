@@ -1,0 +1,63 @@
+<div class="overflow-y-auto h-[85vh] p-2">
+    <h1 class="text-3xl font-bold mb-8 flex">Bind Element
+        <pre> &lt;bind-element></pre>
+    </h1>
+
+
+    <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+    <section>
+        <strong class="text-2xl block ">Descripcion</strong>
+
+        <br>
+        Es un CustomElement que carga de forma remota un template (html) que es luego insertado en la vista de como un
+        <span> <strong> StaticTemplate</strong></span>
+        <br>
+        <br>
+        <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+
+        <strong class="text-2xl block ">Uso</strong>
+
+        <doc-tag>
+            <!--
+            <lazy-template  data='{"name":"World", "frameworks": [{"name":"React"},{"name":"Angular"}] }'
+                  src="{path}/template.html">
+
+            </static-template>
+            -->
+
+        </doc-tag>
+
+        <br>
+
+        <br>
+        <strong class="text-xl block ">Atributos</strong>
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">data</td>
+                <td class="border border-slate-700 p-4"> Contexto de datos que seran usados en el template y propagados
+                    en la interpolacion
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">src</td>
+                <td class="border border-slate-700 p-4"> Ruta hacia el archivo/template (html) que sera insertando en el DOM
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <br>
+
+
+</div>
+
+
