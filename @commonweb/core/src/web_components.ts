@@ -101,7 +101,6 @@ export function WebComponent(attr: CustomElementConfig) {
 
 
             attributeChangedCallback(name, oldValue, newValue) {
-                console.log({name, oldValue, newValue})
                 updateAttributes(this, name, newValue);
                 this.checkInterpolationsFor(name);
             }

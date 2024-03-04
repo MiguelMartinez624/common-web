@@ -1,0 +1,50 @@
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+
+
+<aside toggle id="default-sidebar"
+       class=" top-0 left-0 z-40 h-screen transition-transform -translate-x-full sm:translate-x-0"
+       aria-label="Sidebar">
+
+    <div class="flex justify-center">
+        <span class="material-symbols-outlined">
+                       book
+                     </span> Learn
+    </div>
+    <div class="h-full px-3 py-4 overflow-y-auto bg-white-100 ">
+        <ul class="space-y-2font-medium">
+            <template for-each="{{@host:[data.routes]}}">
+                <li class="mt-4 ">
+                    <a main-route
+                       class="flex gap-4 w-full items-center p-1 rounded-lg hover:bg-gray-100 ">
+                        <span class="material-symbols-outlined">
+                        {{@host:[data.moduleIcon]}}
+                     </span>
+                        <span>
+                                {{@host:[data.moduleName]}}
+                        </span>
+                    </a>
+                    <bind-element value="hidden" from="[main-route]:(click)"
+                                  to="[sub-childs]:toggleClass"></bind-element>
+                    <div sub-childs toggle class="hidden">
+
+                        <ul class="mt-3  pl-5 ">
+                            <template loop-key="route" for-each="{{@host:[data.childs]}}">
+
+                                <li  toggle class="border-l-2 py-1 border-gray-500 cursor-pointer hover:text-slate-50 hover:border-slate-50">
+                                    <span class="ms-3">{{@host:[data.name]}}</span>
+
+                                    <bind-element value="border-gray-500" from="li:(click)"
+                                                  to="li:toggleClass"></bind-element>
+                                    <bind-element value="{{@host:[data.route]}}" from="li:(click)"
+                                                  to="conditional-render-cases[routes]:changeCase"></bind-element>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </li>
+
+            </template>
+        </ul>
+    </div>
+</aside>

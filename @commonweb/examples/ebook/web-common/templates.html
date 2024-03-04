@@ -1,0 +1,229 @@
+<div class="overflow-y-auto h-[85vh] p-2">
+    <h1 class="text-3xl font-bold mb-8 flex">Static Template
+        <pre> &lt;static-template></pre>
+    </h1>
+
+
+    <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+    <section>
+        <strong class="text-2xl block ">Descripcion</strong>
+
+        <br>
+        Es un CustomElement que extiende de la clase Template heredando todas las funcionalidades de esta, agregando
+        tambien
+        un contexto de informacion al arbol de elementos, permitiendo la interpolacion de valores tanto atributos como
+        de texto
+        dentro de las vistas.
+        <br>
+        <br>
+        <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+
+        <strong class="text-2xl block ">Uso</strong>
+
+        <doc-tag>
+            <!--
+            <static-template context data='{"name":"World", "frameworks": [{"name":"React"},{"name":"Angular"}] }'>
+                <h4>Hello! {{@host.data.name}} </h4>
+                <ul>
+                    <template for-each="{{@[context].data.frameworks}}">
+                        <li>{{@host.data.name}}</li>
+                    </template>
+                </ul>
+            </static-template>
+            -->
+
+        </doc-tag>
+
+        <static-template context data='{"name":"World", "frameworks": [{"name":"React"},{"name":"Angular"}] }'>
+            <h4>Hello! {{@[context]:[data.name]}}</h4>
+            <ul>
+                <template for-each="{{@[context]:[data.frameworks]}}">
+                    <!--The list is under the for-each context so data refers to the item on the iteration-->
+                    <li>{{@parent:[data.name]}}</li>
+                </template>
+            </ul>
+        </static-template>
+        <br>
+        El resultado del previo snipped seria el siguiente :
+        <br>
+        <br>
+        <strong class="text-xl block ">Directivas</strong>
+
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">for-each</td>
+                <td class="border border-slate-700 p-4">Renderiza un template definido por cada uno de los elementos en
+                    el contexto dato
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">show-if</td>
+                <td class="border border-slate-700 p-4">Evalua la condicion para ocultar/mostrar el elemento segun el
+                    resultado
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <br>
+        <strong class="text-xl block ">Atributos</strong>
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">context</td>
+                <td class="border border-slate-700 p-4"> Contexto de datos que seran usados en el template y propagados
+                    en la interpolacion
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <br>
+
+
+</div>
+
+<script>
+    if (window.RegisterWebComponent) {
+        window.RegisterWebComponent({
+            selector: "doc-tag",
+            //langua
+            template: `
+
+<slot></slot>`,
+            // language=CSS
+            style: `
+
+
+                :host {
+                    background: rgb(21, 32, 43);
+                    display: block;
+                    padding: 1rem
+                }
+
+                .attr-name {
+                    color: #9393e8;
+                }
+
+                .attr-value {
+                    color: #eeeea7;
+                }
+
+                .tag-name {
+                    color: #ff9999 !important;
+                }
+
+                .tag {
+                    color: #ff9999 !important;
+                }
+
+            `
+        }).on_init(function () {
+            const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
+
+            let html = '';
+            const regex = /(<[a-zA-Z0-9]+>)(?!\/>)/g; // Improved regex for better matching
+            let nextContent = ''; // Inicializar la variable "nextContent"
+            comments.forEach(c => {
+                const chars = c.nodeValue.trim().split('');
+                for (let i = 0; i < chars.length; i++) {
+
+                    let char = chars[i];
+
+                    if (char === '<') {
+                        html += `<span class='tag'>&lt;</span><span class='tag-name'>`;
+                        nextContent = 'tag-name';
+                    } else if (char === '>') {
+                        html += `</span><span class='tag'>&gt;</span>`;
+                        nextContent = "content"
+                    } else if (nextContent === 'tag-name' && char !== " ") {
+                        html += char;
+                    } else if (nextContent === "content") {
+                        html += char;
+                    } else if (char === ' ') {
+                        if (nextContent === "tag-name") {
+                            nextContent = "attribute-name"
+                            html += `</span><span class='attr-name'>`
+                        }
+                        html += char;
+                    } else if (char === '=') {
+                        if (nextContent === "attribute-name") {
+                            // Close atribute name
+                            html += `</span ><span class="attr-value">`
+                            nextContent = "attribute-value";
+                        }
+                        html += char;
+                    } else if (nextContent === "attribute-value" && !["=", "{", ":", " "].includes(chars[i - 1])
+                        && ![":", ",", "}"].includes(chars[i + 1])
+                        && (char === '"' || char === "'")) {
+                        // cerra el valor del attribute canbiando el contexto ahora
+                        html += char;
+                        nextContent = "attribute-name";
+                        html += `</span><span class='attr-name'>`;
+                    } else {
+                        html += char;
+                    }
+                }
+            });
+
+            // Format HTML using indentation and newlines
+            function formatHtml(htmlString) {
+                let indent = '';
+                // const formattedHtml = htmlString.replace(regex, (match, p1) => {
+                //     indent += '  ';
+                //     return `${indent}${p1}\n`; // Add newline after opening tags
+                // })
+                //  // Add newline before closing tags
+                return htmlString.replace(/\n\s+/g, '<br>'); // Remove unnecessary indentation
+
+                // return formattedHtml; // Remove trailing indentation
+            }
+
+            const formattedHtml = formatHtml(html);
+
+
+            this.shadowRoot.innerHTML += `<code>${formattedHtml}</code>`;
+            // ident her?
+            const tags = this.shadowRoot.querySelectorAll(".tag-name");
+            let offsetClose = 0;
+            for (let i = 0; i < tags.length; i++) {
+                if (i === 0 || i === tags.length - 1) {
+                    continue
+                }
+                // TODO agregar tooltops to properties names ?
+                const openingTag = tags[i].previousSibling;
+
+                const nextNext = tags[i].previousSibling.previousSibling;
+                if ((nextNext === null) || (tags[i].textContent.startsWith("/"))) {
+                    if (nextNext.nodeName !== "BR") {
+                        offsetClose = i
+                        continue;
+                    }
+                    debugger
+                    openingTag.style.marginLeft = `${((tags.length - i)) -1 }rem`
+                } else {
+                    openingTag.style.marginLeft = `${i - offsetClose}rem`
+                    // offsetClose=0;
+                }
+            }
+
+
+        })
+            .build();
+    }
+</script>

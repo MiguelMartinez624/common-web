@@ -32,8 +32,6 @@ export function resolveLoop(looper: any) {
     }
 
     if (looper['for-each'] && Array.isArray(looper['for-each'])) {
-        console.log({type: "from method", looper, value: looper['for-each']})
-
         looper['clearAndPush'](looper['for-each'])
     } else {
         // this part
