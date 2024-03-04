@@ -161,8 +161,8 @@
     </div>
 </static-template>
 
-<script  src="../../core/dist/core-pkg.js" type="text/javascript"></script>
-<script src="../../components/dist/components-pkg.js"type="text/javascript"></script>
+<script src="../../core/dist/core-pkg.js" type="text/javascript"></script>
+<script src="../../components/dist/components-pkg.js" type="text/javascript"></script>
 <script>
     if (window.RegisterWebComponent) {
         window.RegisterWebComponent({
@@ -202,8 +202,7 @@
             const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
 
             let html = '';
-            const regex = /(<[a-zA-Z0-9]+>)(?!\/>)/g; // Improved regex for better matching
-            let nextContent = ''; // Inicializar la variable "nextContent"
+            let nextContent = '';
             comments.forEach(c => {
                 const chars = c.nodeValue.trim().split('');
                 for (let i = 0; i < chars.length; i++) {
@@ -248,15 +247,7 @@
 
             // Format HTML using indentation and newlines
             function formatHtml(htmlString) {
-                let indent = '';
-                // const formattedHtml = htmlString.replace(regex, (match, p1) => {
-                //     indent += '  ';
-                //     return `${indent}${p1}\n`; // Add newline after opening tags
-                // })
-                //  // Add newline before closing tags
                 return htmlString.replace(/\n\s+/g, '<br>'); // Remove unnecessary indentation
-
-                // return formattedHtml; // Remove trailing indentation
             }
 
             const formattedHtml = formatHtml(html);
@@ -279,11 +270,10 @@
                         offsetClose = i
                         continue;
                     }
-                    debugger
-                    openingTag.style.marginLeft = `${((tags.length - i)) -1 }rem`
+
+                    openingTag.style.marginLeft = `${((tags.length - i)) - 1}rem`
                 } else {
                     openingTag.style.marginLeft = `${i - offsetClose}rem`
-                    // offsetClose=0;
                 }
             }
 
