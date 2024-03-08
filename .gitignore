@@ -130,6 +130,7 @@ dist
 .pnp.*
 
 ./.idea
-
+.idea
 @commonweb/core/examples
 ./@commonweb/core/examples
+@commonweb/forms
