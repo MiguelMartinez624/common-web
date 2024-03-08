@@ -98,7 +98,7 @@ export class AttributeInterpolation implements Interpolation {
     }
 
     public update(): void {
-        const value = this.elementBind.value;
+        const value = this.elementBind.value || "";
         if (this.prevValue === value) {
             return;
         }

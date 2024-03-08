@@ -46,7 +46,7 @@
         width: 100%;
         background: var(--sidebar-bg);
         color: var(--sidebar-fg);
-        flex: 0.2;
+        flex: 0.25;
         transition-property: flex;
         transition-duration: 0.5s;
         justify-center: center;
@@ -102,7 +102,27 @@
         <div toggle class="sidebar ">
             <lazy-template
                     data='{ "routes":[
-                     { "moduleName":"Common Web", "moduleIcon":"web" ,
+                       { "moduleName":"Aprendiendo CommonWeb", "moduleIcon":"school" ,
+                        "childs": [
+                            {"name":"Instalación","route":"web-common-install","icon":"install"},
+                            {"name":"Declarar Componente","route":"core-web-component","icon":"install"},
+                            {"name":"Query Expression","route":"core-query-expression","icon":"install"},
+
+                            {"name":"Atributos","route":"web-common-install","icon":"install"},
+                            {"name":"Interpolación","route":"web-common-install","icon":"install"},
+                            {"name":"Directivas"    ,"icon":"install",
+                              "childs":[
+                               {"name":"For Each","route":"web-common-install","icon":"install"},
+                               {"name":"Toggle","route":"web-common-install","icon":"install"},
+                               {"name":"Show If","route":"web-common-install","icon":"install"}
+
+                               ]}
+
+
+                            ]
+                        },
+
+                     { "moduleName":"Componentes", "moduleIcon":"code" ,
                        "childs": [
                         {"name":"Install","route":"web-common-install","icon":"install"},
                         {"name":"Static Template","route":"web-common-templates","icon":"restaurant"},
@@ -131,7 +151,7 @@
             </div>
             <div class="content lg:px-40 sm:px-20 leading-8">
                 <!-- Usaer templates para los conditional asi evita ser renderizado           -->
-                <conditional-render-cases routes case="web-common-templates">
+                <conditional-render-cases routes case="core-query-expression">
                     <div case="web-common-install">
                         <template>
                             <lazy-template src="./web-common/install.html"></lazy-template>
@@ -150,6 +170,16 @@
                     <div case="web-common-bind-element">
                         <template>
                             <lazy-template src="./web-common/bind-element.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="core-query-expression">
+                        <template>
+                            <lazy-template src="./core/query-expression.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="core-web-component">
+                        <template>
+                            <lazy-template src="./core/web-component.html"></lazy-template>
                         </template>
                     </div>
                 </conditional-render-cases>
