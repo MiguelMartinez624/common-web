@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo App</title>
+</head>
+<script defer src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    html, body {
+        height: 100%;
+        width: 100%;
+    }
+
+    .header {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        color: var(--fg);
+        background: var(--bg);
+    }
+
+
+    .content {
+        padding: 1rem 3rem;
+        background: #dbdbdb75;
+        height: calc(91%);
+        overflow: auto;
+    }
+
+    .layout {
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .sidebar {
+        display: flex;
+        width: 100%;
+        background: var(--bg-primary);
+        flex: 0.2;
+        transition-property: flex;
+        transition-duration: 0.5s;
+        justify-center: center;
+        overflow: hidden;
+        border-right: 2px solid #f2f2f2;
+    }
+
+    .sidebar.collapsed {
+        transition-property: flex;
+        transition-duration: 0.5s;
+        flex: 0;
+    }
+
+    .card {
+        padding: 1rem;
+        background: white;
+        box-shadow: 0px 0px 8px rgba(0, 0, 0, .2);
+    }
+
+    .collapsed {
+        flex: 0;
+
+    }
+</style>
+<body>
+<static-template>
+
+    <div class="layout">
+        <div toggle class="sidebar">
+            <lazy-template
+                    data='{"routes":[
+                    {"name":"Productos","route":"products","icon":"restaurant"},
+                    {"name":"Tiendas", "route":"stores","icon":"storefront"},
+                    {"name":"Tablero de Ordenes", "route":"orders-board","icon":"sell"},
+                    {"name":"Calendario de Ordenes", "route":"orders-calendar","icon":"sell"}
+
+                ]}'
+                    src="./sidebar.html"
+            ></lazy-template>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+            <div class="header">
+                <span menu-toggle class="cursor-pointer material-symbols-outlined">
+                dock_to_right
+            </span>
+
+
+                <bind-element value="collapsed" from="span[menu-toggle]:(click)"
+                              to=".sidebar:toggleClass"></bind-element>
+            </div>
+            <div class="content">
+                <!-- Usaer templates para los conditional asi evita ser renderizado           -->
+                <conditional-render-cases routes case="orders-board">
+                    <div case="stores">
+                        <template>
+                            <lazy-template src="./stores/listing-page.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="products">
+                        <template>
+                            <lazy-template src="./products/listing-page.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="orders-calendar">
+                        <template>
+                            <lazy-template src="./reports/orders-calendar.html"></lazy-template>
+                        </template>
+                    </div>
+
+                    <div case="orders-board">
+                        <template>
+                            <lazy-template src="./orders-board/board.html"></lazy-template>
+                        </template>
+                    </div>
+                </conditional-render-cases>
+
+
+            </div>
+        </div>
+
+    </div>
+</static-template>
+
+
+<script src="../core/dist/core-pkg.js" type="text/javascript"></script>
+<script src="../components/dist/components-pkg.js" type="text/javascript"></script>
+<script src="../forms/dist/forms-pkg.js" type="text/javascript"></script>
+</body>
+</html>

@@ -25,6 +25,7 @@ export function checkShowIfDirective() {
             const bind = new ElementBind(child, path);
             bind.searchElement();
             const value = bind.value;
+
             if (!value) {
                 // Check check this as may lead to memory leeks, is not the best way
                 // as is a reference to a element that was removed from the dom
@@ -33,6 +34,8 @@ export function checkShowIfDirective() {
                 this["cachedChild"] = child;
                 child.remove();
             } else if (this["cachedChild"]) {
+                console.log({value})
+
                 const cached = this["cachedChild"].find(c => c === child);
                 if (cached) {
                     this.appendChild(cached);

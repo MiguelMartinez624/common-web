@@ -17,8 +17,10 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
 
     if (selector === "@host") {
         let queryResult = element.parentNode as Node;
-        if (queryResult.parentNode !== null && !(queryResult instanceof FrameworkComponent)) {
-            queryResult = findNodeOnUpTree(selector, queryResult)
+        if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
+            queryResult = findNodeOnUpTree(selector, queryResult);
+        } else if (queryResult['host']) {
+            return queryResult['host'];
         }
 
         return queryResult
@@ -35,6 +37,8 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     let queryResult: Node = (element as HTMLElement).querySelector(selector);
     if (!queryResult && element.parentNode !== null) {
         queryResult = findNodeOnUpTree(selector, element.parentNode)
+    }else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
+        return element['host'];
     }
     return queryResult;
 }
@@ -63,6 +67,7 @@ export function findAllChildrensBySelector(tree: HTMLElement, selector: string):
  * @returns {any} The extracted data, or undefined if not found.
  */
 export function extractData(resultPath: string, result: any) {
+
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
         .filter((p) => p !== "@host")
     return properties.reduce((prev: any, curr: any) => prev?.[curr], result)

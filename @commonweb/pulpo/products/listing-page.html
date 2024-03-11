@@ -1,0 +1,26 @@
+<div>
+    <bind-element value="table" from="api-call[data]:(request-success)" to="[content]:[case]"></bind-element>
+    <bind-element value="loading" from="api-call[data]:(loading)" to="[content]:[case]"></bind-element>
+    <bind-element value="error" from="api-call[data]:(request-failed)" to="[content]:[case]"></bind-element>
+    <bind-element input-path="detail.data.content" from="api-call[data]:(request-success)"
+                  to="lazy-template:[data]"></bind-element>
+
+    <api-call
+            data
+            auto="true"
+            method="GET"
+            src="https://pavlova-backend-natp7refrq-uc.a.run.app/products?size=100&page=1">
+    </api-call>
+    <p class="mb-4 font-bold"> Productos</p>
+    <conditional-render-cases content case="loading">
+        <div case="loading">
+            Cargando...
+        </div>
+        <div case="table">
+            <lazy-template
+                    data="{{@host:[data]}}"
+                    src="./products/products-table.html">
+            </lazy-template>
+        </div>
+    </conditional-render-cases>
+</div>
