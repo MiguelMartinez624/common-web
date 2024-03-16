@@ -1,6 +1,7 @@
 import {extractData, findNodeOnUpTree} from "../html_manipulation";
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
+import {FrameworkComponent} from "../framework-component";
 
 
 /**
@@ -56,7 +57,7 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
     for (const match of matches) {
         const propertyPath = match[1];
         // TODO use the @to indicate WHO is gonna be the root source for the data
-        let attributeName = match[1].replace("@host.", "");
+        let attributeName = match[1].replace("@host:", "");
 
         const interpolation = new AttributeInterpolation(child, propertyPath, key);
         /*
@@ -66,6 +67,7 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
         if (nextDot > -1) {
             attributeName = attributeName.slice(0, nextDot)
         }
+
         let interpolationsStored = interpolations.get(attributeName);
         if (!interpolationsStored) {
             interpolations.set(attributeName, [interpolation]);
@@ -91,16 +93,18 @@ export class AttributeInterpolation implements Interpolation {
         public readonly attributeName: string) {
 
         this.elementBind = new ElementBind(element, propertyPath);
-
         this.root = this.elementBind.searchElement(element);
 
 
     }
 
     public update(): void {
-        const value = this.elementBind.value || "";
+        const value = this.elementBind.value;
         if (this.prevValue === value) {
             return;
+        }
+        if (!value) {
+            return
         }
         this.updateValue(value);
         this.prevValue = value;
@@ -109,12 +113,22 @@ export class AttributeInterpolation implements Interpolation {
 
     private updateValue(value: any) {
         const toUpdate = this.element[this.attributeName];
-        if (typeof value === "object" && typeof toUpdate === "function") {
+        if (!value && this.attributeName === "for-each") {
+            // dont do nothing for nestd component for each
+            return;
+        }
+
+        if (this.element instanceof FrameworkComponent) {
+
+            (this.element as FrameworkComponent)
+                .changeAttributeAndUpdate(this.attributeName, value);
+        } else if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {
             // Required??
             this.element[this.attributeName] = value;
+
         } else {
             this.element.setAttribute(this.attributeName, value);
         }

@@ -2,7 +2,7 @@
 
 <div class="flex gap-4 flex-col h-[90%]">
 
-    <api-call method="POST" report src="https://pavlova-backend-natp7refrq-uc.a.run.app/report"></api-call>
+    <api-call method="POST" report src="http://localhost:8080/report"></api-call>
     <div class="card">
         <strong>Filtros</strong>
         <form-group class="flex flex-wrap">
@@ -94,8 +94,8 @@
             </style>
             <div>
                 <template for-each="{{@host:[data]}}">
-                    <div class="order-item">
-                        <div class="{{@host:[data.status]}}">
+                    <div  class="order-item">
+                        <div card class="{{@host:[data.status]}}">
                             <div class="order-card">
                                 <div class="code">
                                     {{@host:[data.orderCode]}}
@@ -107,6 +107,12 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <bind-element from="[card]:(click)" to="[toggle]:toggleClass" value="hidden"></bind-element>
+
+                        <div toggle class="modal hidden">
+                            <bind-element from="[toggle]:(click)" to="[toggle]:toggleClass" value="hidden"></bind-element>
+                            <order-details order-id="{{@host:[data.orderId]}}"></order-details>
                         </div>
                     </div>
                 </template>

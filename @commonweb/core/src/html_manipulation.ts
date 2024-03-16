@@ -11,36 +11,45 @@
 import {FrameworkComponent} from "./framework-component";
 
 export function findNodeOnUpTree(selector: string, element: Node): Node | null {
-    /*
-    * Search the root element is the web component itself
-    * */
+    try {
+        /*
+        * Search the root element is the web component itself
+        * */
 
-    if (selector === "@host") {
-        let queryResult = element.parentNode as Node;
-        if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
-            queryResult = findNodeOnUpTree(selector, queryResult);
-        } else if (queryResult['host']) {
-            return queryResult['host'];
+        if (selector === "@host") {
+            let queryResult = element.parentNode as Node;
+            if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
+                queryResult = findNodeOnUpTree(selector, queryResult);
+            } else if (queryResult['host']) {
+                return queryResult['host'];
+            }
+
+            return queryResult
         }
 
-        return queryResult
-    }
+        if (selector === "@parent") {
+            return (element.parentNode)
+        }
+        // if not one of the key workds resplace
+        if (selector[0] === "@") {
+            selector = selector.slice(selector.indexOf("@") + 1);
+        }
 
-    if (selector === "@parent") {
-        return (element.parentNode)
-    }
-    // if not one of the key workds resplace
-    if (selector[0] === "@") {
-        selector = selector.slice(selector.indexOf("@") + 1);
-    }
+        let queryResult: Node = (element as HTMLElement).querySelector(selector);
+        if (!queryResult && element.parentNode !== null) {
+            queryResult = findNodeOnUpTree(selector, element.parentNode)
+        } else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
+            return element['host'];
+        }
+        return queryResult;
+    } catch (e) {
 
-    let queryResult: Node = (element as HTMLElement).querySelector(selector);
-    if (!queryResult && element.parentNode !== null) {
-        queryResult = findNodeOnUpTree(selector, element.parentNode)
-    }else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
-        return element['host'];
+        throw {
+            query: selector,
+            root: element,
+            error: e
+        }
     }
-    return queryResult;
 }
 
 

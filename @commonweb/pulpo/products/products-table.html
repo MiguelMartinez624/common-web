@@ -46,7 +46,9 @@
     <div class="h-[70vh] overflow-auto">
         <template for-each="{{@host:[data]}}">
             <div class="table-row">
-                <div><img class="outline rounded-full" height="60" width="60" style="width: 60px;max-width: 60px; "
+                <div><img
+                        loading="lazy"
+                        class="outline rounded-full" height="60" width="60" style="width: 60px;max-width: 60px; "
                           src="{{@host:[data.thumbnailUrl]}}" alt=""></div>
                 <div>{{@host:[data.name]}}</div>
                 <div title="{{@host:[data.description]}}"> {{@host:[data.description]}}</div>
