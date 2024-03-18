@@ -39,7 +39,7 @@ export class ConditionalRenderCasesComponent extends HTMLElement {
             if (show && isTemplated && !el.getAttribute("is-active")) {
 
                 const fragment = document.createRange().createContextualFragment(
-                    `<div is-active="true">${el.children[0].innerHTML}</div>`);
+                    `<div style="height: 100%;width: 100%"  is-active="true">${el.children[0].innerHTML}</div>`);
                 el.appendChild(fragment)
                 el.setAttribute("is-active", "true")
             } else if (!show && isTemplated) {

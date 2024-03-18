@@ -1,4 +1,3 @@
-import {extractData, findNodeOnUpTree} from "../html_manipulation";
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
 
@@ -59,6 +58,7 @@ export class TemplateInterpolation implements Interpolation {
         // any childs
         this.elementBind = new ElementBind(element.parentElement, propertyPath);
         this.elementBind.searchElement(element.parentElement);
+
 
         const value = this.elementBind.value;
         this.prevValue = value;

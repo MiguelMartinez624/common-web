@@ -27,6 +27,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
         }
 
         label {
+            gap: 4px;
             color: var(--form-text);
             font-size: var(--form-text-size);
         }
@@ -62,7 +63,7 @@ export class FormField extends FrameworkComponent {
 
     public value() {
         const value = this.shadowRoot.querySelector("input").value;
-        if (this.format = "date") {
+        if (this.format === "date") {
             return new Date(value);
         }
 

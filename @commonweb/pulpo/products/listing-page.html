@@ -10,6 +10,7 @@
             auto="true"
             method="GET"
             src="https://pavlova-backend-natp7refrq-uc.a.run.app/products?size=100&page=1">
+        <http-header key="token" value="@localstorage:pulpo-token"></http-header>
     </api-call>
     <p class="mb-4 font-bold"> Productos</p>
     <conditional-render-cases content case="loading">

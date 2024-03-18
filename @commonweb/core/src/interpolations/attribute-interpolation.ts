@@ -1,4 +1,3 @@
-import {extractData, findNodeOnUpTree} from "../html_manipulation";
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
 import {FrameworkComponent} from "../framework-component";

@@ -15,7 +15,6 @@
     html, body {
         height: 100%;
         width: 100%;
-        background: blue;
     }
 
     .header {
@@ -76,6 +75,11 @@
         display: none !important;
     }
 
+    .full-page {
+        height: 100%;
+        width: 100%;
+    }
+
     .modal {
         background-color: #ffffff87;
         backdrop-filter: blur(2px);
@@ -92,70 +96,19 @@
 </style>
 <body>
 <static-template>
+    <local-storage-value key="pulpo-user"></local-storage-value>
 
-    <conditional-render-cases routes case="login">
+
+    <conditional-render-cases main-routes case="login">
         <div case="login">
             <template>
-                <div class="card">
-                    <web-form>
-                        <form-field placeholder="usuario" label="Usuario"></form-field>
-                        <form-field placeholder="1234" label="Contrase;a"></form-field>
-                    </web-form>
-                </div>
+                <login-page></login-page>
+                <bind-element value="dashboard" from="login-page:(login-success)" to="[main-routes]"></bind-element>
             </template>
         </div>
         <div case="dashboard">
             <template>
-                <div class="layout">
-                    <div toggle class="sidebar">
-                        <lazy-template
-                                data='{"routes":[
-                    {"name":"Productos","route":"products","icon":"restaurant"},
-                    {"name":"Tiendas", "route":"stores","icon":"storefront"},
-                    {"name":"Tablero de Ordenes", "route":"orders-board","icon":"sell"},
-                    {"name":"Calendario de Ordenes", "route":"orders-calendar","icon":"sell"}
-
-                ]}'
-                                src="./sidebar.html"
-                        ></lazy-template>
-                    </div>
-                    <div style="flex:1;overflow:hidden;">
-                        <div class="header">
-                            <span menu-toggle class="cursor-pointer material-symbols-outlined"> dock_to_right </span>
-                            <bind-element value="collapsed" from="span[menu-toggle]:(click)"
-                                          to=".sidebar:toggleClass"></bind-element>
-                        </div>
-                        <div class="content">
-                            <!-- Usaer templates para los conditional asi evita ser renderizado           -->
-                            <conditional-render-cases routes case="orders-board">
-                                <div case="stores">
-                                    <template>
-                                        <lazy-template src="./stores/listing-page.html"></lazy-template>
-                                    </template>
-                                </div>
-                                <div case="products">
-                                    <template>
-                                        <lazy-template src="./products/listing-page.html"></lazy-template>
-                                    </template>
-                                </div>
-                                <div case="orders-calendar">
-                                    <template>
-                                        <lazy-template src="./reports/orders-calendar.html"></lazy-template>
-                                    </template>
-                                </div>
-
-                                <div case="orders-board">
-                                    <template>
-                                        <lazy-template src="./orders-board/board.html"></lazy-template>
-                                    </template>
-                                </div>
-                            </conditional-render-cases>
-
-
-                        </div>
-                    </div>
-
-                </div>
+                <pulpo-dashboard></pulpo-dashboard>
             </template>
         </div>
     </conditional-render-cases>
@@ -167,6 +120,22 @@
 <script src="../components/dist/components-pkg.js" type="text/javascript"></script>
 <script defer src="../forms/dist/forms-pkg.js" type="text/javascript"></script>
 <script defer src="./orders-details.component.js" type="text/javascript"></script>
+<script defer src="./logo.components.js" type="text/javascript"></script>
+<script defer src="./login.page.js" type="text/javascript"></script>
+<script defer src="./dashboard.page.js" type="text/javascript"></script>
+
+
+<script>
+    const user = document.querySelector("local-storage-value");
+    const mainRouting = document.querySelector("conditional-render-cases[main-routes]")
+    if (user.value) {
+        mainRouting.changeCase("dashboard");
+    }else{
+        mainRouting.changeCase("login");
+    }
+
+</script>
+
 
 </body>
 </html>
