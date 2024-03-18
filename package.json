@@ -1,6 +1,7 @@
 {
   "workspaces": [
     "@commonweb/core",
+    "@commonweb/components"
   ],
   "scripts": {
   },

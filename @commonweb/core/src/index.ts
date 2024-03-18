@@ -1,6 +1,8 @@
 import {CustomElementConfig, WebComponent} from "./web_components";
 import {Attribute} from "./attributes";
 import {FrameworkComponent} from "./framework-component";
+import {checkShowIfDirective, enhanceClassChange, forEachDirective} from "./directives";
+
 export * from './framework-component';
 
 export * from './interpolations';
@@ -8,7 +10,9 @@ export * from './web_components';
 export * from './html_manipulation';
 export * from './storage';
 export * from './attributes';
-export * from './components';
+export * from './directives';
+export * from './bindings';
+
 
 class ComponentBuilder {
 
@@ -42,7 +46,6 @@ class ComponentBuilder {
         let raw = class extends FrameworkComponent {
             constructor(...args) {
                 super();
-
                 methods.forEach(({methodName, handler}) => {
                     this[methodName] = handler.bind(this);
                 })
@@ -70,7 +73,7 @@ class ComponentBuilder {
         };
 
 
-        WebComponent(this.config)(raw);
+        WebComponent({...this.config, directives: [forEachDirective, checkShowIfDirective, enhanceClassChange]})(raw);
     }
 
 

@@ -1,0 +1,30 @@
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+
+
+<aside id="default-sidebar"
+       class=" top-0 left-0 z-40 h-screen transition-transform -translate-x-full sm:translate-x-0"
+       aria-label="Sidebar">
+
+    <div class="flex justify-center">
+
+    </div>
+    <div class="h-full px-3 py-4 overflow-y-auto bg-white-100 text-gray-800">
+        <ul class="space-y-2 font-medium">
+            <template for-each="{{@host:[data.routes]}}">
+                <li>
+                    <a href="#"
+                       class="flex items-center p-2 text-gray-800 rounded-lg hover:bg-gray-100 ">
+                        <span class="material-symbols-outlined">
+                {{@host:[data.icon]}}
+                     </span>
+                        <span class="ms-3">{{@host:[data.name]}}</span>
+                        <bind-element value="{{@host:[data.route]}}" from="a:(click)"
+                                      to="[routes]:changeCase"></bind-element>
+                    </a>
+                </li>
+
+            </template>
+        </ul>
+    </div>
+</aside>

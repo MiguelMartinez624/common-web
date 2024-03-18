@@ -52,14 +52,13 @@ function insertTemplate(attr: CustomElementConfig) {
  */
 export function bindTemplateToProperties(root: HTMLElement) {
     const interpolations = new Map<string, Interpolation[]>();
-
     const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
     // Bind Attribute Interpolations
     // childs should be the parameter
-
     generateAttributesInterpolations(root, childrens, interpolations);
 
     generateTemplateInterpolations(root, childrens, interpolations);
+
     (root as any).interpolations = interpolations;
 }
 
@@ -83,6 +82,7 @@ function updateAttributes(element: any, name: string, newValue: any) {
 
 
 export function WebComponent(attr: CustomElementConfig) {
+
     return function _WebComponent<T extends { new(...args: any[]): {} }>(constr: T) {
 
         if (attr.useShadow === undefined) {
@@ -94,8 +94,8 @@ export function WebComponent(attr: CustomElementConfig) {
             constructor(...args: any[]) {
                 super(...args);
 
-                    // Whats the different for a framework component ?.
-                    (this as any).directives = attr.directives;
+                // Whats the different for a framework component ?.
+                (this as any).directives = attr.directives;
 
             }
 
@@ -127,11 +127,13 @@ export function WebComponent(attr: CustomElementConfig) {
             public connectedCallback() {
                 insertTemplate.call(this, attr);
                 this.wireTemplate();
+
                 syncWithStorage(this as unknown as HTMLElement);
                 this["checkAllInterpolations"]();
                 if (super["connectedCallback"]) {
                     super["connectedCallback"]();
                 }
+
             }
 
             public checkInterpolationsFor(name) {

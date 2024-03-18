@@ -1,7 +1,6 @@
-import {isJSON, WebComponent} from "../web_components";
-import {Attribute} from "../attributes";
-import {ElementBind} from "../bindings/element_bind";
-import {extractData} from "../html_manipulation";
+import {Attribute, extractData, isJSON, WebComponent, ElementBind} from "@commonweb/core";
+
+
 
 @WebComponent({
     selector: 'bind-element',
@@ -41,8 +40,8 @@ export class BindElementComponent extends HTMLElement {
             return;
         }
 
-        const triggerQuery = new ElementBind(fromSelector);
-        const triggerElement: any = triggerQuery.searchElement(this);
+        const triggerQuery = new ElementBind(this, fromSelector);
+        const triggerElement: any = triggerQuery.searchElement();
         if (!triggerElement) {
             console.warn("not foound")
             return;
@@ -60,8 +59,8 @@ export class BindElementComponent extends HTMLElement {
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
         // We get the trigger here
-        const targetQuery = new ElementBind(this.getAttribute("to"));
-        const targetElement = targetQuery.searchElement(this) as HTMLElement;
+        const targetQuery = new ElementBind(this, this.getAttribute("to"));
+        const targetElement = targetQuery.searchElement() as HTMLElement;
         if (!targetElement) {
             return;
         }
@@ -97,8 +96,8 @@ export class BindElementComponent extends HTMLElement {
 
         if (this.getAttribute("input-src")) {
             // From other element
-            const sourceInputQuery = new ElementBind(this.getAttribute("input-src"));
-            const elementSource = sourceInputQuery.searchElement(this);
+            const sourceInputQuery = new ElementBind(this, this.getAttribute("input-src"));
+            const elementSource = sourceInputQuery.searchElement();
             if (!elementSource) {
                 return;
             }

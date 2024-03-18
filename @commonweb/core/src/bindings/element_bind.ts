@@ -2,14 +2,16 @@
     ElementBind will bind a element and a property/event/method
     to be used on a easy way.
  */
-import {findNodeOnUpTree} from "../html_manipulation";
+import {extractData, findNodeOnUpTree} from "../html_manipulation";
+
+// TO should have the element that make the binding as a parant so can get values easily
 
 export class ElementBind {
     private readonly elementSelector: string;
     private readonly elementProperty: string;
     private _element: any;
 
-    constructor(public readonly rawStr: string) {
+    constructor(public readonly target: Node, public readonly rawStr: string) {
         const sections = rawStr.split(":");
         // TODO: need toi validate the length of this strings to avoid out of index errors
         this.elementSelector = sections[0];
@@ -34,7 +36,11 @@ export class ElementBind {
             case "(":
                 throw {message: "Functionality for events is not implemented yet"}
             case  "[":
-                return this._element[this.propertyName] || this._element.getAttribute(this.propertyName)
+                const value = extractData(this.propertyName, this.element) || "";
+                if (value && typeof value === "function") {
+                    return value();
+                }
+                return value || this._element.getAttribute(this.propertyName)
             default:
                 // todo no params method for now
                 return this._element[this.propertyName]();
@@ -54,8 +60,19 @@ export class ElementBind {
         }
     }
 
+    public get element(): Node | null {
+        if (this._element) {
+            return this._element;
+        }
+
+        return this.searchElement(this.target);
+    }
+
     // Can be cached?
-    public searchElement(initialNode: Node): Node | null {
+    public searchElement(initialNode?: Node): Node | null {
+        if (!initialNode) {
+            initialNode = this.target;
+        }
         this._element = findNodeOnUpTree(this.elementSelector, initialNode);
         return this._element;
     }

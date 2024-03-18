@@ -1,10 +1,10 @@
-import {extractData} from "../html_manipulation";
 import {Interpolation} from "./index";
+import {ElementBind} from "../bindings";
 
 /*
 * Evaluate the entire innerHTML to generate TemplateInterpolations
 * */
-export function generateTemplateInterpolations(root: Element, childList: Element[], interpolations: Map<string, Interpolation[]>) {
+export function generateTemplateInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
 
     childList
         .forEach((child) => {
@@ -15,12 +15,12 @@ export function generateTemplateInterpolations(root: Element, childList: Element
                     const matches = node.textContent.matchAll(/\{\{(.*?)\}\}/g);
                     for (const match of matches) {
                         const propertyPath = match[1];
-                        const interpolation = new TemplateInterpolation(root, node, propertyPath, `<!--${propertyPath}-->`);
+                        const interpolation = new TemplateInterpolation(node, propertyPath, `<!--${propertyPath}-->`);
                         /*
                          * Need to attach this interpolation to the properties
                          * */
                         // TODO this peace of code can be moved to a collection style as is used on many part
-                        let attributeName = match[1].replace("@host.", "");
+                        let attributeName = match[1].replace("@host:", "").replace("[", "").replace("]", "");
                         const nextDot = attributeName.indexOf(".");
                         if (nextDot > -1) {
                             attributeName = attributeName.slice(0, nextDot)
@@ -44,15 +44,23 @@ export function generateTemplateInterpolations(root: Element, childList: Element
 
 export class TemplateInterpolation implements Interpolation {
     private prevValue: string;
+    private readonly root: Node;
+    private elementBind: ElementBind;
 
     constructor(
         // root should reference the component no the parent
-        public readonly root: Element,
+
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly pattern: string) {
 
-        const value = extractData(propertyPath, this.root) || "";
+        // the parent element for this case as the text node dont have a query selector for not having
+        // any childs
+        this.elementBind = new ElementBind(element.parentElement, propertyPath);
+        this.elementBind.searchElement(element.parentElement);
+
+
+        const value = this.elementBind.value;
         this.prevValue = value;
         element.textContent = element.textContent
             .replace(`{{${propertyPath}}}`, `${value}`);
@@ -62,7 +70,7 @@ export class TemplateInterpolation implements Interpolation {
 
     public update(): void {
 
-        const value = extractData(this.propertyPath, this.root) || "";
+        const value = this.elementBind.value;
         if (this.prevValue === value) {
             return;
         }

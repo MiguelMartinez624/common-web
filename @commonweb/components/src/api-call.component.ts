@@ -1,17 +1,11 @@
-import {WebComponent} from "../web_components";
-import {Attribute} from "../attributes";
+import {Attribute, WebComponent} from "@commonweb/core";
+import {callLocalStorage} from "./local-storage.component";
 
-export enum DataFetcherPropsName {
-    Source = "source",
-}
-
-// Meter dentro los estados de llamada y eso
 @WebComponent({
     selector: 'api-call',
-    template: '<slot></slot>'
+    template: ''
 })
 export class ApiCallComponent extends HTMLElement {
-    private _type: string;
     private _source: string = "";
     private _method: 'POST' | 'GET' | 'DELETE' | 'PUT';
 
@@ -70,14 +64,25 @@ export class ApiCallComponent extends HTMLElement {
         const sourceType = this._source.slice(0, this._source.indexOf(":"));
         const method = this._method || 'GET';
 
-        // Implement factory pattern
+        const headers = [...this.querySelectorAll("http-header")]
+            .map((c: HTTPHeaderComponent) => {
+                const value = c.getAttribute("value");
+                let headerValue = null;
+                if (value.startsWith("@localstorage")) {
+                    const key = value.replace("@localstorage:", "");
+                    headerValue = callLocalStorage(key, "GET", null);
+                } else {
+                    headerValue = value;
+                }
+
+                return {key: c.getAttribute("key"), value: headerValue}
+            });
+
+
         switch (sourceType) {
             case "https" :
             case "http"  :
-                return await callRemoteAPI(this._source, method, filters, this.Payload);
-            case "localstorage":
-                return this.callLocalStorage(this._source, method, filters);
-
+                return await callRemoteAPI(this._source, method, filters, this.Payload, headers);
             default:
                 throw new Error("Invalid source type, available types [http,https,localstorage]");
 
@@ -85,41 +90,39 @@ export class ApiCallComponent extends HTMLElement {
     }
 
 
-    private callLocalStorage(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any) {
-        const storageKey = source.slice(source.indexOf(":"));
-        switch (method) {
-            case "POST":
-                localStorage.setItem(storageKey, JSON.parse(filters));
-                break;
-            case "GET":
-                const value = localStorage.getItem(storageKey);
-                if (value) {
-                    return JSON.parse(value)
-                }
-                throw "not found on storage";
-            case "DELETE":
-                localStorage.removeItem(storageKey);
-                return;
-            case "PUT":
-                return;
-
-        }
-        return;
-    }
-
     static get observedAttributes() {
         return ["method", "src", "auto", "result-path", "subscribed-key", "payload"];
     }
 }
 
 
-export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any, payload?: any) {
+@WebComponent({
+    selector: 'http-header',
+    template: ''
+})
+export class HTTPHeaderComponent extends HTMLElement {
+
+    @Attribute("string")
+    public key: string;
+
+    @Attribute("value")
+    public value: string;
+
+    static get observedAttributes() {
+        return ["key", "value"];
+    }
+}
+
+
+export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DELETE" | "PUT", filters: any, payload?: any, headers?: any) {
+    const headersMap = new Headers({"Content-type": "application/json"});
+    if (headers) {
+        headers.forEach((h) => headersMap.append(h.key, h.value));
+    }
     const result = await fetch(source, {
         method: method,
         body: (filters && method !== 'GET') ? JSON.stringify({...filters, ...payload}) : null,
-        headers: {
-            "Content-Type": "application/json",
-        }
+        headers: headersMap
     });
     const contentType = result.headers.get("Content-Type")
 

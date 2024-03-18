@@ -1,5 +1,6 @@
-import {extractData} from "../html_manipulation";
 import {Interpolation} from "./index";
+import {ElementBind} from "../bindings";
+import {FrameworkComponent} from "../framework-component";
 
 
 /**
@@ -10,33 +11,33 @@ import {Interpolation} from "./index";
  * @param {Map<string, Interpolation[]>} interpolations - A Map to store created interpolations by attribute name.
  */
 export function generateAttributesInterpolations(root: Element, childList: any[], interpolations: Map<string, Interpolation[]>) {
-    childList.forEach((child) => {
-
-        const attributes: Map<string, any> = (child as any).attribute_list;
-        if (attributes) {
-            for (const [key, value] of attributes) {
-                evaluateInterpolationKey(child, root, key, interpolations);
-            }
-        }
-        [...child.attributes]
-            .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null)
-            .forEach(({name, value}) => {
-
-                const propertyPath = value.replace("{{", "").replace("}}", "");
-                let attributeName = propertyPath.replace("@host.", "");
-
-                const interpolation = new AttributeInterpolation(root, child, propertyPath, name);
-                let interpolationsStored = interpolations.get(attributeName);
-                if (!interpolationsStored) {
-                    interpolations.set(attributeName, [interpolation]);
-                    return;
+    childList
+        .forEach((child) => {
+            const attributes: Map<string, any> = (child as any).attribute_list;
+            if (attributes) {
+                for (const [key, value] of attributes) {
+                    evaluateInterpolationKey(child, root, key, interpolations);
                 }
-                interpolationsStored.push(interpolation);
+            }
 
-            });
+            [...child.attributes]
+                .filter(a => (a.value as string).match(/\{\{(.*?)\}\}/g) !== null)
+                .forEach(({name, value}) => {
+                    const propertyPath = value.replace("{{", "").replace("}}", "");
+                    let attributeName = propertyPath.slice(propertyPath.indexOf(":") + 1);
 
-        generateAttributesInterpolations(root, [...child.children], interpolations);
-    });
+                    const interpolation = new AttributeInterpolation(child, propertyPath, name);
+                    let interpolationsStored = interpolations.get(attributeName);
+                    if (!interpolationsStored) {
+                        interpolations.set(attributeName, [interpolation]);
+                        return;
+                    }
+                    interpolationsStored.push(interpolation);
+
+                });
+
+            generateAttributesInterpolations(root, [...child.children], interpolations);
+        });
 }
 
 /**
@@ -55,9 +56,9 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
     for (const match of matches) {
         const propertyPath = match[1];
         // TODO use the @to indicate WHO is gonna be the root source for the data
-        let attributeName = match[1].replace("@host.", "");
+        let attributeName = match[1].replace("@host:", "");
 
-        const interpolation = new AttributeInterpolation(node, child, propertyPath, key);
+        const interpolation = new AttributeInterpolation(child, propertyPath, key);
         /*
          * Need to attach this interpolation to the properties
          * */
@@ -65,6 +66,7 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
         if (nextDot > -1) {
             attributeName = attributeName.slice(0, nextDot)
         }
+
         let interpolationsStored = interpolations.get(attributeName);
         if (!interpolationsStored) {
             interpolations.set(attributeName, [interpolation]);
@@ -81,20 +83,27 @@ export function evaluateInterpolationKey(child: Element, node: Element, key: str
  */
 export class AttributeInterpolation implements Interpolation {
     private prevValue: string;
+    private readonly root: Node;
+    private elementBind: ElementBind;
 
     constructor(
-        public readonly root: Element,
         public readonly element: Element,
         public readonly propertyPath: string,
         public readonly attributeName: string) {
 
+        this.elementBind = new ElementBind(element, propertyPath);
+        this.root = this.elementBind.searchElement(element);
+
+
     }
 
     public update(): void {
-
-        const value = extractData(this.propertyPath, this.root);
+        const value = this.elementBind.value;
         if (this.prevValue === value) {
             return;
+        }
+        if (!value) {
+            return
         }
         this.updateValue(value);
         this.prevValue = value;
@@ -103,12 +112,22 @@ export class AttributeInterpolation implements Interpolation {
 
     private updateValue(value: any) {
         const toUpdate = this.element[this.attributeName];
-        if (typeof value === "object" && typeof toUpdate === "function") {
+        if (!value && this.attributeName === "for-each") {
+            // dont do nothing for nestd component for each
+            return;
+        }
+
+        if (this.element instanceof FrameworkComponent) {
+
+            (this.element as FrameworkComponent)
+                .changeAttributeAndUpdate(this.attributeName, value);
+        } else if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {
             // Required??
             this.element[this.attributeName] = value;
+
         } else {
             this.element.setAttribute(this.attributeName, value);
         }

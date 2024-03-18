@@ -8,19 +8,48 @@
  * @returns {Node | null} The nearest ancestor node matching the selector,
  *   or null if not found.
  */
-export function findNodeOnUpTree(selector: string, element: Node): Node | null {
-    /*
-    * Search the root element is the web component itself
-    * */
-    if (selector === "@host") {
-        return (element.getRootNode() as any)?.host
-    }
+import {FrameworkComponent} from "./framework-component";
 
-    let queryResult: Node = (element as HTMLElement).querySelector(selector);
-    if (!queryResult && element.parentNode !== null) {
-        queryResult = findNodeOnUpTree(selector, element.parentNode)
+export function findNodeOnUpTree(selector: string, element: Node): Node | null {
+    try {
+        /*
+        * Search the root element is the web component itself
+        * */
+
+        if (selector === "@host") {
+            let queryResult = element.parentNode as Node;
+            if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
+                queryResult = findNodeOnUpTree(selector, queryResult);
+            } else if (queryResult['host']) {
+                return queryResult['host'];
+            }
+
+            return queryResult
+        }
+
+        if (selector === "@parent") {
+            return (element.parentNode)
+        }
+        // if not one of the key workds resplace
+        if (selector[0] === "@") {
+            selector = selector.slice(selector.indexOf("@") + 1);
+        }
+
+        let queryResult: Node = (element as HTMLElement).querySelector(selector);
+        if (!queryResult && element.parentNode !== null) {
+            queryResult = findNodeOnUpTree(selector, element.parentNode)
+        } else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
+            return element['host'];
+        }
+        return queryResult;
+    } catch (e) {
+
+        throw {
+            query: selector,
+            root: element,
+            error: e
+        }
     }
-    return queryResult;
 }
 
 
@@ -47,6 +76,7 @@ export function findAllChildrensBySelector(tree: HTMLElement, selector: string):
  * @returns {any} The extracted data, or undefined if not found.
  */
 export function extractData(resultPath: string, result: any) {
+
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
         .filter((p) => p !== "@host")
     return properties.reduce((prev: any, curr: any) => prev?.[curr], result)

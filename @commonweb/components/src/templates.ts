@@ -1,14 +1,18 @@
-import {WebComponent} from "../web_components";
-import {Attribute} from "../attributes";
+import {
+    Attribute,
+    checkShowIfDirective,
+    enhanceClassChange,
+    forEachDirective,
+    FrameworkComponent,
+    WebComponent
+} from "@commonweb/core";
 import {callRemoteAPI} from "./api-call.component";
-import {checkShowIfDirective, enhanceClassChange, forEachDirective} from "../directives";
-import {FrameworkComponent} from "../framework-component";
-
 
 /*
 * Template that will pull its content from a remote source, like lazy loading style, will make a fetch
 * and append its content as the innerHTML.
 * */
+
 @WebComponent({
     selector: 'static-template',
     template: '<slot></slot>',
@@ -91,7 +95,16 @@ export class LazyTemplate extends FrameworkComponent {
                 templateView.innerHTML = result;
                 templateView.data = this.data;
                 this.appendChild(templateView);
-                templateView.evaluateDirectives()
+                templateView.querySelectorAll("script").forEach((s) => {
+                    const scriptNew = document.createElement("script");
+                    scriptNew.textContent = s.textContent;
+                    if (s.src) {
+                        scriptNew.src = s.src;
+                    }
+
+                    document.head.appendChild(scriptNew);
+                });
+
 
             })
     }

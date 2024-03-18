@@ -133,3 +133,7 @@ dist
 
 @commonweb/core/examples
 ./@commonweb/core/examples
+
+@commonweb/pulpo/*
+@commonweb/pulpo
+./@commonweb/pulpo/
