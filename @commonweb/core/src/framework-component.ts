@@ -8,7 +8,6 @@ import {bindTemplateToProperties, isJSON} from "./web_components";
  *
  * Base class for creating custom components within the framework.
  */
-
 export class FrameworkComponent extends HTMLElement {
     /**
      * A map of interpolations, mapping attribute names to lists of Interpolation instances.
@@ -31,6 +30,9 @@ export class FrameworkComponent extends HTMLElement {
     }
 
     public evaluateDirectives(): void {
+        if (!this.directives) {
+            return
+        }
         this.directives.forEach(d => d.call(this))
     }
 

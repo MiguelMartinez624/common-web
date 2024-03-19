@@ -130,7 +130,10 @@ dist
 .pnp.*
 
 ./.idea
-.idea
+
 @commonweb/core/examples
 ./@commonweb/core/examples
-@commonweb/forms
+
+@commonweb/pulpo/*
+@commonweb/pulpo
+./@commonweb/pulpo/

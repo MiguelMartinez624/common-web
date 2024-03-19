@@ -1,4 +1,3 @@
-import {extractData, findNodeOnUpTree} from "../html_manipulation";
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
 
@@ -21,7 +20,7 @@ export function generateTemplateInterpolations(root: Element, childList: any[], 
                          * Need to attach this interpolation to the properties
                          * */
                         // TODO this peace of code can be moved to a collection style as is used on many part
-                        let attributeName = match[1].replace("@host.", "");
+                        let attributeName = match[1].replace("@host:", "").replace("[", "").replace("]", "");
                         const nextDot = attributeName.indexOf(".");
                         if (nextDot > -1) {
                             attributeName = attributeName.slice(0, nextDot)
@@ -59,6 +58,7 @@ export class TemplateInterpolation implements Interpolation {
         // any childs
         this.elementBind = new ElementBind(element.parentElement, propertyPath);
         this.elementBind.searchElement(element.parentElement);
+
 
         const value = this.elementBind.value;
         this.prevValue = value;

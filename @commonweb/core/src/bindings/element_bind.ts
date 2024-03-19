@@ -37,6 +37,9 @@ export class ElementBind {
                 throw {message: "Functionality for events is not implemented yet"}
             case  "[":
                 const value = extractData(this.propertyName, this.element) || "";
+                if (value && typeof value === "function") {
+                    return value();
+                }
                 return value || this._element.getAttribute(this.propertyName)
             default:
                 // todo no params method for now

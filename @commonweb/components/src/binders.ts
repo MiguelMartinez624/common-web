@@ -1,9 +1,6 @@
 import {Attribute, extractData, isJSON, WebComponent, ElementBind} from "@commonweb/core";
 
 
-// TODO change the binding to set the target and starter affect target should
-// trigger the bind, this should be change to bind-event probablly
-// as is a reactive element that only owrk with evetns
 
 @WebComponent({
     selector: 'bind-element',

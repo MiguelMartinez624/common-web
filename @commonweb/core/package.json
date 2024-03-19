@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc-1",
+  "version": "1.0.0-rc-2",
   "name": "@commonweb/core",
   "main": "dist/core.js",
   "module": "dist/core.mjs",
@@ -12,7 +12,7 @@
     "push-canary": "npm run build && npm publish --access public",
 
     "push": "npm run test && npm run build && npm publish --access public",
-    "build": "rollup -c",
+    "build": "rollup -c ",
     "test": "jest"
   },
   "repository": {

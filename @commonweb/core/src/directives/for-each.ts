@@ -25,14 +25,24 @@ export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, r
 export function resolveLoop(looper: any) {
     // Extending method to add pushAll
     if (!looper.getAttribute("loop-enhanced")) {
-        looper["clearAndPush"] = clearAndPush;
-        looper["push"] = push;
+
+        Object.defineProperty(looper, "clearAndPush", {
+            value: clearAndPush,
+            writable: false,
+            enumerable: true
+        });
+        Object.defineProperty(looper, "push", {
+            value: push,
+            writable: false,
+            enumerable: true
+        });
+
         looper._loopElement = [];
         looper.setAttribute("loop-enhanced", "done")
     }
 
     if (looper['for-each'] && Array.isArray(looper['for-each'])) {
-        looper['clearAndPush'](looper['for-each'])
+        looper.clearAndPush(looper['for-each'])
     } else {
         // this part
         const key = looper.getAttribute("for-each")
@@ -43,7 +53,7 @@ export function resolveLoop(looper: any) {
         elementBind.searchElement();
         // Need to find the element so to dhat we will do this
 
-        looper['clearAndPush'](elementBind.value);
+        looper.clearAndPush(elementBind.value);
 
     }
 
@@ -58,7 +68,6 @@ function clearAndPush(items: any[]) {
     // push all so each time , check if need to be replaced
     this._loopElement.forEach((e: HTMLElement) => e.remove());
     const recipient = this.parentElement;
-    // this.setAttribute("iteration",);
 
     items.forEach((value) => {
         const t = interpolateAndRender(this, value, recipient);
@@ -74,6 +83,5 @@ function push(value: any) {
 
 export function forEachDirective() {
     findAllChildrensBySelector(this, "[for-each]")
-        .filter(c => c.getAttribute("unwired") !== "true")
-        .forEach(resolveLoop)
+        .forEach(resolveLoop);
 }
