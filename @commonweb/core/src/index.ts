@@ -1,5 +1,6 @@
-import {CustomElementConfig, WebComponent} from "./web_components";
+import {CustomElementConfig} from "./web_components";
 import {ComponentBuilder} from "./builder";
+import {InterpolationServer} from "./interpolations";
 
 export * from './framework-component';
 
@@ -12,7 +13,11 @@ export * from './directives';
 export * from './bindings';
 
 
+// Servers
 
+window["_CommonWebServers_"] = [
+    new InterpolationServer(),
+]
 
 // Need to register the builder to be able to extends all this features this way
 window['RegisterWebComponent'] = (config: CustomElementConfig) => {

@@ -16,11 +16,7 @@ export default [
         plugins: [esbuild({
             exclude: ["**/__tests__", "**/*.test.ts"]
         }),
-            terser({
-                mangle: true,
-                toplevel: true,
-                compress: {arrows: true, drop_console: true}
-            })
+
         ],
         output: [
             {

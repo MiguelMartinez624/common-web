@@ -4,7 +4,6 @@ import {FrameworkComponent} from "./framework-component";
  * Finds the nearest ancestor node matching the specified selector,
  * starting from the given node and traversing upwards the DOM tree.
  * This function also handles the special case of `@host` to find closest FrameworkComponent
- * .
  *
  *
  * @param {string} selector - The CSS selector to use for finding the node.

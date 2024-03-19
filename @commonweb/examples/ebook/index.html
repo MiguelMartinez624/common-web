@@ -149,8 +149,10 @@
              <span menu-toggle class="cursor-pointer material-symbols-outlined">
                 dock_to_right
             </span>
+                <form-group>
+                    <form-field label=" " placeholder="e.g Componentes"></form-field>
+                </form-group>
 
-                <input type="text">
                 <bind-element value="collapsed" from=".overlay:(click)"
                               to=".overlay:toggleClass"></bind-element>
                 <bind-element value="collapsed" from=".overlay:(click)"
@@ -206,6 +208,7 @@
 </static-template>
 <script src="../../core/dist/core-pkg.js" type="text/javascript"></script>
 <script src="../../components/dist/components-pkg.js" type="text/javascript"></script>
+<script src="../../forms/dist/forms-pkg.js" type="text/javascript"></script>
 
 <script>
     if (window.RegisterWebComponent) {
@@ -241,86 +244,86 @@
             `
         })
             .on_init(function () {
-            const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
+                const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
 
-            let html = '';
-            let nextContent = '';
-            comments.forEach(c => {
-                const chars = c.nodeValue.trim().split('');
-                for (let i = 0; i < chars.length; i++) {
+                let html = '';
+                let nextContent = '';
+                comments.forEach(c => {
+                    const chars = c.nodeValue.trim().split('');
+                    for (let i = 0; i < chars.length; i++) {
 
-                    let char = chars[i];
+                        let char = chars[i];
 
-                    if (char === '<') {
-                        html += `<span class='tag'>&lt;</span><span class='tag-name'>`;
-                        nextContent = 'tag-name';
-                    } else if (char === '>') {
-                        html += `</span><span class='tag'>&gt;</span>`;
-                        nextContent = "content"
-                    } else if (nextContent === 'tag-name' && char !== " ") {
-                        html += char;
-                    } else if (nextContent === "content") {
-                        html += char;
-                    } else if (char === ' ') {
-                        if (nextContent === "tag-name") {
-                            nextContent = "attribute-name"
-                            html += `</span><span class='attr-name'>`
+                        if (char === '<') {
+                            html += `<span class='tag'>&lt;</span><span class='tag-name'>`;
+                            nextContent = 'tag-name';
+                        } else if (char === '>') {
+                            html += `</span><span class='tag'>&gt;</span>`;
+                            nextContent = "content"
+                        } else if (nextContent === 'tag-name' && char !== " ") {
+                            html += char;
+                        } else if (nextContent === "content") {
+                            html += char;
+                        } else if (char === ' ') {
+                            if (nextContent === "tag-name") {
+                                nextContent = "attribute-name"
+                                html += `</span><span class='attr-name'>`
+                            }
+                            html += char;
+                        } else if (char === '=') {
+                            if (nextContent === "attribute-name") {
+                                // Close atribute name
+                                html += `</span ><span class="attr-value">`
+                                nextContent = "attribute-value";
+                            }
+                            html += char;
+                        } else if (nextContent === "attribute-value" && !["=", "{", ":", " "].includes(chars[i - 1])
+                            && ![":", ",", "}"].includes(chars[i + 1])
+                            && (char === '"' || char === "'")) {
+                            // cerra el valor del attribute canbiando el contexto ahora
+                            html += char;
+                            nextContent = "attribute-name";
+                            html += `</span><span class='attr-name'>`;
+                        } else {
+                            html += char;
                         }
-                        html += char;
-                    } else if (char === '=') {
-                        if (nextContent === "attribute-name") {
-                            // Close atribute name
-                            html += `</span ><span class="attr-value">`
-                            nextContent = "attribute-value";
+                    }
+                });
+
+                // Format HTML using indentation and newlines
+                function formatHtml(htmlString) {
+                    return htmlString.replace(/\n\s+/g, '<br>'); // Remove unnecessary indentation
+                }
+
+                const formattedHtml = formatHtml(html);
+
+
+                this.shadowRoot.innerHTML += `<code>${formattedHtml}</code>`;
+                // ident her?
+                const tags = this.shadowRoot.querySelectorAll(".tag-name");
+                let offsetClose = 0;
+                for (let i = 0; i < tags.length; i++) {
+                    if (i === 0 || i === tags.length - 1) {
+                        continue
+                    }
+                    // TODO agregar tooltops to properties names ?
+                    const openingTag = tags[i].previousSibling;
+
+                    const nextNext = tags[i].previousSibling.previousSibling;
+                    if ((nextNext === null) || (tags[i].textContent.startsWith("/"))) {
+                        if (nextNext.nodeName !== "BR") {
+                            offsetClose = i
+                            continue;
                         }
-                        html += char;
-                    } else if (nextContent === "attribute-value" && !["=", "{", ":", " "].includes(chars[i - 1])
-                        && ![":", ",", "}"].includes(chars[i + 1])
-                        && (char === '"' || char === "'")) {
-                        // cerra el valor del attribute canbiando el contexto ahora
-                        html += char;
-                        nextContent = "attribute-name";
-                        html += `</span><span class='attr-name'>`;
+
+                        openingTag.style.marginLeft = `${((tags.length - i)) - 1}rem`
                     } else {
-                        html += char;
+                        openingTag.style.marginLeft = `${i - offsetClose}rem`
                     }
                 }
-            });
-
-            // Format HTML using indentation and newlines
-            function formatHtml(htmlString) {
-                return htmlString.replace(/\n\s+/g, '<br>'); // Remove unnecessary indentation
-            }
-
-            const formattedHtml = formatHtml(html);
 
 
-            this.shadowRoot.innerHTML += `<code>${formattedHtml}</code>`;
-            // ident her?
-            const tags = this.shadowRoot.querySelectorAll(".tag-name");
-            let offsetClose = 0;
-            for (let i = 0; i < tags.length; i++) {
-                if (i === 0 || i === tags.length - 1) {
-                    continue
-                }
-                // TODO agregar tooltops to properties names ?
-                const openingTag = tags[i].previousSibling;
-
-                const nextNext = tags[i].previousSibling.previousSibling;
-                if ((nextNext === null) || (tags[i].textContent.startsWith("/"))) {
-                    if (nextNext.nodeName !== "BR") {
-                        offsetClose = i
-                        continue;
-                    }
-
-                    openingTag.style.marginLeft = `${((tags.length - i)) - 1}rem`
-                } else {
-                    openingTag.style.marginLeft = `${i - offsetClose}rem`
-                }
-            }
-
-
-        })
+            })
             .build();
     }
 </script>
