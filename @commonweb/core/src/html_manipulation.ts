@@ -41,7 +41,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
         if (!queryResult && element.parentNode !== null) {
             queryResult = findNodeOnUpTree(selector, element.parentNode)
         } else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
-            return (element as unknown).host;
+            return (element as any).host;
         }
         return queryResult;
     } catch (e) {
