@@ -1,16 +1,18 @@
 {
-  "version": "1.0.0-beta.53",
+  "version": "1.0.0-rc-2",
   "name": "@commonweb/core",
-  "main": "dist/lib.js",
-  "module": "dist/lib.mjs",
-  "typings": "dist/lib.d.ts",
+  "main": "dist/core.js",
+  "module": "dist/core.mjs",
+  "typings": "dist/core.d.ts",
   "type": "module",
   "files": [
     "dist"
   ],
   "scripts": {
+    "push-canary": "npm run build && npm publish --access public",
+
     "push": "npm run test && npm run build && npm publish --access public",
-    "build": "rollup -c",
+    "build": "rollup -c ",
     "test": "jest"
   },
   "repository": {

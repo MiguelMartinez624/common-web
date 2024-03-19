@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo App</title>
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="./dark-theme.css">
+<style>
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        font-family: Roboto, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    }
+
+    .header {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        color: var(--fg);
+        background: var(--bg);
+    }
+
+    .content {
+        padding: 1rem 3rem;
+        color: var(--fg);
+        background: var(--bg);
+        height: calc(95%);
+    }
+
+    .layout {
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .sidebar {
+        display: flex;
+        width: 300px;
+        background: var(--sidebar-bg);
+        color: var(--sidebar-fg);
+        transition-property: width;
+        transition-duration: 0.2s;
+        justify-center: center;
+        overflow: hidden;
+    }
+
+    a {
+        color: var(--sidebar-fg);
+    }
+
+    .sidebar.collapsed {
+        transition-property: width;
+        transition-duration: 0.2s;
+        width: 0%;
+    }
+
+
+    @media only screen and (max-width: 768px) {
+        .sidebar {
+            z-index: 4;
+            width: 0%;
+            position: fixed;
+            display: block;
+            transition-property: width;
+            transition-duration: 0.2s;
+        }
+
+        .content {
+            padding: 1rem;
+        }
+
+        .sidebar.collapsed {
+            transition-property: width;
+            transition-duration: 0.2s;
+            width: 80%;
+        }
+
+        .overlay.collapsed {
+            transition-property: width;
+            transition-duration: 0.2s;
+            width: 100%;
+        }
+
+    }
+
+
+    .overlay {
+        height: 100%;
+        width: 0%;
+        position: fixed;
+        background: #7258585e;
+        z-index: 2;
+        filter: blur(12px);
+    }
+</style>
+<body>
+<static-template>
+    <div class="layout ">
+        <div toggle class="overlay sm:hidden "></div>
+
+        <div toggle class="sidebar ">
+
+            <lazy-template
+                    data='{ "routes":[
+                       { "moduleName":"Aprendiendo CommonWeb", "moduleIcon":"school" ,
+                        "childs": [
+                            {"name":"Instalación","route":"web-common-install","icon":"install"},
+                            {"name":"Declarar Componente","route":"core-web-component","icon":"install"},
+                            {"name":"Query Expression","route":"core-query-expression","icon":"install"},
+
+                            {"name":"Atributos","route":"web-common-install","icon":"install"},
+                            {"name":"Interpolación","route":"web-common-install","icon":"install"},
+                            {"name":"Directivas"    ,"icon":"install",
+                              "childs":[
+                               {"name":"For Each","route":"web-common-install","icon":"install"},
+                               {"name":"Toggle","route":"web-common-install","icon":"install"},
+                               {"name":"Show If","route":"web-common-install","icon":"install"}
+
+                               ]}
+
+
+                            ]
+                        },
+
+                     { "moduleName":"Componentes", "moduleIcon":"code" ,
+                       "childs": [
+                        {"name":"Install","route":"web-common-install","icon":"install"},
+                        {"name":"Static Template","route":"web-common-templates","icon":"restaurant"},
+                        {"name":"Lazy Template","route":"web-common-lazy-template","icon":"restaurant"},
+                        {"name":"Bind Element","route":"web-common-bind-element","icon":"restaurant"}
+
+                          ]
+                        }
+
+                         ]}'
+                    src="./sidebar.html"
+            ></lazy-template>
+        </div>
+        <div style="flex:1;overflow:hidden;">
+            <div class="header">
+             <span menu-toggle class="cursor-pointer material-symbols-outlined">
+                dock_to_right
+            </span>
+
+                <input type="text">
+                <bind-element value="collapsed" from=".overlay:(click)"
+                              to=".overlay:toggleClass"></bind-element>
+                <bind-element value="collapsed" from=".overlay:(click)"
+                              to=".sidebar:toggleClass"></bind-element>
+
+                <bind-element value="collapsed" from="span[menu-toggle]:(click)"
+                              to=".overlay:toggleClass"></bind-element>
+                <bind-element value="collapsed" from="span[menu-toggle]:(click)"
+                              to=".sidebar:toggleClass"></bind-element>
+
+
+            </div>
+            <div class="content lg:px-40 sm:px-20 leading-8">
+                <!-- Usaer templates para los conditional asi evita ser renderizado           -->
+                <conditional-render-cases routes case="core-query-expression">
+                    <div case="web-common-install">
+                        <template>
+                            <lazy-template src="./web-common/install.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="web-common-templates">
+                        <template>
+                            <lazy-template src="./web-common/templates.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="web-common-lazy-template">
+                        <template>
+                            <lazy-template src="./web-common/lazy-template.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="web-common-bind-element">
+                        <template>
+                            <lazy-template src="./web-common/bind-element.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="core-query-expression">
+                        <template>
+                            <lazy-template src="./core/query-expression.html"></lazy-template>
+                        </template>
+                    </div>
+                    <div case="core-web-component">
+                        <template>
+                            <lazy-template src="./core/web-component.html"></lazy-template>
+                        </template>
+                    </div>
+                </conditional-render-cases>
+
+
+            </div>
+        </div>
+
+    </div>
+</static-template>
+<script src="../../core/dist/core-pkg.js" type="text/javascript"></script>
+<script src="../../components/dist/components-pkg.js" type="text/javascript"></script>
+
+<script>
+    if (window.RegisterWebComponent) {
+        window.RegisterWebComponent({
+            selector: "doc-tag",
+            //language=HTML
+            template: `
+                <slot></slot>`,
+            // language=CSS
+            style: `
+                :host {
+                    background: rgb(21, 32, 43);
+                    display: block;
+                    padding: 1rem
+                }
+
+                .attr-name {
+                    color: #9393e8;
+                }
+
+                .attr-value {
+                    color: #eeeea7;
+                }
+
+                .tag-name {
+                    color: #ff9999 !important;
+                }
+
+                .tag {
+                    color: #ff9999 !important;
+                }
+
+            `
+        })
+            .on_init(function () {
+            const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
+
+            let html = '';
+            let nextContent = '';
+            comments.forEach(c => {
+                const chars = c.nodeValue.trim().split('');
+                for (let i = 0; i < chars.length; i++) {
+
+                    let char = chars[i];
+
+                    if (char === '<') {
+                        html += `<span class='tag'>&lt;</span><span class='tag-name'>`;
+                        nextContent = 'tag-name';
+                    } else if (char === '>') {
+                        html += `</span><span class='tag'>&gt;</span>`;
+                        nextContent = "content"
+                    } else if (nextContent === 'tag-name' && char !== " ") {
+                        html += char;
+                    } else if (nextContent === "content") {
+                        html += char;
+                    } else if (char === ' ') {
+                        if (nextContent === "tag-name") {
+                            nextContent = "attribute-name"
+                            html += `</span><span class='attr-name'>`
+                        }
+                        html += char;
+                    } else if (char === '=') {
+                        if (nextContent === "attribute-name") {
+                            // Close atribute name
+                            html += `</span ><span class="attr-value">`
+                            nextContent = "attribute-value";
+                        }
+                        html += char;
+                    } else if (nextContent === "attribute-value" && !["=", "{", ":", " "].includes(chars[i - 1])
+                        && ![":", ",", "}"].includes(chars[i + 1])
+                        && (char === '"' || char === "'")) {
+                        // cerra el valor del attribute canbiando el contexto ahora
+                        html += char;
+                        nextContent = "attribute-name";
+                        html += `</span><span class='attr-name'>`;
+                    } else {
+                        html += char;
+                    }
+                }
+            });
+
+            // Format HTML using indentation and newlines
+            function formatHtml(htmlString) {
+                return htmlString.replace(/\n\s+/g, '<br>'); // Remove unnecessary indentation
+            }
+
+            const formattedHtml = formatHtml(html);
+
+
+            this.shadowRoot.innerHTML += `<code>${formattedHtml}</code>`;
+            // ident her?
+            const tags = this.shadowRoot.querySelectorAll(".tag-name");
+            let offsetClose = 0;
+            for (let i = 0; i < tags.length; i++) {
+                if (i === 0 || i === tags.length - 1) {
+                    continue
+                }
+                // TODO agregar tooltops to properties names ?
+                const openingTag = tags[i].previousSibling;
+
+                const nextNext = tags[i].previousSibling.previousSibling;
+                if ((nextNext === null) || (tags[i].textContent.startsWith("/"))) {
+                    if (nextNext.nodeName !== "BR") {
+                        offsetClose = i
+                        continue;
+                    }
+
+                    openingTag.style.marginLeft = `${((tags.length - i)) - 1}rem`
+                } else {
+                    openingTag.style.marginLeft = `${i - offsetClose}rem`
+                }
+            }
+
+
+        })
+            .build();
+    }
+</script>
+</body>
+</html>

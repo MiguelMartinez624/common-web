@@ -1,0 +1,6 @@
+if (window.RegisterWebComponent) {
+
+
+
+}
+

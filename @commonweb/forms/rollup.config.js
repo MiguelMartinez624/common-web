@@ -14,21 +14,33 @@ const bundle = config => ({
 export default [
     bundle({
         plugins: [esbuild({
-            exclude: ["**/__tests__", "**/*.tsest.ts"]
-        })],
+            exclude: ["**/__tests__", "**/*.test.ts"]
+        }),
+
+            terser({
+                mangle: true,
+                toplevel: true,
+                compress: {arrows: true}
+            })
+        ],
         output: [
             {
                 file: `${name}.js`,
                 format: 'cjs',
-                sourcemap:  false,
+                sourcemap: false,
             },
             {
                 file: `${name}.mjs`,
                 format: 'es',
                 sourcemap: false,
             },
-
+            {
+                file: `${name}-pkg.js`,
+                format: "umd",
+                name: "forms",
+            }
         ],
+
     }),
     bundle({
         input: './dist/dts/index.d.ts',

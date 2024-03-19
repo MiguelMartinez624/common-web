@@ -53,13 +53,6 @@ describe('@EventBind', () => {
     });
 
 });
-describe('@EventBindAll', () => {
-    test('should attach event listeners to the corresponding event pattern.', () => {
-        document.body.innerHTML = `<orders-page name="Dev!"></orders-page>`;
-
-    });
-
-});
 
 describe('@FromStorage', () => {
     beforeEach(() => {
@@ -97,4 +90,61 @@ describe('@FromStorage', () => {
         expect(currentH4Content).toBe("Hello World!");
     });
 
+});
+
+
+describe('Template Interpolation', () => {
+    beforeEach(() => {
+        // restart the storage
+        localStorage.clear();
+    })
+
+    test('should replace template values with the host (this) value on the component.', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->Miguel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
+    });
+
+
+    test('should update interpolated values once the attributes changes ', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+
+        component.setAttribute("name", "Manuel")
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->Manuel<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
+    });
+    test('should update value with eventbind decotar trigger ', () => {
+        document.body.innerHTML = `<string-template-component></string-template-component>`;
+        const component = document.body.querySelector("string-template-component");
+        const btn = component.shadowRoot.querySelector("button");
+        btn.click();
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.name-->De evento<!--@host.name--> <span><!--@host.lastname-->Martinez<!--@host.lastname--></span> ");
+    });
+
+    test('should update interpolated obj', async () => {
+        document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
+        expect(document.body).not.toBeNull()
+        const component = document.body.querySelector("string-template-obj-component");
+        expect(component.shadowRoot).not.toBeNull()
+
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Miguel<!--@host.profile.name--> <span><!--@host.profile.lastname-->Martinez<!--@host.profile.lastname--></span> ");
+    });
+
+    test('should allow event binding and interpolation interpolated obj', () => {
+        document.body.innerHTML = `<string-template-obj-component></string-template-obj-component>`;
+        const component = document.body.querySelector("string-template-obj-component");
+        const btn = component.shadowRoot.querySelector("button");
+        btn.click();
+
+        const currentH4Content = component.shadowRoot.querySelector("h4").innerHTML;
+        expect(currentH4Content).toBe("Hello World! <!--@host.profile.name-->Cambio<!--@host.profile.name--> <span><!--@host.profile.lastname-->A click<!--@host.profile.lastname--></span> ");
+    });
 })

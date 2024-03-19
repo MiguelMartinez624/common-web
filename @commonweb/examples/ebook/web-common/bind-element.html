@@ -1,0 +1,87 @@
+<div class="overflow-y-auto h-[85vh] p-2">
+    <div class="flex mb-8  flex-wrap gap-2">
+        <span class="text-3xl font-bold">Bind Element</span>
+        <pre class="text-2xl">&lt;bind-element></pre>
+    </div>
+
+    <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+    <section>
+        <strong class="text-2xl block ">Descripcion</strong>
+
+        <br>
+        Es un CustomElement que funciona como enlace entre dos components, puede ser para pasar informacion de un evento
+        a otro componente
+        o para encadenar eventos entre componentes
+        <span> <strong> StaticTemplate</strong></span>
+        <br>
+        <br>
+        <div class="w-full h-[1px] bg-cyan-600 my-6"></div>
+
+        <strong class="text-2xl block ">Uso</strong>
+
+        <doc-tag>
+            <!--
+            <div>
+                <button>Click me!</button>
+                 //     toggleClass is a method added by the [toggle] directive.
+                <bind-element value="hidden" from="button:(click)" to="[mirror]:toggleClass"></bind-element>
+                <div toggle mirror>I will disappear!</div>
+            </div>
+            -->
+
+        </doc-tag>
+        <br>
+        <p>Este codigo creara una relacion entre el evento "click" del <code> &lt;button> </code> al metodo
+            <strong>toggleClass</strong> del &lt;div> y se pasara el valor "hidden" al metodo. </p>
+
+        <br>
+
+        <br>
+        <strong class="text-xl block ">Atributos</strong>
+        <table class="border-collapse mt-4 border border-slate-500 p-2">
+            <thead class="bg-slate-700">
+            <tr>
+                <th class="border border-slate-600 p-4">Nombre</th>
+                <th class="border border-slate-600 p-4">Descripcion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">from</td>
+                <td class="border border-slate-700 p-4"> Selector de quien inicia el acoplamiento
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">to</td>
+                <td class="border border-slate-700 p-4">Selector del elemento objetivo.
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">value</td>
+                <td class="border border-slate-700 p-4"> Valor estatico a pasar en caso de llamar un metodo en el elemento
+                    objetivo
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">input-src</td>
+                <td class="border border-slate-700 p-4"> Selector a un elemento de donde se tomara el valor para ser pasado
+                    al objetivo
+                </td>
+            </tr>
+            <tr>
+                <td class="border border-slate-700 p-4 font-bold">input-path</td>
+                <td class="border border-slate-700 p-4"> Ruta a la propiedad que se desea extraer antes de ser pasado al elemento
+                    afectado
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <br>
+    <br>
+
+
+</div>
+
+

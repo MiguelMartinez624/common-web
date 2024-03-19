@@ -1,3 +1,3 @@
-export * from './form_field.component';
-export * from './select.component';
-export * from './form.component';
+export * from './form-field';
+export * from './form';
+export * from './multiselect-form-field';
