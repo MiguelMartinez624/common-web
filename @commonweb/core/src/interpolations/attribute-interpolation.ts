@@ -113,15 +113,16 @@ export class AttributeInterpolation implements Interpolation {
     private updateValue(value: any) {
         const toUpdate = this.element[this.attributeName];
         if (!value && this.attributeName === "for-each") {
-            // dont do nothing for nestd component for each
+            // dont do nothing for nested component for each
             return;
         }
 
         if (this.element instanceof FrameworkComponent) {
+            (this.element as FrameworkComponent).changeAttributeAndUpdate(this.attributeName, value);
+            return;
+        }
 
-            (this.element as FrameworkComponent)
-                .changeAttributeAndUpdate(this.attributeName, value);
-        } else if (typeof value === "object" && typeof toUpdate === "function") {
+        if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
         } else if (typeof value === "object") {

@@ -16,7 +16,7 @@ or use the library internals to create your own custom elements easily and effic
 **NPM**
 
 ```bash 
-    npm install --save @commonweb/core
+    npm install --save @commonweb/core 
 ```
 
 **Add the script to your HTML**

@@ -1,4 +1,4 @@
-import {Attribute, WebComponent} from "@commonweb/core";
+import {Attribute, extractData, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     selector: 'local-storage-value',
@@ -9,8 +9,18 @@ export class LocalStorageComponent extends HTMLElement {
     @Attribute("key")
     public key: string;
 
+
+    @Attribute("property")
+    public property: string;
+
     public get value(): any {
-        return callLocalStorage(this.key, "GET", null);
+        this.property = this.getAttribute("property");
+        const object = callLocalStorage(this.key, "GET", null);
+        if (!this.property) {
+            return object;
+        }
+
+        return extractData(this.property, object);
     }
 
     public setValue(value: any): void {
@@ -18,7 +28,7 @@ export class LocalStorageComponent extends HTMLElement {
     }
 
     static get observedAttributes(): string[] {
-        return ["key"];
+        return ["key","property"];
 
 
     }

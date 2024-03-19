@@ -1,21 +1,23 @@
+import {FrameworkComponent} from "./framework-component";
+
 /**
  * Finds the nearest ancestor node matching the specified selector,
  * starting from the given node and traversing upwards the DOM tree.
- * This function also handles the special case of `@host` to find the web component itself.
+ * This function also handles the special case of `@host` to find closest FrameworkComponent
+ * .
  *
- * @param {string} selector - The CSS selector to match.
- * @param {Node} element - The node from which to start searching.
- * @returns {Node | null} The nearest ancestor node matching the selector,
- *   or null if not found.
+ *
+ * @param {string} selector - The CSS selector to use for finding the node.
+ * @param {Node} element - The starting element for the search.
+ * @returns {Node | null} The first matching ancestor node, or null if not found.
+ *
+ * @throws {Error} If an error occurs during the search, including a descriptive object with:
+ *   - query: The selector that was used.
+ *   - root: The starting element for the search.
+ *    error: The underlying error object.
  */
-import {FrameworkComponent} from "./framework-component";
-
 export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     try {
-        /*
-        * Search the root element is the web component itself
-        * */
-
         if (selector === "@host") {
             let queryResult = element.parentNode as Node;
             if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
@@ -30,7 +32,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
         if (selector === "@parent") {
             return (element.parentNode)
         }
-        // if not one of the key workds resplace
+        // if not one of the key work replace
         if (selector[0] === "@") {
             selector = selector.slice(selector.indexOf("@") + 1);
         }
@@ -39,7 +41,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
         if (!queryResult && element.parentNode !== null) {
             queryResult = findNodeOnUpTree(selector, element.parentNode)
         } else if (!queryResult && element['host'] && element instanceof DocumentFragment) {
-            return element['host'];
+            return (element as unknown).host;
         }
         return queryResult;
     } catch (e) {
@@ -72,12 +74,12 @@ export function findAllChildrensBySelector(tree: HTMLElement, selector: string):
  * Supports accessing nested properties and handles the "@host" case for web components.
  *
  * @param {string|string[]} resultPath - The path to the desired data, either a dot-separated string or an array of property names.
- * @param {any} result - The object from which to extract data.
+ * @param {any} obj - The object from which to extract data.
  * @returns {any} The extracted data, or undefined if not found.
  */
-export function extractData(resultPath: string, result: any) {
+export function extractData(resultPath: string, obj: any) {
 
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
         .filter((p) => p !== "@host")
-    return properties.reduce((prev: any, curr: any) => prev?.[curr], result)
+    return properties.reduce((prev: any, curr: any) => prev?.[curr], obj)
 }

@@ -8,7 +8,6 @@ import {bindTemplateToProperties, isJSON} from "./web_components";
  *
  * Base class for creating custom components within the framework.
  */
-
 export class FrameworkComponent extends HTMLElement {
     /**
      * A map of interpolations, mapping attribute names to lists of Interpolation instances.

@@ -43,12 +43,11 @@
 
     .sidebar {
         display: flex;
-        width: 100%;
+        width: 300px;
         background: var(--sidebar-bg);
         color: var(--sidebar-fg);
-        flex: 0.25;
-        transition-property: flex;
-        transition-duration: 0.5s;
+        transition-property: width;
+        transition-duration: 0.2s;
         justify-center: center;
         overflow: hidden;
     }
@@ -57,49 +56,58 @@
         color: var(--sidebar-fg);
     }
 
+    .sidebar.collapsed {
+        transition-property: width;
+        transition-duration: 0.2s;
+        width: 0%;
+    }
+
 
     @media only screen and (max-width: 768px) {
         .sidebar {
-            width: 100%;
-            right: 0;
+            z-index: 4;
+            width: 0%;
             position: fixed;
             display: block;
+            transition-property: width;
+            transition-duration: 0.2s;
         }
 
-        .collapsed {
-            left: 0;
-            display: none;
+        .content {
+            padding: 1rem;
+        }
+
+        .sidebar.collapsed {
+            transition-property: width;
+            transition-duration: 0.2s;
+            width: 80%;
+        }
+
+        .overlay.collapsed {
+            transition-property: width;
+            transition-duration: 0.2s;
+            width: 100%;
         }
 
     }
 
-    .sidebar.collapsed {
-        transition-property: flex;
-        transition-duration: 0.5s;
-        flex: 0;
+
+    .overlay {
+        height: 100%;
+        width: 0%;
+        position: fixed;
+        background: #7258585e;
+        z-index: 2;
+        filter: blur(12px);
     }
-
-    li {
-        list-style: none
-    }
-
-
-    .collapsed {
-        flex: 0;
-    }
-
-    .close {
-        position: absolute;
-        right: 10px;
-        cursor: pointer;
-
-    }
-
 </style>
 <body>
 <static-template>
     <div class="layout ">
+        <div toggle class="overlay sm:hidden "></div>
+
         <div toggle class="sidebar ">
+
             <lazy-template
                     data='{ "routes":[
                        { "moduleName":"Aprendiendo CommonWeb", "moduleIcon":"school" ,
@@ -143,7 +151,13 @@
             </span>
 
                 <input type="text">
+                <bind-element value="collapsed" from=".overlay:(click)"
+                              to=".overlay:toggleClass"></bind-element>
+                <bind-element value="collapsed" from=".overlay:(click)"
+                              to=".sidebar:toggleClass"></bind-element>
 
+                <bind-element value="collapsed" from="span[menu-toggle]:(click)"
+                              to=".overlay:toggleClass"></bind-element>
                 <bind-element value="collapsed" from="span[menu-toggle]:(click)"
                               to=".sidebar:toggleClass"></bind-element>
 
@@ -190,21 +204,18 @@
 
     </div>
 </static-template>
-
 <script src="../../core/dist/core-pkg.js" type="text/javascript"></script>
 <script src="../../components/dist/components-pkg.js" type="text/javascript"></script>
+
 <script>
     if (window.RegisterWebComponent) {
         window.RegisterWebComponent({
             selector: "doc-tag",
-            //langua
+            //language=HTML
             template: `
-
-<slot></slot>`,
+                <slot></slot>`,
             // language=CSS
             style: `
-
-
                 :host {
                     background: rgb(21, 32, 43);
                     display: block;
@@ -228,7 +239,8 @@
                 }
 
             `
-        }).on_init(function () {
+        })
+            .on_init(function () {
             const comments = [...this.childNodes].filter(n => n.nodeName === "#comment");
 
             let html = '';

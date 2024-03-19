@@ -95,6 +95,8 @@ export class LazyTemplate extends FrameworkComponent {
                 templateView.innerHTML = result;
                 templateView.data = this.data;
                 this.appendChild(templateView);
+
+                // should flag this script run?
                 templateView.querySelectorAll("script").forEach((s) => {
                     const scriptNew = document.createElement("script");
                     scriptNew.textContent = s.textContent;
