@@ -20,7 +20,7 @@ export default [
             terser({
                 mangle: true,
                 toplevel: true,
-                compress: {arrows: true,drop_console:true}
+                compress: {arrows: true}
             })
         ],
         output: [

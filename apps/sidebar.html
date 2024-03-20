@@ -1,0 +1,72 @@
+
+<style>
+    li > span {
+        overflow: hidden;
+        text-wrap: nowrap;
+        text-overflow: ellipsis;
+        width: 90%;
+        display: block;
+    }
+    ul{
+        list-style: none;
+    }
+</style>
+<aside toggle id="default-sidebar"
+       class=" top-0 left-0 z-40 h-screen "
+       aria-label="Sidebar">
+
+    <div class="flex justify-center">
+        <span class="material-symbols-outlined">
+                       book
+                     </span> Learn
+    </div>
+    <div class="h-full px-3 py-4 overflow-y-auto bg-white-100 ">
+        <ul class="space-y-2font-medium">
+            <template for-each="{{@host:[data]}}">
+                <li class="mt-4 ">
+                    <a main-route
+                       class="flex gap-4 w-full items-center p-1 rounded-lg hover:bg-gray-100 ">
+                        <span class="material-symbols-outlined">
+                        {{@host:[data.moduleIcon]}}
+                     </span>
+                        <span>
+                                {{@host:[data.moduleName]}}
+                        </span>
+                    </a>
+                    <bind-element value="hidden" from="[main-route]:(click)"
+                                  to="[sub-childs]:toggleClass"></bind-element>
+                    <div sub-childs toggle class="hidden">
+
+                        <ul class="mt-3  pl-5 ">
+                            <template loop-key="route" for-each="{{@host:[data.childs]}}">
+
+                                <li first-child toggle
+                                    class="border-l-2 py-1 border-gray-500 cursor-pointer  hover:border-slate-50">
+                                    <span class="ms-3 hover:text-slate-50">{{@host:[data.name]}}</span>
+
+                                    <bind-element value="border-gray-500" from="li:(click)"
+                                                  to="[first-child]:toggleClass"></bind-element>
+                                    <bind-element value="hidden" from="li:(click)"
+                                                  to="[nested-childs]:toggleClass"></bind-element>
+
+                                    <bind-element show-if="@host:[data.route]" value="{{@host:[data.route]}}"
+                                                  from="[first-child]:(click)" to="[routes]:changeCase"></bind-element>
+                                    <!--   Sub child routes                                 -->
+                                    <ul toggle nested-childs class="hidden pl-6">
+                                        <template for-each="{{@host:[data.childs]}}">
+                                            <li class=" cursor-pointer hover:text-slate-50 text-sm py-1">
+                                                <span class="ms-3">{{@host:[data.name]}}</span>
+                                            </li>
+                                        </template>
+                                    </ul>
+
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </li>
+
+            </template>
+        </ul>
+    </div>
+</aside>

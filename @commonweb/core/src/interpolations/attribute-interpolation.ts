@@ -98,8 +98,9 @@ export class AttributeInterpolation implements Interpolation {
     }
 
     public update(): void {
+
         const value = this.elementBind.value;
-        if (this.prevValue === value) {
+        if (this.prevValue === value || (typeof value === "string" && value.startsWith("{{"))) {
             return;
         }
         if (!value) {
@@ -116,8 +117,8 @@ export class AttributeInterpolation implements Interpolation {
             // dont do nothing for nested component for each
             return;
         }
-
-        if (this.element instanceof FrameworkComponent) {
+        if (this.element instanceof FrameworkComponent || this.element.hasOwnProperty("changeAttributeAndUpdate")) {
+            console.log({element: this.element, name: this.attributeName, value: value});
             (this.element as FrameworkComponent).changeAttributeAndUpdate(this.attributeName, value);
             return;
         }
@@ -128,6 +129,10 @@ export class AttributeInterpolation implements Interpolation {
         } else if (typeof value === "object") {
             // Required??
             this.element[this.attributeName] = value;
+            if (this.element['checkInterpolationsFor']) {
+                console.log("CHEING",this.element)
+                this.element['checkInterpolationsFor'](this.attributeName);
+            }
 
         } else {
             this.element.setAttribute(this.attributeName, value);

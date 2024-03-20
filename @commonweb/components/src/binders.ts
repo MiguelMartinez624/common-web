@@ -87,7 +87,7 @@ export class BindElementComponent extends HTMLElement {
     private getPayload(ev: CustomEvent) {
         if (this.getAttribute("value")) {
             const value = this.getAttribute("value");
-            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            if ((typeof value === 'string' && !value.startsWith("{")) || typeof value === 'number' || typeof value === 'boolean') {
                 return value;
             } else if (isJSON(value)) {
                 return JSON.parse(value);

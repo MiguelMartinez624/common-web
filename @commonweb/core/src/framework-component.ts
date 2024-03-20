@@ -15,6 +15,10 @@ export class FrameworkComponent extends HTMLElement {
      */
     public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
 
+    constructor() {
+        super();
+    }
+
     /**
      * An array of functions that represent the component's directives.
      * @type {Function[]}
@@ -22,6 +26,7 @@ export class FrameworkComponent extends HTMLElement {
     public directives: Function[] = [];
 
     changeAttributeAndUpdate(attrName: string, newValue: any) {
+
         this.updateAttributes(attrName, newValue);
         this.checkInterpolationsFor(attrName);
 
@@ -51,6 +56,10 @@ export class FrameworkComponent extends HTMLElement {
                 // so we can index the property on the target
                 this[handler] = valueToPass;
             }
+        }
+        // Patch value if not exist?
+        if (this[name] === undefined) {
+            this[name] = newValue;
         }
     }
 

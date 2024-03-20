@@ -78,6 +78,8 @@ function clearAndPush(items: any[]) {
 function push(value: any) {
     const recipient = this.parentElement;
     const t = interpolateAndRender(this, value, recipient);
+    this._loopElement.push(t);
+
 }
 
 
