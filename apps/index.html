@@ -52,7 +52,7 @@
                     ]'>
     <main slot="content">
         <h1>Expenses List</h1>
-        <local-storage-value data-list key="demo-expenses-list"></local-storage-value>
+        <local-storage-value item-key="title" data-list key="demo-expenses-list"></local-storage-value>
         <div style="overflow: auto;height: 70vh;padding: 18px;">
             <template for-each="@[data-list]:[value]">
                 <expense-card data="{{@host:[data]}}"></expense-card>
@@ -95,16 +95,19 @@
         </style>
 
         <div class="barra-acciones">
-            <button class="btn-accion">
+            <button home class="btn-accion">
                 <cw-home-icon></cw-home-icon>
                 <span>Home</span>
+                <bind-element
+                        value='{"title":"Added 3","date":"01-01-2020","amount":"343232323.23$"}'
+                        from="button[home]:(click)" to="local-storage-value:updateValue"></bind-element>
             </button>
             <button add class="btn-accion">
                 <cw-plus-icon></cw-plus-icon>
                 <span>Add</span>
                 <bind-element
-                        value='{"title":"Added 1","date":"01-01-2020","amount":"34.23$"}'
-                        from="button[add]:(click)" to="template[for-each]:push"></bind-element>
+                        value='{"title":"Added 3","date":"01-01-2020","amount":"34.23$"}'
+                        from="button[add]:(click)" to="local-storage-value:append"></bind-element>
             </button>
 
             <button class="btn-accion">
@@ -117,9 +120,9 @@
 
 </cw-sidebar>
 
-<script src="../@commonweb/core/dist/core-pkg.js" type="text/javascript"></script>
-<script src="../@commonweb/components/dist/components-pkg.js" type="text/javascript"></script>
-<script src="../@commonweb/forms/dist/forms-pkg.js" type="text/javascript"></script>
+<script   src="https://unpkg.com/@commonweb/core@1.0.0-rc-3/dist/core-pkg.js"></script>
+<script   src="https://unpkg.com/@commonweb/components@1.0.0-rc-3/dist/components-pkg.js"></script>
+<script   src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>
 <script src="./sidebar.js"></script>
 <script src="./expenses.module.js"></script>
 <script src="./icons.js"></script>
