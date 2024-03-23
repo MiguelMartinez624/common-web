@@ -37,6 +37,13 @@ export function resolveLoop(looper: any) {
             enumerable: true
         });
 
+        Object.defineProperty(looper, "removeItem", {
+            value: removeItem,
+            writable: false,
+            enumerable: true
+        });
+
+
         looper._loopElement = [];
         looper.setAttribute("loop-enhanced", "done")
     }
@@ -73,6 +80,18 @@ function clearAndPush(items: any[]) {
         const t = interpolateAndRender(this, value, recipient);
         this._loopElement.push(t);
     });
+}
+
+
+function removeItem(key: string) {
+    const elementIndex = this._loopElement.findIndex(ele => ele.getAttribute("loop-id") === key);
+    if (elementIndex === -1) {
+        console.warn("dont exist", {key})
+    }
+    const element = this._loopElement[elementIndex];
+    this._loopElement.splice(elementIndex, 1);
+    element.remove();
+
 }
 
 function push(value: any) {

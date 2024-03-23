@@ -6,6 +6,9 @@ import {Attribute, extractData, WebComponent} from "@commonweb/core";
 })
 export class LocalStorageComponent extends HTMLElement {
 
+    @Attribute("property-matcher")
+    public propertyMatcher: string;
+
     @Attribute("key")
     public key: string;
 
@@ -49,8 +52,18 @@ export class LocalStorageComponent extends HTMLElement {
 
     }
 
+    public removeItem(identifier: any): void {
+        console.log({identifier})
+        callLocalStorage(this.key,
+            "DELETE-ITEM",
+            identifier,
+            (ele) => ele[this.getAttribute("property-matcher")] === identifier);
+        this.dispatchEvent(new CustomEvent("item-removed", {detail: identifier}));
+
+    }
+
     static get observedAttributes(): string[] {
-        return ["key", "property"];
+        return ["key", "property", "property-matcher"];
 
 
     }
@@ -60,7 +73,7 @@ export class LocalStorageComponent extends HTMLElement {
 
 export function callLocalStorage(
     key: string,
-    method: "POST" | "GET" | "DELETE" | "PUT" | "APPEND",
+    method: "POST" | "GET" | "DELETE" | "PUT" | "APPEND" | "DELETE-ITEM",
     data: any,
     findIndexCallback?: (item: any) => boolean
 ) {
@@ -103,7 +116,17 @@ export function callLocalStorage(
             localStorage.setItem(key, JSON.stringify(updatedData));
             break;
         case "APPEND":
-            pushLocalStorage(key, data)
+            pushLocalStorage(key, data);
+            break;
+        case "DELETE-ITEM":
+            const array = callLocalStorage(key, "GET", null);
+            if (!array || !Array.isArray(array)) {
+                return null;
+            }
+            const index = array.findIndex(findIndexCallback);
+            (array as any[]).splice(index,1);
+            callLocalStorage(key, "POST", array);
+
             break;
     }
     return;

@@ -58,6 +58,7 @@ export class BindElementComponent extends HTMLElement {
 
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
+        debugger
         // We get the trigger here
         const targetQuery = new ElementBind(this, this.getAttribute("to"));
         const targetElement = targetQuery.searchElement() as HTMLElement;

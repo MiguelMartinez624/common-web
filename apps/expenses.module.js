@@ -5,10 +5,10 @@ window.RegisterWebComponent({
         :host {
             display: block;
             margin: 30px 0px;
+            position: relative;
         }
 
         .card {
-            padding: 0.5rem;
             outline-offset: 4px;
             outline: var(--card-outline);
             border-radius: 5px;
@@ -21,16 +21,58 @@ window.RegisterWebComponent({
         }
 
         .card-icon {
-            height: 5rem;
-            width: 5rem;
+            height: 2rem;
+            width: 2rem;
             border-radius: 50%;
-            background: var(--content-bg);
             padding: 1rem;
         }
 
         .flex-centered {
             justify-content: center;
             align-items: center;
+        }
+
+        .title {
+            font-weight: bold;
+        }
+
+        .text-end {
+            text-align: end;
+
+        }
+
+        .sub-title {
+            opacity: 0.7;
+            font-size: 14px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 60vw;
+            margin: 0;
+        }
+
+        .hidden {
+            display: none
+        }
+
+        [options] {
+            z-index: 4;
+            position: absolute;
+            box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+            right: 0px;
+            top: 54px;
+        }
+
+        li {
+            font-weight: bold;
+        }
+
+        .line {
+            height: 1px;
+            width: 100%;
+            background: white;
         }
 
         .gap {
@@ -50,20 +92,46 @@ window.RegisterWebComponent({
                     </svg>
                 </div>
             </div>
-            <div style="flex: 1">
-                <!--Content-->
-                <div>Motivo : <span>{{@host:[data.title]}}</span></div>
-                <div>Monto : <span>{{@host:[data.amount]}}</span></div>
-                <div>Fecha : <span>{{@host:dateFormatted}}</span></div>
+            <div style="flex: 1;justify-content: space-between;" class="flex ">
+                <div>
+                    <!--Content-->
+                    <div class="title"><span>{{@host:[data.title]}}</span></div>
+                    <div class="sub-title"><span>{{@host:[data.description]}}</span></div>
+                </div>
+                <div class="flex gap flex-centered">
+                    <div class="text-end">
+                        <div class="title"><span>{{@host:[data.amount]}}</span></div>
+                        <div class="sub-title"><span>{{@host:dateFormatted}}</span></div>
+                    </div>
+                    <div style="padding: 10px">
+                        <cw-menu-dots-icon menu style="width:20px;height: 20px; "></cw-menu-dots-icon>
+                        <bind-element value="hidden" from="[menu]:(click)" to="[options]:toggleClass"></bind-element>
+                    </div>
+                </div>
             </div>
-            <div>
+            <div options toggle class=" hidden">
                 <!--Actions-->
+                <ul>
+                    <li style="background:rgb(60 130 246); padding:1rem">
+                        Edit Item
+                    </li>
+                    <div class="line"></div>
+                    <li style="background:rgb(234,52,52); padding:1rem" delete>
+                        Delete Item
+                        <bind-element from="[delete]:(click)" to="@host:delete"></bind-element>
+                    </li>
+
+                </ul>
+
             </div>
 
         </div>
         <!--        </template>-->
     `
 })
+    .with_method("delete", function (params) {
+        this.dispatchEvent(new CustomEvent("delete", {detail: this.data.title}))
+    })
     .with_method("dateFormatted", function () {
         if (this.data) {
             return new Date(this.data.date).toLocaleDateString();
@@ -108,6 +176,18 @@ window.RegisterWebComponent({
             align-items: center;
         }
 
+        button {
+            border: none;
+            outline: 2px solid #a083c3;
+            background: #5339d6;
+            font-weight: bold;
+            padding: 1rem;
+            font-size: large;
+            width: -webkit-fill-available;
+            color: white;
+            margin: 10px;
+        }
+
         .gap {
             gap: 1.5rem;
         }`,
@@ -115,10 +195,23 @@ window.RegisterWebComponent({
     template: `
         <div>
             <!--Stepped Form-->
+            <form-group>
+                <form-field property="title" label="Reason" placeholder="Comida"></form-field>
+                <form-field property="description" label="Description" placeholder="Comida"></form-field>
+                <form-field property="amount" label="Amount" placeholder="amount"></form-field>
+                <form-field format="date" property="date" label="Date" placeholder="dd/mm/yyyy"></form-field>
+                <button>Create</button>
 
-
+            </form-group>
+            <bind-element input-path="detail.data" from="form-group:(submit)" to="@host:submit"></bind-element>
+            <bind-element from="button:(click)" to="form-group:submit"></bind-element>
         </div>
 
     `
 })
+    .with_method("submit", function (data) {
+        console.log({data})
+        this.dispatchEvent(new CustomEvent("submit", {detail: data}))
+    })
+
     .build()

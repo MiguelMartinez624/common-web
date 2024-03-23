@@ -5,10 +5,21 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Personal</title>
+    <link rel="manifest" href="./manifest.json"/>
+
 </head>
 <body>
+<script>
+    if (navigator.serviceWorker.controller) {
+        console.log("Active service worker found");
+    } else {
+        navigator.serviceWorker.register("./sw.js")
+            .then(console.log)
+            .catch(console.error)
 
+    }
+</script>
 <style>
     *, ::after, ::before {
         box-sizing: border-box;
@@ -31,14 +42,15 @@
         --sidebar-bg: #0f172abd;
 
         --header-fc: white;
-        --header-bg: #0f172a;
+        --header-bg: #2d3a5b;
         --header-bottom: 1px solid #3b82f6;
         --content-fg: white;
-        --content-bg: #0f172a;
+        --content-bg: #2d3a5b;
+
 
         /*cards stylinh*/
-        --card-outline: 2px solid #3b82f6;
-        --card-bg: #13478b96;
+        --card-outline: none;
+        --card-bg: #334062;
         --card-fc: white;
 
     }
@@ -51,12 +63,42 @@
                          }
                     ]'>
     <main slot="content">
-        <h1>Expenses List</h1>
-        <local-storage-value item-key="title" data-list key="demo-expenses-list"></local-storage-value>
+
+        <div>
+            <h2>Transaction List</h2>
+        </div>
+        <div>
+            <form-group>
+                <form-field label=" " placeholder="Titulo"></form-field>
+            </form-group>
+        </div>
+
+
+        <local-storage-value
+                property-matcher="title"
+                item-key="title"
+                data-list
+                key="demo-expenses-list">
+        </local-storage-value>
+        <bind-element input-path="detail" from="[data-list]:(appended-value)" to="[expenses-list]:push"></bind-element>
+        <bind-element input-path="detail" from="[data-list]:(item-removed)"
+                      to="[expenses-list]:removeItem"></bind-element>
+
+
         <div style="overflow: auto;height: 70vh;padding: 18px;">
-            <template for-each="@[data-list]:[value]">
+            <template
+                    loop-key="title"
+                    expenses-list for-each="@[data-list]:[value]">
                 <expense-card data="{{@host:[data]}}"></expense-card>
+
+
+                <bind-element input-path="detail"
+                              from="expense-card:(delete)"
+                              to="[data-list]:removeItem">
+                </bind-element>
+
             </template>
+
         </div>
         <style>
             /* Estilo de la barra de acciones */
@@ -65,11 +107,11 @@
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                background-color: #073475;
+                background-color: var(--content-bg);
                 display: flex;
-                justify-content: space-between;
+                justify-content: space-around;
                 align-items: center;
-                padding: 10px 20px;
+                padding: 10px 10px;
 
                 box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             }
@@ -79,12 +121,12 @@
                 background-color: transparent;
                 border: none;
                 cursor: pointer;
-                padding: 0 10px;
+                padding: 0 5px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 color: white;
-                font-size: 16px;
+                font-size: 12px;
                 gap: 4px;
             }
 
@@ -92,22 +134,49 @@
                 margin-right: 5px;
             }
 
-        </style>
+            cw-home-icon, cw-plus-icon, cw-search-icon {
+                height: 22px;
+                width: 22px;
+            }
 
+            .hidden {
+                display: none;
+            }
+
+            .card {
+                padding: 0.5rem;
+                outline-offset: 4px;
+                outline: var(--card-outline);
+                border-radius: 5px;
+                background: var(--card-bg);
+                color: var(--card-fc);
+            }
+
+            .card[form] {
+                box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+                bottom: 80px;
+                position: fixed;
+                z-index: 10;
+                width: 93vw;
+            }
+        </style>
+        <div form toggle class="card hidden">
+            <expense-form></expense-form>
+            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:append"></bind-element>
+            <bind-element value="hidden" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
+        </div>
         <div class="barra-acciones">
             <button home class="btn-accion">
                 <cw-home-icon></cw-home-icon>
                 <span>Home</span>
-                <bind-element
-                        value='{"title":"Added 3","date":"01-01-2020","amount":"343232323.23$"}'
-                        from="button[home]:(click)" to="local-storage-value:updateValue"></bind-element>
             </button>
             <button add class="btn-accion">
                 <cw-plus-icon></cw-plus-icon>
                 <span>Add</span>
                 <bind-element
-                        value='{"title":"Added 3","date":"01-01-2020","amount":"34.23$"}'
-                        from="button[add]:(click)" to="local-storage-value:append"></bind-element>
+                        value="hidden"
+                        from="button[add]:(click)" to="[form]:toggleClass">
+                </bind-element>
             </button>
 
             <button class="btn-accion">
@@ -120,9 +189,13 @@
 
 </cw-sidebar>
 
-<script   src="https://unpkg.com/@commonweb/core@1.0.0-rc-3/dist/core-pkg.js"></script>
-<script   src="https://unpkg.com/@commonweb/components@1.0.0-rc-3/dist/components-pkg.js"></script>
-<script   src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-4/dist/core-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-5/dist/components-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>
+<!--
+<script src="../@commonweb/core/dist/core-pkg.js"></script>
+<script src="../@commonweb/components/dist/components-pkg.js"></script>
+<script src="../@commonweb/forms/dist/forms-pkg.js"></script>-->
 <script src="./sidebar.js"></script>
 <script src="./expenses.module.js"></script>
 <script src="./icons.js"></script>
