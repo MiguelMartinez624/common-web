@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Personal</title>
-    <link rel="manifest" href="./manifest.json"/>
+    <!--    <link rel="manifest" href="./manifest.json"/>-->
 
 </head>
 <body>
@@ -65,38 +65,43 @@
     <main slot="content">
 
         <div>
-            <h2>Transaction List</h2>
+            <h4>Transaction List</h4>
         </div>
         <div>
-            <form-group>
-                <form-field label=" " placeholder="Titulo"></form-field>
-            </form-group>
+            <!--            <form-group>-->
+            <!--                <form-field label=" " placeholder="Titulo"></form-field>-->
+            <!--            </form-group>-->
         </div>
 
 
         <local-storage-value
-                property-matcher="title"
-                item-key="title"
+                property-matcher="date"
+                item-key="date"
                 data-list
                 key="demo-expenses-list">
         </local-storage-value>
-        <bind-element input-path="detail" from="[data-list]:(appended-value)" to="[expenses-list]:push"></bind-element>
+        <bind-element input-path="detail"
+                      from="[data-list]:(appended-value)" to="[expenses-list]:push">
+        </bind-element>
         <bind-element input-path="detail" from="[data-list]:(item-removed)"
-                      to="[expenses-list]:removeItem"></bind-element>
+                      to="[expenses-list]:removeItem">
+        </bind-element>
+        <bind-element input-path="detail"
+                      from="[data-list]:(updated-value)" to="[expenses-list]:replace">
+        </bind-element>
+        <style>
 
+        </style>
+        <div style="overflow: auto;height: 80vh;padding: 3px">
 
-        <div style="overflow: auto;height: 70vh;padding: 18px;">
-            <template
-                    loop-key="title"
-                    expenses-list for-each="@[data-list]:[value]">
-                <expense-card data="{{@host:[data]}}"></expense-card>
+            <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
 
-
-                <bind-element input-path="detail"
-                              from="expense-card:(delete)"
-                              to="[data-list]:removeItem">
+                <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
+                <bind-element
+                        input-path="detail"
+                        from="expense-list-by-date:(delete)"
+                        to="[data-list]:removeItem">
                 </bind-element>
-
             </template>
 
         </div>
@@ -162,8 +167,11 @@
         </style>
         <div form toggle class="card hidden">
             <expense-form></expense-form>
-            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:append"></bind-element>
+            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
+            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
             <bind-element value="hidden" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
+            <bind-element value="hidden" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
+
         </div>
         <div class="barra-acciones">
             <button home class="btn-accion">
@@ -189,13 +197,14 @@
 
 </cw-sidebar>
 
-<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-4/dist/core-pkg.js"></script>
-<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-5/dist/components-pkg.js"></script>
-<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>
-<!--
+<!--<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-4/dist/core-pkg.js"></script>-->
+<!--<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-5/dist/components-pkg.js"></script>-->
+<!--<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>-->
+
 <script src="../@commonweb/core/dist/core-pkg.js"></script>
 <script src="../@commonweb/components/dist/components-pkg.js"></script>
-<script src="../@commonweb/forms/dist/forms-pkg.js"></script>-->
+<script src="../@commonweb/forms/dist/forms-pkg.js"></script>
+
 <script src="./sidebar.js"></script>
 <script src="./expenses.module.js"></script>
 <script src="./icons.js"></script>
@@ -204,4 +213,13 @@
 </body>
 </html>
 
+<script>
+    const mock = [{
+        date: new Date(),
+        transactions: [
+            {title: "test", description: "test description", amount: "23.32$"},
+            {title: "test", description: "test description", amount: "23.32$"}
+        ]
+    }]
 
+</script>

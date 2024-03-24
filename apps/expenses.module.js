@@ -1,4 +1,77 @@
 window.RegisterWebComponent({
+    selector: "expense-list-by-date",
+    //language=CSS
+    style: `
+        .date-title {
+            text-align: center;
+            background: #25304d;
+            outline: 1px solid #232437;
+            padding: 6px;
+            border-radius: 7px;
+        }
+
+        :host {
+            display: block;
+            margin: 30px 0px;
+            position: relative;
+        }
+    `,
+    //language=HTML
+    template: `
+        <local-storage-value
+                item-key="data"
+                data-list
+                key="demo-expenses-list">
+        </local-storage-value>
+        <div>
+            <div class="date-title">
+                <div><span>{{@host:[data.date]}}</span></div>
+
+            </div>
+            <template transactions-list loop-key="title" for-each="@host:[data.transactions]">
+                <expense-card data="{{@host:[data]}}"></expense-card>
+
+                <bind-element
+                        input-path="detail"
+                        from="expense-card:(delete)"
+                        to="expense-list-by-date:removeItem">
+                </bind-element>
+                <bind-element
+                        input-path="detail"
+                        from="expense-card:(delete)"
+                        to="[transactions-list]:removeItem">
+                </bind-element>
+            </template>
+        </div>
+    `
+})
+    .with_method("removeItem", function (params) {
+        debugger
+        console.log(params)
+        const storage = this.shadowRoot.querySelector("local-storage-value");
+        const value = storage.value;
+        const date = new Date(this.data.date);
+
+        const dateList = value.find(v => {
+            const date1 = new Date(v.date).toLocaleDateString();
+            return date1 === date.toLocaleDateString()
+        });
+
+        if (dateList) {
+            const index = dateList.transactions.findIndex(i => i.title === params);
+            dateList.transactions.splice(index, 1);
+        }
+
+        storage.setValue(value);
+        // iten that need to be removed from the list
+        if (dateList.transactions.length === 0) {
+            this.dispatchEvent(new CustomEvent("delete", {detail: date.toLocaleDateString()}));
+        }
+    })
+    .build()
+
+
+window.RegisterWebComponent({
     selector: "expense-card",
     //language=CSS
     style: `
@@ -101,7 +174,7 @@ window.RegisterWebComponent({
                 <div class="flex gap flex-centered">
                     <div class="text-end">
                         <div class="title"><span>{{@host:[data.amount]}}</span></div>
-                        <div class="sub-title"><span>{{@host:dateFormatted}}</span></div>
+                        <!--                        <div class="sub-title"><span>{{@host:dateFormatted}}</span></div>-->
                     </div>
                     <div style="padding: 10px">
                         <cw-menu-dots-icon menu style="width:20px;height: 20px; "></cw-menu-dots-icon>
@@ -119,6 +192,7 @@ window.RegisterWebComponent({
                     <li style="background:rgb(234,52,52); padding:1rem" delete>
                         Delete Item
                         <bind-element from="[delete]:(click)" to="@host:delete"></bind-element>
+                        <bind-element value="hidden" from="[delete]:(click)" to="[options]:toggleClass"></bind-element>
                     </li>
 
                 </ul>
@@ -194,6 +268,11 @@ window.RegisterWebComponent({
     //language=HTML
     template: `
         <div>
+            <local-storage-value
+                    item-key="date"
+                    data-list
+                    key="demo-expenses-list">
+            </local-storage-value>
             <!--Stepped Form-->
             <form-group>
                 <form-field property="title" label="Reason" placeholder="Comida"></form-field>
@@ -209,9 +288,50 @@ window.RegisterWebComponent({
 
     `
 })
-    .with_method("submit", function (data) {
-        console.log({data})
-        this.dispatchEvent(new CustomEvent("submit", {detail: data}))
+    .with_method("dateFormatted", function () {
+        if (this.data) {
+            return new Date(this.data.date).toLocaleDateString();
+        }
+        return "00/00/0000"
     })
+    .with_method("submit", function (data) {
+        const storage = this.shadowRoot.querySelector("local-storage-value");
+        const value = storage.value;
+        if (!value || value.length === 0) {
+            // Initialize
+            this.dispatchEvent(new CustomEvent("new-day", {
+                detail:
+                    {
+                        date: new Date(data.date).toLocaleDateString(),
+                        transactions: [data]
+                    }
 
+            }));
+            return
+        }
+
+        const dateList = value.find(v => {
+            const date1 = new Date(v.date).toLocaleDateString();
+            const date2 = new Date(data.date).toLocaleDateString();
+            return date1 === date2
+        });
+
+        if (dateList) {
+            dateList.transactions.push(data);
+        } else {
+            this.dispatchEvent(new CustomEvent("new-day", {
+                detail:
+                    {
+                        date: new Date(data.date).toLocaleDateString(),
+                        transactions: [data]
+                    }
+
+            }));
+            return
+        }
+
+        // storage.setValue(value);
+
+        this.dispatchEvent(new CustomEvent("submit", {detail: dateList}))
+    })
     .build()

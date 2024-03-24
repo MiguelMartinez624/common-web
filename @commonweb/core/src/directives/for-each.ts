@@ -23,6 +23,7 @@ export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, r
 }
 
 export function resolveLoop(looper: any) {
+
     // Extending method to add pushAll
     if (!looper.getAttribute("loop-enhanced")) {
 
@@ -31,6 +32,7 @@ export function resolveLoop(looper: any) {
             writable: false,
             enumerable: true
         });
+
         Object.defineProperty(looper, "push", {
             value: push,
             writable: false,
@@ -39,6 +41,12 @@ export function resolveLoop(looper: any) {
 
         Object.defineProperty(looper, "removeItem", {
             value: removeItem,
+            writable: false,
+            enumerable: true
+        });
+
+        Object.defineProperty(looper, "replace", {
+            value: replaceItem,
             writable: false,
             enumerable: true
         });
@@ -69,6 +77,7 @@ export function resolveLoop(looper: any) {
 
 function clearAndPush(items: any[]) {
     if (!Array.isArray(items)) {
+        console.log("no and array for for-each", {items})
         return;
     }
     // On a push all remove the previous elements so we can inject,
@@ -82,6 +91,25 @@ function clearAndPush(items: any[]) {
     });
 }
 
+
+function replaceItem(value: any) {
+
+    const key = this.getAttribute("loop-key");
+
+    const element = this._loopElement.find(ele => ele.getAttribute("loop-id") === value[key]);
+    if (!element) {
+        console.warn("dont exist", {key})
+        return
+    }
+
+    // Como actualizar el elemento en el loop
+    element.data = value;
+    // element.innerHTML = element.innerHTML;
+    element.changeAttributeAndUpdate("data", value)
+    // Best way?
+    element.firstElementChild.data = value;
+    element.firstElementChild.evaluateDirectives();
+}
 
 function removeItem(key: string) {
     const elementIndex = this._loopElement.findIndex(ele => ele.getAttribute("loop-id") === key);
