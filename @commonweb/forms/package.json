@@ -13,6 +13,8 @@
 
     "push": "npm run test && npm run build && npm publish --access public",
     "build": "rollup -c",
+    "build:watch": "rollup -c --watch",
+
     "test": "jest"
   },
   "dependencies": {

@@ -22,7 +22,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
             border-color: var(--form-border-color, #ccc);
             color: var(--form-text);
             font-size: var(--form-text-size);
-           
+
             padding: var(--form-input-padding, 12px 20px);
         }
 
@@ -66,10 +66,37 @@ export class FormField extends FrameworkComponent {
         if (this.format === "date") {
             return new Date(value);
         }
+        if (this.format === "currency") {
+            return parseFloat(value.replace("$", ""));
+        }
 
         return value;
     }
 
+    connectedCallback() {
+        function reverseDecimals(value) {
+            const parts = value.split('.');
+            return parts[1] + '.' + parts[0];
+        }
+
+        const type = this.getAttribute("format");
+        if (type === "currency") {
+
+
+            const regex = /[^0-9.,-]/g;
+            const input = this.shadowRoot.querySelector("input");
+            input.value = "$";
+            input.addEventListener("keyup", (ev) => {
+                let value = input.value.replace("$", "");
+
+                value = value.replace(regex, '');
+
+                input.value = "$" + value
+
+
+            })
+        }
+    }
 
     static get observedAttributes(): string[] {
         return ["property", "format", "label", "placeholder"];

@@ -15,6 +15,14 @@ window.RegisterWebComponent({
             margin: 30px 0px;
             position: relative;
         }
+
+        h5 {
+            margin: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
     `,
     //language=HTML
     template: `
@@ -25,8 +33,22 @@ window.RegisterWebComponent({
         </local-storage-value>
         <div>
             <div class="date-title">
-                <div><span>{{@host:[data.date]}}</span></div>
-
+                <div style="display: flex;justify-content: center;align-items: center"><span>{{@host:[data.date]}}</span>
+                    <cw-info-icon style="height: 16px;width: 16px;position: absolute;right: 10px;"></cw-info-icon>
+                    <bind-element value="hidden" from="cw-info-icon:(click)" to="[details]:toggleClass"></bind-element>
+                </div>
+                <div toggle details class="hidden">
+                    <div style="display: flex;justify-content: space-around;font-size: 16px;margin-top: 6px">
+                        <div style="color: lightgreen">
+                            <h5>Incomes</h5>
+                            {{@host:incomes}}
+                        </div>
+                        <div style="color: rgb(198 75 19)">
+                            <h5>Outcomes</h5>
+                            {{@host:outcomes}}
+                        </div>
+                    </div>
+                </div>
             </div>
             <template transactions-list loop-key="title" for-each="@host:[data.transactions]">
                 <expense-card data="{{@host:[data]}}"></expense-card>
@@ -45,9 +67,23 @@ window.RegisterWebComponent({
         </div>
     `
 })
+    .with_method("incomes", function () {
+        return this.data.transactions
+            .filter(t => t.amount > 0)
+            .reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.amount;
+            }, 0).toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+    })
+
+    .with_method("outcomes", function () {
+        return this.data.transactions
+            .filter(t => t.amount < 0)
+            .reduce((accumulator, currentValue) => {
+                return accumulator + currentValue.amount;
+            }, 0).toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+    })
     .with_method("removeItem", function (params) {
-        debugger
-        console.log(params)
+
         const storage = this.shadowRoot.querySelector("local-storage-value");
         const value = storage.value;
         const date = new Date(this.data.date);
@@ -77,7 +113,7 @@ window.RegisterWebComponent({
     style: `
         :host {
             display: block;
-            margin: 30px 0px;
+            margin: 15px 0px;
             position: relative;
         }
 
@@ -173,7 +209,7 @@ window.RegisterWebComponent({
                 </div>
                 <div class="flex gap flex-centered">
                     <div class="text-end">
-                        <div class="title"><span>{{@host:[data.amount]}}</span></div>
+                        <div class="title"><span>{{@host:amountFormatted}}</span></div>
                         <!--                        <div class="sub-title"><span>{{@host:dateFormatted}}</span></div>-->
                     </div>
                     <div style="padding: 10px">
@@ -211,6 +247,12 @@ window.RegisterWebComponent({
             return new Date(this.data.date).toLocaleDateString();
         }
         return "00/00/0000"
+    })
+    .with_method("amountFormatted", function () {
+        if (this.data) {
+            return this.data.amount.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+        }
+        return "$00.00";
     })
     .build()
 
@@ -277,7 +319,7 @@ window.RegisterWebComponent({
             <form-group>
                 <form-field property="title" label="Reason" placeholder="Comida"></form-field>
                 <form-field property="description" label="Description" placeholder="Comida"></form-field>
-                <form-field property="amount" label="Amount" placeholder="amount"></form-field>
+                <form-field format="currency" property="amount" label="Amount" placeholder="amount"></form-field>
                 <form-field format="date" property="date" label="Date" placeholder="dd/mm/yyyy"></form-field>
                 <button>Create</button>
 

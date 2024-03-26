@@ -17,11 +17,11 @@ export default [
             exclude: ["**/__tests__", "**/*.test.ts"]
         }),
 
-            terser({
-                mangle: true,
-                toplevel: true,
-                compress: {arrows: true}
-            })
+            // terser({
+            //     mangle: true,
+            //     toplevel: true,
+            //     compress: {arrows: true}
+            // })
         ],
         output: [
             {
