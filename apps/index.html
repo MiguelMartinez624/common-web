@@ -63,7 +63,20 @@
                          }
                     ]'>
     <main slot="content">
-        <expenses-module></expenses-module>
+        <conditional-render-cases case="todos">
+            <div case="expenses">
+                <template>
+                    <expenses-module></expenses-module>
+                </template>
+            </div>
+            <div case="todos">
+                <template>
+                    <todos-module></todos-module>
+                </template>
+            </div>
+        </conditional-render-cases>
+
+
     </main>
 
 </cw-sidebar>
@@ -77,6 +90,8 @@
 
 <script src="./sidebar.js"></script>
 <script src="./expenses.module.js"></script>
+<script src="./todo.module.js"></script>
+
 <script src="./icons.js"></script>
 
 
