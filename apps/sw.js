@@ -9,7 +9,7 @@ const urlsToCache = [
     '/manifest.json',
     // Add other static assets here, e.g., CSS, JavaScript, images
 ];
-const version = 'v1'; // Update version number for significant changes
+const version = 'v1.1.2'; // Update version number for significant changes
 
 const cacheNameWithVersion = `${CACHE_NAME}-${version}`;
 // Install event handler

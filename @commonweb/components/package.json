@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc-5",
+  "version": "1.0.0-rc-6",
   "name": "@commonweb/components",
   "main": "dist/components.js",
   "module": "dist/components.mjs",

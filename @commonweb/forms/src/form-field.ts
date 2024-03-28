@@ -78,13 +78,13 @@ export class FormField extends FrameworkComponent {
             const parts = value.split('.');
             return parts[1] + '.' + parts[0];
         }
+        const input = this.shadowRoot.querySelector("input");
 
         const type = this.getAttribute("format");
         if (type === "currency") {
 
-
+            input.inputMode = "decimal";
             const regex = /[^0-9.,-]/g;
-            const input = this.shadowRoot.querySelector("input");
             input.value = "$";
             input.addEventListener("keyup", (ev) => {
                 let value = input.value.replace("$", "");

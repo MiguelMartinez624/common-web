@@ -9,7 +9,20 @@ export function enhanceClassChange() {
         .forEach((child) => {
             if (!child["toggleClass"]) {
                 child["toggleClass"] = (className: string) => {
+                    console.log(this)
                     child.classList.toggle(className);
+                }
+
+                child["toggleUniqueClass"] = (className: string) => {
+                    if (this._currentAffected) {
+                        this._currentAffected.classList.remove(className);
+                        this._currentAffected = child;
+                        child.classList.toggle(className);
+                    } else {
+                        this._currentAffected = child;
+                        child.classList.toggle(className);
+
+                    }
                 }
             }
         });

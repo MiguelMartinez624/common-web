@@ -46,6 +46,7 @@ export class LocalStorageComponent extends HTMLElement {
         const toCompare = extractData(identifier, value);
         callLocalStorage(this.key, "PUT", value, (ele) => {
             const onEle = extractData(identifier, ele);
+            alert(`comparing ${onEle} y ${toCompare}`)
             return onEle === toCompare;
         });
         this.dispatchEvent(new CustomEvent("updated-value", {detail: value}));

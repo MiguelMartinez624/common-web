@@ -107,8 +107,11 @@ function replaceItem(value: any) {
     // element.innerHTML = element.innerHTML;
     element.changeAttributeAndUpdate("data", value)
     // Best way?
+
     element.firstElementChild.data = value;
+    element.firstElementChild.checkAllInterpolations();
     element.firstElementChild.evaluateDirectives();
+
 }
 
 function removeItem(key: string) {

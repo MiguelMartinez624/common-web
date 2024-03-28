@@ -56,9 +56,7 @@ export class FrameworkComponent extends HTMLElement {
                 // so we can index the property on the target
                 this[handler] = valueToPass;
             }
-        }
-        // Patch value if not exist?
-        if (this[name] === undefined) {
+        }else {
             this[name] = newValue;
         }
     }

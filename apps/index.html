@@ -63,147 +63,17 @@
                          }
                     ]'>
     <main slot="content">
-
-        <div>
-            <h4>Transaction List</h4>
-        </div>
-        <div>
-            <!--            <form-group>-->
-            <!--                <form-field label=" " placeholder="Titulo"></form-field>-->
-            <!--            </form-group>-->
-        </div>
-
-
-        <local-storage-value
-                property-matcher="date"
-                item-key="date"
-                data-list
-                key="demo-expenses-list">
-        </local-storage-value>
-        <bind-element input-path="detail"
-                      from="[data-list]:(appended-value)" to="[expenses-list]:push">
-        </bind-element>
-        <bind-element input-path="detail" from="[data-list]:(item-removed)"
-                      to="[expenses-list]:removeItem">
-        </bind-element>
-        <bind-element input-path="detail"
-                      from="[data-list]:(updated-value)" to="[expenses-list]:replace">
-        </bind-element>
-        <style>
-
-        </style>
-        <div style="overflow: auto;height: 80vh;padding: 3px">
-
-            <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
-
-                <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
-                <bind-element
-                        input-path="detail"
-                        from="expense-list-by-date:(delete)"
-                        to="[data-list]:removeItem">
-                </bind-element>
-            </template>
-
-        </div>
-        <style>
-            /* Estilo de la barra de acciones */
-            .barra-acciones {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background-color: var(--content-bg);
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 10px 10px;
-
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            }
-
-            /* Estilos de los botones de acción */
-            .btn-accion {
-                background-color: transparent;
-                border: none;
-                cursor: pointer;
-                padding: 0 5px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: white;
-                font-size: 12px;
-                gap: 4px;
-            }
-
-            .btn-accion i {
-                margin-right: 5px;
-            }
-
-            cw-home-icon, cw-plus-icon, cw-search-icon {
-                height: 22px;
-                width: 22px;
-            }
-
-            .hidden {
-                display: none;
-            }
-
-            .card {
-                padding: 0.5rem;
-                outline-offset: 4px;
-                outline: var(--card-outline);
-                border-radius: 5px;
-                background: var(--card-bg);
-                color: var(--card-fc);
-            }
-
-            .card[form] {
-                box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-                bottom: 80px;
-                position: fixed;
-                z-index: 10;
-                width: 93vw;
-            }
-        </style>
-        <div form toggle class="card hidden">
-            <expense-form></expense-form>
-            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
-            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
-            <bind-element value="hidden" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
-            <bind-element value="hidden" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
-
-        </div>
-        <div class="barra-acciones">
-            <button home class="btn-accion">
-                <cw-home-icon></cw-home-icon>
-                <span>Home</span>
-            </button>
-            <button add class="btn-accion">
-                <cw-plus-icon></cw-plus-icon>
-                <span>Add</span>
-                <bind-element
-                        value="hidden"
-                        from="button[add]:(click)" to="[form]:toggleClass">
-                </bind-element>
-            </button>
-
-            <button class="btn-accion">
-                <cw-search-icon></cw-search-icon>
-                <span>Search</span>
-            </button>
-
-        </div>
+        <expenses-module></expenses-module>
     </main>
 
 </cw-sidebar>
 
-<!--<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-4/dist/core-pkg.js"></script>-->
-<!--<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-5/dist/components-pkg.js"></script>-->
-<!--<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-1/dist/forms-pkg.js"></script>-->
-
-<script src="../@commonweb/core/dist/core-pkg.js"></script>
-<script src="../@commonweb/components/dist/components-pkg.js"></script>
-<script src="../@commonweb/forms/dist/forms-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-7/dist/core-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-6/dist/components-pkg.js"></script>
+<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-3/dist/forms-pkg.js"></script>
+<!--<script src="../@commonweb/core/dist/core-pkg.js"></script>-->
+<!--<script src="../@commonweb/components/dist/components-pkg.js"></script>-->
+<!--<script src="../@commonweb/forms/dist/forms-pkg.js"></script>-->
 
 <script src="./sidebar.js"></script>
 <script src="./expenses.module.js"></script>
@@ -213,13 +83,3 @@
 </body>
 </html>
 
-<script>
-    const mock = [{
-        date: new Date(),
-        transactions: [
-            {title: "test", description: "test description", amount: "23.32$"},
-            {title: "test", description: "test description", amount: "23.32$"}
-        ]
-    }]
-
-</script>

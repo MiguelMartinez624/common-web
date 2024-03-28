@@ -1,4 +1,147 @@
 window.RegisterWebComponent({
+    selector: "expenses-module",
+    // language=HTML
+    template: `
+        <div>
+            <h4>Transaction List</h4>
+        </div>
+
+
+        <local-storage-value
+                property-matcher="date"
+                item-key="date"
+                data-list
+                key="demo-expenses-list">
+        </local-storage-value>
+        <bind-element input-path="detail"
+                      from="[data-list]:(appended-value)" to="[expenses-list]:push">
+        </bind-element>
+        <bind-element input-path="detail" from="[data-list]:(item-removed)"
+                      to="[expenses-list]:removeItem">
+        </bind-element>
+        <bind-element input-path="detail"
+                      from="[data-list]:(updated-value)" to="[expenses-list]:replace">
+        </bind-element>
+        <div style="overflow: auto;height: 80vh;padding: 3px">
+            <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
+
+                <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
+                <bind-element
+                        input-path="detail"
+                        from="expense-list-by-date:(delete)"
+                        to="[data-list]:removeItem">
+                </bind-element>
+            </template>
+
+        </div>
+        <div form toggle class="card collapse">
+            <expense-form></expense-form>
+            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
+            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
+            <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
+            <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
+
+        </div>
+        <div class="barra-acciones">
+            <button home class="btn-accion">
+                <cw-home-icon></cw-home-icon>
+                <span>Home</span>
+            </button>
+            <button add class="btn-accion">
+                <cw-plus-icon></cw-plus-icon>
+                <span>Add</span>
+                <bind-element
+                        from="button[add]:(click)" to="expense-form:reset">
+                </bind-element>
+                <bind-element
+                        value="collapse"
+                        from="button[add]:(click)" to="[form]:toggleClass">
+                </bind-element>
+            </button>
+
+            <button class="btn-accion">
+                <cw-search-icon></cw-search-icon>
+                <span>Search</span>
+            </button>
+
+        </div>
+    `,
+    // language=CSS
+    style: `
+        /* Estilo de la barra de acciones */
+        .barra-acciones {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--content-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 10px;
+
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos de los botones de acción */
+        .btn-accion {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            gap: 4px;
+        }
+
+        .btn-accion i {
+            margin-right: 5px;
+        }
+
+        cw-home-icon, cw-plus-icon, cw-search-icon {
+            height: 22px;
+            width: 22px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .card {
+            padding: 0.5rem;
+            outline-offset: 4px;
+            outline: var(--card-outline);
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--card-fc);
+        }
+
+        .card[form] {
+            bottom: 80px;
+            position: absolute;
+
+            width: -webkit-fill-available;
+            height: calc(100% - 80px);
+            left: 0;
+            transition: all 0.2s ease-out;
+
+        }
+
+        .collapse {
+            height: 0 !important;
+            padding: 0;
+            overflow: hidden;
+        }
+
+    `,
+})
+    .build();
+
+
+window.RegisterWebComponent({
     selector: "expense-list-by-date",
     //language=CSS
     style: `
@@ -33,7 +176,9 @@ window.RegisterWebComponent({
         </local-storage-value>
         <div>
             <div class="date-title">
-                <div style="display: flex;justify-content: center;align-items: center"><span>{{@host:[data.date]}}</span>
+                <div style="display: flex;justify-content: center;align-items: center">
+
+                    <span>{{@host:dateFormatted}}</span>
                     <cw-info-icon style="height: 16px;width: 16px;position: absolute;right: 10px;"></cw-info-icon>
                     <bind-element value="hidden" from="cw-info-icon:(click)" to="[details]:toggleClass"></bind-element>
                 </div>
@@ -67,15 +212,35 @@ window.RegisterWebComponent({
         </div>
     `
 })
+    .with_method("dateFormatted", function () {
+        if (this.data) {
+            const date = new Date(this.data.date);
+            const utcDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+            return utcDate.toLocaleDateString('en-EN', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+            })
+        }
+
+        return ""
+    })
     .with_method("incomes", function () {
+        if (!this.data || !this.data.transactions) {
+            return 0.00
+        }
         return this.data.transactions
             .filter(t => t.amount > 0)
             .reduce((accumulator, currentValue) => {
                 return accumulator + currentValue.amount;
             }, 0).toLocaleString('en-US', {style: 'currency', currency: 'USD'});
     })
-
     .with_method("outcomes", function () {
+        if (!this.data || !this.data.transactions) {
+            return 0.00
+        }
+
         return this.data.transactions
             .filter(t => t.amount < 0)
             .reduce((accumulator, currentValue) => {
@@ -86,23 +251,34 @@ window.RegisterWebComponent({
 
         const storage = this.shadowRoot.querySelector("local-storage-value");
         const value = storage.value;
-        const date = new Date(this.data.date);
+        const date = new Date(this.data.date).toString();
 
         const dateList = value.find(v => {
-            const date1 = new Date(v.date).toLocaleDateString();
-            return date1 === date.toLocaleDateString()
+            const [days, month, year] = v.date.split("/")
+            const date1 = new Date(`${year}/${month}/${days}`).toString();
+            return date1 === date
         });
 
         if (dateList) {
             const index = dateList.transactions.findIndex(i => i.title === params);
             dateList.transactions.splice(index, 1);
+            storage.setValue(value);
+
+            // Best way??
+            this.changeAttributeAndUpdate("data", dateList);
+            this.checkAllInterpolations();
+            // iten that need to be removed from the list
+            if (dateList.transactions.length === 0) {
+                this.dispatchEvent(new CustomEvent("delete", {detail: date}));
+            }
+        } else {
+            // iten that need to be removed from the list
+
+            this.dispatchEvent(new CustomEvent("delete", {detail: date}));
+
         }
 
-        storage.setValue(value);
-        // iten that need to be removed from the list
-        if (dateList.transactions.length === 0) {
-            this.dispatchEvent(new CustomEvent("delete", {detail: date.toLocaleDateString()}));
-        }
+
     })
     .build()
 
@@ -189,16 +365,14 @@ window.RegisterWebComponent({
         }`,
     //language=HTML
     template: `
+        
         <!--        <template for-each="">-->
         <div class="card flex gap flex-centered">
             <div style="flex: 0.3;">
                 <!--icon for topic-->
                 <div class="card-icon flex flex-centered">
-                    <svg style="height: 30px;width: 30px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-                        <!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
-                        <path fill="lightblue"
-                              d="M0 24C0 10.7 10.7 0 24 0H69.5c22 0 41.5 12.8 50.6 32h411c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3H170.7l5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5H488c13.3 0 24 10.7 24 24s-10.7 24-24 24H199.7c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5H24C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/>
-                    </svg>
+                    {{@host:category}}
+
                 </div>
             </div>
             <div style="flex: 1;justify-content: space-between;" class="flex ">
@@ -239,6 +413,29 @@ window.RegisterWebComponent({
         <!--        </template>-->
     `
 })
+    .with_method("category", function () {
+        if (!this.data) {
+            return ""
+        }
+        const cariCon = this.shadowRoot.querySelector(".card-icon")
+
+        switch (this.data.category) {
+            case "car":
+                cariCon.innerHTML = '<cw-car-icon></cw-car-icon>'
+                break
+            case "entertainment":
+                cariCon.innerHTML = '<cw-gamepad-icon></cw-gamepad-icon>'
+                break
+            case "food":
+                cariCon.innerHTML = '<cw-shopping-car-icon></cw-shopping-car-icon>'
+                break
+            default:
+                cariCon.innerHTML = '<cw-shopping-car-icon></cw-shopping-car-icon>'
+
+        }
+
+
+    })
     .with_method("delete", function (params) {
         this.dispatchEvent(new CustomEvent("delete", {detail: this.data.title}))
     })
@@ -292,7 +489,7 @@ window.RegisterWebComponent({
             align-items: center;
         }
 
-        button {
+        button[submit] {
             border: none;
             outline: 2px solid #a083c3;
             background: #5339d6;
@@ -302,6 +499,24 @@ window.RegisterWebComponent({
             width: -webkit-fill-available;
             color: white;
             margin: 10px;
+        }
+
+        button[icon] {
+            background: none;
+            align-items: center;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            width: fit-content;
+            padding: 1rem;
+            outline: none;
+            border: none;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        [icon].selected {
+            border-radius: 5px;
+            outline: 2px solid #9a77e0;
         }
 
         .gap {
@@ -315,21 +530,54 @@ window.RegisterWebComponent({
                     data-list
                     key="demo-expenses-list">
             </local-storage-value>
+
+
             <!--Stepped Form-->
             <form-group>
+                <div style="padding: 1rem">
+                    <h3>Category</h3>
+                    <div style="display: flex;gap: 15px;">
+                        <button toggle food icon>
+                            <cw-shopping-car-icon></cw-shopping-car-icon>
+                            <bind-element value="selected" from="button[food]:(click)"
+                                          to="button[food]:toggleUniqueClass"></bind-element>
+                            <bind-element value="food" from="button[food]:(click)"
+                                          to="expense-form:setCategory"></bind-element>
+
+                        </button>
+                        <button toggle entertainment icon>
+                            <cw-gamepad-icon></cw-gamepad-icon>
+                            <bind-element value="selected" from="button[entertainment]:(click)"
+                                          to="button[entertainment]:toggleUniqueClass"></bind-element>
+                            <bind-element value="entertainment" from="button[entertainment]:(click)"
+                                          to="expense-form:setCategory"></bind-element>
+                        </button>
+                        <button toggle car icon>
+                            <cw-car-icon></cw-car-icon>
+                            <bind-element value="selected" from="button[car]:(click)"
+                                          to="button[car]:toggleUniqueClass"></bind-element>
+                            <bind-element value="car" from="button[car]:(click)"
+                                          to="expense-form:setCategory"></bind-element>
+                        </button>
+                    </div>
+
+                </div>
                 <form-field property="title" label="Reason" placeholder="Comida"></form-field>
                 <form-field property="description" label="Description" placeholder="Comida"></form-field>
                 <form-field format="currency" property="amount" label="Amount" placeholder="amount"></form-field>
                 <form-field format="date" property="date" label="Date" placeholder="dd/mm/yyyy"></form-field>
-                <button>Create</button>
+                <button submit>Create</button>
 
             </form-group>
             <bind-element input-path="detail.data" from="form-group:(submit)" to="@host:submit"></bind-element>
-            <bind-element from="button:(click)" to="form-group:submit"></bind-element>
+            <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
         </div>
 
     `
 })
+    .with_method("setCategory", function (va) {
+        this.category = va;
+    })
     .with_method("dateFormatted", function () {
         if (this.data) {
             return new Date(this.data.date).toLocaleDateString();
@@ -337,6 +585,8 @@ window.RegisterWebComponent({
         return "00/00/0000"
     })
     .with_method("submit", function (data) {
+        data.category = this.category;
+
         const storage = this.shadowRoot.querySelector("local-storage-value");
         const value = storage.value;
         if (!value || value.length === 0) {
@@ -344,7 +594,7 @@ window.RegisterWebComponent({
             this.dispatchEvent(new CustomEvent("new-day", {
                 detail:
                     {
-                        date: new Date(data.date).toLocaleDateString(),
+                        date: new Date(data.date).toString(),
                         transactions: [data]
                     }
 
@@ -353,8 +603,9 @@ window.RegisterWebComponent({
         }
 
         const dateList = value.find(v => {
-            const date1 = new Date(v.date).toLocaleDateString();
-            const date2 = new Date(data.date).toLocaleDateString();
+            const [days, month, year] = v.date.split("/")
+            const date1 = new Date(`${year}/${month}/${days}`).toString();
+            const date2 = new Date(data.date).toString();
             return date1 === date2
         });
 
@@ -364,16 +615,21 @@ window.RegisterWebComponent({
             this.dispatchEvent(new CustomEvent("new-day", {
                 detail:
                     {
-                        date: new Date(data.date).toLocaleDateString(),
+                        date: new Date(data.date).toString(),
                         transactions: [data]
                     }
-
             }));
             return
         }
 
-        // storage.setValue(value);
-
         this.dispatchEvent(new CustomEvent("submit", {detail: dateList}))
+
     })
+    .with_method("reset", function (data) {
+        this.shadowRoot.querySelector("form-group").reset();
+    })
+    .on_init(function () {
+
+    })
+
     .build()
