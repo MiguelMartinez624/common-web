@@ -3,7 +3,7 @@ window.RegisterWebComponent({
     // language=HTML
     template: `
         <div>
-            <h4>Transaction List</h4>
+            <h4 class="no-margin">Todo List</h4>
         </div>
 
 
@@ -83,10 +83,14 @@ window.RegisterWebComponent({
     // language=CSS
     style: `
 
+        .no-margin {
+            margin: 0;
+        }
+
         .hidden {
             display: none;
         }
-        
+
 
         .collapse {
             height: 0 !important;
@@ -96,7 +100,4 @@ window.RegisterWebComponent({
 
     `,
 })
-    .with_method("changeRoute", function (newRoute) {
-        this.dispatchEvent(new CustomEvent("navigation-event", {detail: newRoute}))
-    })
     .build();

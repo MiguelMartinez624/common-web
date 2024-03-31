@@ -1,0 +1,42 @@
+
+.hidden {
+    display: none;
+}
+
+.card {
+    padding: 0.5rem;
+    outline-offset: 4px;
+    outline: var(--card-outline);
+    border-radius: 5px;
+    background: var(--card-bg);
+    color: var(--card-fc);
+}
+
+.card[form] {
+    bottom: 80px;
+    position: absolute;
+
+    width: -webkit-fill-available;
+    height: calc(100% - 80px);
+    left: 0;
+    transition: all 0.2s ease-out;
+
+}
+
+.collapse {
+    height: 0 !important;
+    padding: 0;
+    overflow: hidden;
+}
+
+.flex {
+    display: flex;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.flex-between {
+    justify-content: space-between;
+}

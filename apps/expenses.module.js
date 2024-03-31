@@ -57,6 +57,9 @@ window.RegisterWebComponent({
     `,
     // language=CSS
     style: `
+        h4{
+            margin: 0;
+        }
         .floating-action {
             background: none;
             border: none;

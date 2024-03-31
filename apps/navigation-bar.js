@@ -7,6 +7,14 @@ if (window.RegisterWebComponent) {
                 <button toggle home class="btn-accion">
                     <cw-home-icon></cw-home-icon>
                     <span>Home</span>
+                    <bind-element
+                            value="home"
+                            from="@parent:(click)" to="navigation-bar:changeRoute">
+                    </bind-element>
+                    <bind-element
+                            value="selected"
+                            from="@parent:(click)" to="[home]:toggleUniqueClass">
+                    </bind-element>
                 </button>
                 <button toggle expenses class="selected btn-accion">
                     <div style="height: 19px;">
@@ -44,7 +52,7 @@ if (window.RegisterWebComponent) {
                 position: fixed;
                 bottom: 0;
                 left: 0;
-                width: 100%;
+                width: calc(100% - 20px);
                 background-color: var(--content-bg);
                 display: flex;
                 justify-content: space-around;

@@ -63,7 +63,7 @@
                          }
                     ]'>
     <main slot="content">
-        <conditional-render-cases main-routes case="expenses">
+        <conditional-render-cases main-routes case="home">
             <div case="expenses">
                 <template>
                     <expenses-module>
@@ -76,6 +76,11 @@
                     <todos-module>
 
                     </todos-module>
+                </template>
+            </div>
+            <div case="home">
+                <template>
+                    <home-module> </home-module>
                 </template>
             </div>
         </conditional-render-cases>
@@ -99,6 +104,7 @@
 <script src="./expenses.module.js"></script>
 <script src="./todo.module.js"></script>
 <script src="./navigation-bar.js"></script>
+<script src="./home.module.js"></script>
 
 <script src="./icons.js"></script>
 
