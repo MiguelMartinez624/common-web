@@ -9,11 +9,16 @@ export function enhanceClassChange() {
         .forEach((child) => {
             if (!child["toggleClass"]) {
                 child["toggleClass"] = (className: string) => {
-                    console.log(this)
                     child.classList.toggle(className);
                 }
 
                 child["toggleUniqueClass"] = (className: string) => {
+                    // in case there is a initial one marked as selected neeed to be marked
+                    // as the current affected
+                    if (!this._currentAffected) {
+                        this._currentAffected = this.shadowRoot.querySelector("." + className) || this.querySelector("." + className);
+                    }
+
                     if (this._currentAffected) {
                         this._currentAffected.classList.remove(className);
                         this._currentAffected = child;
@@ -24,6 +29,8 @@ export function enhanceClassChange() {
 
                     }
                 }
+
+
             }
         });
 }

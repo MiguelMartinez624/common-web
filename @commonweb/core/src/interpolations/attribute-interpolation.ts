@@ -118,7 +118,6 @@ export class AttributeInterpolation implements Interpolation {
             return;
         }
         if (this.element instanceof FrameworkComponent || this.element.hasOwnProperty("changeAttributeAndUpdate")) {
-            console.log({element: this.element, name: this.attributeName, value: value});
             (this.element as FrameworkComponent).changeAttributeAndUpdate(this.attributeName, value);
             return;
         }
@@ -130,7 +129,6 @@ export class AttributeInterpolation implements Interpolation {
             // Required??
             this.element[this.attributeName] = value;
             if (this.element['checkInterpolationsFor']) {
-                console.log("CHEING",this.element)
                 this.element['checkInterpolationsFor'](this.attributeName);
             }
 

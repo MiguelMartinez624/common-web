@@ -22,7 +22,7 @@ window.RegisterWebComponent({
         <bind-element input-path="detail"
                       from="[data-list]:(updated-value)" to="[expenses-list]:replace">
         </bind-element>
-        <div style="overflow: auto;height: 80vh;padding: 3px">
+        <div style="overflow: auto;height: 84vh;padding: 3px">
             <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
 
                 <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
@@ -32,24 +32,10 @@ window.RegisterWebComponent({
                         to="[data-list]:removeItem">
                 </bind-element>
             </template>
-
-        </div>
-        <div form toggle class="card collapse">
-            <expense-form></expense-form>
-            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
-            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
-            <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
-            <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
-
-        </div>
-        <div class="barra-acciones">
-            <button home class="btn-accion">
-                <cw-home-icon></cw-home-icon>
-                <span>Home</span>
-            </button>
-            <button add class="btn-accion">
-                <cw-plus-icon></cw-plus-icon>
-                <span>Add</span>
+            <button add class="floating-action">
+                <div>
+                    <cw-plus-icon></cw-plus-icon>
+                </div>
                 <bind-element
                         from="button[add]:(click)" to="expense-form:reset">
                 </bind-element>
@@ -58,16 +44,28 @@ window.RegisterWebComponent({
                         from="button[add]:(click)" to="[form]:toggleClass">
                 </bind-element>
             </button>
-
-            <button class="btn-accion">
-                <cw-search-icon></cw-search-icon>
-                <span>Search</span>
-            </button>
-
         </div>
+        <div form toggle class="card collapse">
+            <expense-form></expense-form>
+            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
+            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
+            <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
+            <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
+        </div>
+
+
     `,
     // language=CSS
     style: `
+        .floating-action {
+            background: none;
+            border: none;
+            position: fixed;
+            z-index: 2;
+            bottom: 70px;
+            right: 20px;
+        }
+
         /* Estilo de la barra de acciones */
         .barra-acciones {
             position: fixed;
@@ -101,9 +99,15 @@ window.RegisterWebComponent({
             margin-right: 5px;
         }
 
-        cw-home-icon, cw-plus-icon, cw-search-icon {
-            height: 22px;
-            width: 22px;
+        cw-home-icon, cw-todo-icon {
+            fill: white;
+            height: 19px;
+            width: 19px;
+        }
+
+        .selected {
+            color: #80d674;
+            fill: #80d674;
         }
 
         .hidden {
@@ -138,6 +142,9 @@ window.RegisterWebComponent({
 
     `,
 })
+    .with_method("changeRoute", function (newRoute) {
+        this.dispatchEvent(new CustomEvent("navigation-event", {detail: newRoute}))
+    })
     .build();
 
 
@@ -365,7 +372,7 @@ window.RegisterWebComponent({
         }`,
     //language=HTML
     template: `
-        
+
         <!--        <template for-each="">-->
         <div class="card flex gap flex-centered">
             <div style="flex: 0.3;">
