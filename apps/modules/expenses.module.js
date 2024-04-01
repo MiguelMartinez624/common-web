@@ -5,8 +5,6 @@ window.RegisterWebComponent({
         <div>
             <h4>Transaction List</h4>
         </div>
-
-
         <local-storage-value
                 property-matcher="date"
                 item-key="date"
