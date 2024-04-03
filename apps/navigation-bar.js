@@ -4,7 +4,7 @@ if (window.RegisterWebComponent) {
         // language=HTML
         template: `
             <div class="barra-acciones">
-                <button toggle home class="btn-accion">
+                <button toggle home class=" selected btn-accion">
                     <cw-home-icon></cw-home-icon>
                     <span>Home</span>
                     <bind-element
@@ -16,7 +16,7 @@ if (window.RegisterWebComponent) {
                             from="@parent:(click)" to="[home]:toggleUniqueClass">
                     </bind-element>
                 </button>
-                <button toggle expenses class="selected btn-accion">
+                <button toggle expenses class=" btn-accion">
                     <div style="height: 19px;">
                         <cw-expense-icon style="height: 15px;width: 15px"></cw-expense-icon>
                     </div>

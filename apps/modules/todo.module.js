@@ -5,20 +5,7 @@ window.RegisterWebComponent({
         <div>
             <h4 class="no-margin">Todo List</h4>
         </div>
-
-
-        <local-storage-value
-                property-matcher="date"
-                item-key="date"
-                data-list
-                key="demo-todo-list">
-        </local-storage-value>
-        <bind-element input-path="detail" from="[data-list]:(appended-value)" to="[expenses-list]:push"></bind-element>
-        <bind-element input-path="detail" from="[data-list]:(item-removed)"
-                      to="[expenses-list]:removeItem">
-        </bind-element>
-        <bind-element input-path="detail" from="[data-list]:(updated-value)" to="[expenses-list]:replace">
-        </bind-element>
+        
         <style>
             .tab {
                 flex: 1;
@@ -51,54 +38,82 @@ window.RegisterWebComponent({
                 fill: #80d674;
             }
         </style>
+        <div style="display: flex;">
+            <div pending toggle class=" tab">
+                <h4>Pending</h4>
+                <div toggle class="linea visible">
+                    <bind-element value="visible" from="[pending]:(click)"
+                                  to="@parent:toggleUniqueClass"></bind-element>
+                </div>
+            </div>
+            <div process toggle class="tab">
+                <h4>Progress</h4>
+                <div toggle class="linea">
+                    <bind-element value="visible" from="[process]:(click)"
+                                  to="@parent:toggleUniqueClass"></bind-element>
+                </div>
+
+            </div>
+            <div toggle completed class="tab">
+                <h4>Completed</h4>
+                <div toggle class="linea">
+                    <bind-element value="visible" from="[completed]:(click)"
+                                  to="@parent:toggleUniqueClass"></bind-element>
+                </div>
+
+            </div>
+        </div>
         <div style="overflow: auto;height: 80vh;padding: 3px">
-            <div style="display: flex;">
-                <div pending toggle class="tab">
-                    <h4>Pending</h4>
-                    <div toggle class="linea">
-                        <bind-element value="visible" from="[pending]:(click)"
-                                      to="@parent:toggleUniqueClass"></bind-element>
-                    </div>
 
+            <conditional-render-cases case="pending">
+                <div case="pending">
+                    <template>
+                        <local-storage-value
+                                property-matcher="date"
+                                item-key="date"
+                                pending-list
+                                key="demo-pending-todo-list">
+                        </local-storage-value>
+                        <bind-element
+                                input-path="detail"
+                                from="[data-list]:(appended-value)"
+                                to="[todo-pending-list]:push">
+                        </bind-element>
+                        <template todo-pending-list loop-key="date" for-each="@[pending-list]:[value]">
+                            <div class="card">
+                                <h3>{{@host:[data.title]}}</h3>
+                                <p>
+                                    {{@host:[data.description]}}
+                                </p>
+                            </div>
+                        </template>
+
+
+                    </template>
                 </div>
-                <div process toggle class="tab">
-                    <h4>Progress</h4>
-                    <div toggle class="linea">
-                        <bind-element value="visible" from="[process]:(click)"
-                                      to="@parent:toggleUniqueClass"></bind-element>
-                    </div>
+            </conditional-render-cases>
 
+            <button add class="floating-action">
+                <div>
+                    <cw-plus-icon></cw-plus-icon>
                 </div>
-                <div toggle completed class="tab">
-                    <h4>Completed</h4>
-                    <div toggle class="linea">
-                        <bind-element value="visible" from="[completed]:(click)"
-                                      to="@parent:toggleUniqueClass"></bind-element>
-                    </div>
-
-                </div>
-            </div>
-
-
-            <div style="overflow: auto;height: 84vh;padding: 3px">
-          
-                <button add class="floating-action">
-                    <div>
-                        <cw-plus-icon></cw-plus-icon>
-                    </div>
-                    <bind-element
-                            from="button[add]:(click)" to="todo-form:reset">
-                    </bind-element>
-                    <bind-element
-                            value="collapse"
-                            from="button[add]:(click)" to="[form]:toggleClass">
-                    </bind-element>
-                </button>
-            </div>
-            <div form toggle class="card collapse">
-                <todo-form></todo-form>
-                
-            </div>
+                <bind-element
+                        from="button[add]:(click)" to="todo-form:reset">
+                </bind-element>
+                <bind-element
+                        value="collapse"
+                        from="button[add]:(click)" to="[form]:toggleClass">
+                </bind-element>
+            </button>
+        </div>
+        <div form toggle class="card collapse">
+            <todo-form></todo-form>
+            <bind-element value="collapse" from="todo-form:(submit)" to="[form]:toggleClass"></bind-element>
+            <bind-element
+                    input-path="detail"
+                    from="todo-form:(submit)"
+                    to="[pending-list]:append"></bind-element>
+        </div>
 
         </div>
     `,
@@ -112,7 +127,7 @@ window.RegisterWebComponent({
             background: var(--card-bg);
             color: var(--card-fc);
         }
-        
+
         .card[form] {
             bottom: 80px;
             position: absolute;
@@ -123,7 +138,7 @@ window.RegisterWebComponent({
             transition: all 0.2s ease-out;
 
         }
-        
+
         .floating-action {
             background: none;
             border: none;
@@ -224,13 +239,6 @@ window.RegisterWebComponent({
     //language=HTML
     template: `
         <div>
-            <local-storage-value
-                    item-key="date"
-                    data-list
-                    key="demo-expenses-list">
-            </local-storage-value>
-
-
             <!--Stepped Form-->
             <form-group>
                 <form-field property="title" label="Title" placeholder="Comida"></form-field>
@@ -246,44 +254,7 @@ window.RegisterWebComponent({
     `
 })
     .with_method("submit", function (data) {
-        data.category = this.category;
-
-        const storage = this.shadowRoot.querySelector("local-storage-value");
-        const value = storage.value;
-        if (!value || value.length === 0) {
-            // Initialize
-            this.dispatchEvent(new CustomEvent("new-day", {
-                detail:
-                    {
-                        date: new Date(data.date).toString(),
-                        transactions: [data]
-                    }
-
-            }));
-            return
-        }
-
-        const dateList = value.find(v => {
-            const [days, month, year] = v.date.split("/")
-            const date1 = new Date(`${year}/${month}/${days}`).toString();
-            const date2 = new Date(data.date).toString();
-            return date1 === date2
-        });
-
-        if (dateList) {
-            dateList.transactions.push(data);
-        } else {
-            this.dispatchEvent(new CustomEvent("new-day", {
-                detail:
-                    {
-                        date: new Date(data.date).toString(),
-                        transactions: [data]
-                    }
-            }));
-            return
-        }
-
-        this.dispatchEvent(new CustomEvent("submit", {detail: dateList}))
+        this.dispatchEvent(new CustomEvent("submit", {detail: data}));
 
     })
     .with_method("reset", function (data) {

@@ -126,7 +126,7 @@ export async function callRemoteAPI(source: string, method: "POST" | "GET" | "DE
     });
     const contentType = result.headers.get("Content-Type")
 
-    const resultBody = contentType === "application/json" ? await result.json() : await result.text();
+    const resultBody = contentType.startsWith("application/json") ? await result.json() : await result.text();
 
     if (!result.ok) {
         throw {error: resultBody}

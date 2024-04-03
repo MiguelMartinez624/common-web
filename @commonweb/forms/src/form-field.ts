@@ -22,7 +22,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
             border-color: var(--form-border-color, #ccc);
             color: var(--form-text);
             font-size: var(--form-text-size);
-
+    
             padding: var(--form-input-padding, 12px 20px);
         }
 
