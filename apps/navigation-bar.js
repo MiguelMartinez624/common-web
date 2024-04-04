@@ -49,17 +49,16 @@ if (window.RegisterWebComponent) {
 
             /* Estilo de la barra de acciones */
             .barra-acciones {
-                position: fixed;
-                bottom: 0;
-                left: 0;
                 width: calc(100% - 20px);
-                background-color: var(--content-bg);
+                background-color: var(--sidebar-bg);
                 display: flex;
-                justify-content: space-around;
                 align-items: center;
-                padding: 10px 10px;
+                padding: 4rem 10px;
+                flex-wrap: wrap;
+                height: 100%;
+                gap: 2rem;
+                flex-direction: column;
 
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
             }
 
             /* Estilos de los botones de acción */
@@ -74,6 +73,20 @@ if (window.RegisterWebComponent) {
                 color: white;
                 font-size: 12px;
                 height: 35px;
+                & span {
+                    margin-top: 4px;
+                }
+            }
+
+
+            /* Responsive layout - makes a one column layout instead of a two-column layout */
+            @media (max-width: 800px) {
+
+                .barra-acciones {
+                    padding: 10px 10px;
+                    justify-content: space-around;
+                    flex-direction: row;
+                }
             }
 
             cw-home-icon, cw-todo-icon {

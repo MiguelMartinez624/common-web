@@ -15,14 +15,14 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
             margin: 10px 0;
         }
 
-        input {
+        textarea {
             background-color: var(--form-field-bg);
             border: var(--form-border, 1px solid);
             border-radius: var(--form-border-radius, 4px);
             border-color: var(--form-border-color, #ccc);
             color: var(--form-text);
             font-size: var(--form-text-size);
-    
+
             padding: var(--form-input-padding, 12px 20px);
         }
 
@@ -32,42 +32,38 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
             font-size: var(--form-text-size);
         }
     `,
-    selector: 'form-field',
+    selector: 'textarea-field',
     // language=HTML
     template: `
 
         <label class="form-field" for="">
             <span>{{@host:[label]}}</span>
-            <input placeholder="{{@host:[placeholder]}}" type="{{@host:[format]}}">
+            <textarea
+                    rows="{{@host:[rows]}}"
+                    placeholder="{{@host:[placeholder]}}"></textarea>
         </label>
     `,
 })
-export class FormField extends FrameworkComponent {
+export class TextareaField extends FrameworkComponent {
     @Attribute("placeholder")
     public placeholder: string = "";
+
+    @Attribute("rows")
+    public rows: number = 3;
 
     @Attribute("label")
     public label: string = "";
 
-    @Attribute("format")
-    public format: string = "";
 
     @Attribute("property")
     public property: string = "";
 
     public reset() {
-        this.shadowRoot.querySelector("input").value = ""
+        (this.shadowRoot.querySelector("textarea") as HTMLTextAreaElement).value = ""
     }
 
     public value() {
-        const value = this.shadowRoot.querySelector("input").value;
-        if (this.format === "date") {
-            return new Date(value);
-        }
-        if (this.format === "currency") {
-            return parseFloat(value.replace("$", ""));
-        }
-
+        const value = (this.shadowRoot.querySelector("textarea") as HTMLTextAreaElement).value;
         return value;
     }
 
@@ -76,28 +72,11 @@ export class FormField extends FrameworkComponent {
             const parts = value.split('.');
             return parts[1] + '.' + parts[0];
         }
-        const input = this.shadowRoot.querySelector("input");
 
-        const type = this.getAttribute("format");
-        if (type === "currency") {
-
-            input.inputMode = "decimal";
-            const regex = /[^0-9.,-]/g;
-            input.value = "$";
-            input.addEventListener("keyup", (ev) => {
-                let value = input.value.replace("$", "");
-
-                value = value.replace(regex, '');
-
-                input.value = "$" + value
-
-
-            })
-        }
     }
 
     static get observedAttributes(): string[] {
-        return ["property", "format", "label", "placeholder"];
+        return ["property", "format", "label", "placeholder", "rows"];
     }
 
 }

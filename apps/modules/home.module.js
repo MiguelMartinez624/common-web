@@ -10,20 +10,38 @@ window.RegisterWebComponent({
                 <div class="centered flex flex-between">
                     <div class="text-center">
                         <h4>Pending</h4>
+                        <local-storage-value
+                                property-matcher="date"
+                                item-key="date"
+                                pending-list
+                                key="demo-pending-todo-list">
+                        </local-storage-value>
                         <p>
-                            0
+                            {{[pending-list]:[value.length]}}
                         </p>
                     </div>
                     <div class="text-center">
                         <h4>Progress</h4>
+                        <local-storage-value
+                                property-matcher="date"
+                                item-key="date"
+                                progress-list
+                                key="demo-progress-todo-list">
+                        </local-storage-value>
                         <p>
-                            0
+                            {{[progress-list]:[value.length]}}
                         </p>
                     </div>
                     <div class="text-center">
+                        <local-storage-value
+                                property-matcher="date"
+                                item-key="date"
+                                completed-list
+                                key="demo-completed-todo-list">
+                        </local-storage-value>
                         <h4>Completed</h4>
                         <p>
-                            0
+                            {{[completed-list]:[value.length]}}
                         </p>
                     </div>
                 </div>
@@ -80,4 +98,5 @@ window.RegisterWebComponent({
     .with_method("changeRoute", function (newRoute) {
         this.dispatchEvent(new CustomEvent("navigation-event", {detail: newRoute}))
     })
+
     .build();

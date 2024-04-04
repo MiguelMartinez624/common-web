@@ -6,6 +6,9 @@ if (window["RegisterWebComponent"]) {
             // language=CSS
             style: `
 
+                .sidebar {
+                    border-right: 1px solid #80d674;
+                }
 
                 .header {
                     height: 60px;
@@ -26,50 +29,24 @@ if (window["RegisterWebComponent"]) {
                     background-size: 40px 40px;
                     background-position: -19px -19px;
 
-                    height: calc(95%);
+                    height: 100%;
                 }
 
                 .layout {
                     overflow: hidden;
-                    height: 100vh;
-                    display: flex;
-                    overflow: hidden;
-                    width: 100%;
-                }
-
-                .sidebar {
-                    display: flex;
-                    width: 300px;
                     height: 100%;
-                    background: var(--sidebar-bg);
-                    color: var(--sidebar-fg);
-                    transition-property: width;
-                    transition-duration: 0.2s;
-                    justify-center: center;
-                    overflow: hidden;
-                    border-right: var(--sidebar-border);
-                }
-
-                a {
-                    color: var(--sidebar-fg);
-                }
-
-                .sidebar.collapsed {
-                    transition-property: width;
-                    transition-duration: 0.2s;
-                    width: 0%;
+                    display: flex;
+                    width: 100%;
                 }
 
 
                 @media only screen and (max-width: 768px) {
+                    .layout {
+                        flex-direction: column-reverse;
+                    }
+
                     .sidebar {
-                        z-index: 4;
-                        width: 0%;
-                        position: fixed;
-                        display: block;
-                        transition-property: width;
-                        transition-duration: 0.2s;
-                        left: -1px;
+                        border: none;
                     }
 
                     .content {
@@ -82,11 +59,6 @@ if (window["RegisterWebComponent"]) {
                         width: 80%;
                     }
 
-                    .overlay.collapsed {
-                        transition-property: width;
-                        transition-duration: 0.2s;
-                        width: 100%;
-                    }
 
                 }
 
@@ -94,14 +66,6 @@ if (window["RegisterWebComponent"]) {
                     display: none;
                 }
 
-                .overlay {
-                    height: 100%;
-                    width: 0%;
-                    position: fixed;
-                    background: #7258585e;
-                    z-index: 2;
-                    filter: blur(12px);
-                }
 
                 .cursor-pointer {
                     cursor: pointer;
@@ -109,34 +73,11 @@ if (window["RegisterWebComponent"]) {
             `, //language=HTML
             template: `
 
-                <div class="layout">
-                    <div toggle class="overlay  "></div>
+                <div class="layout" style="display: flex;">
                     <div toggle class="sidebar ">
-                        <lazy-template data="{{@host:[_routes]}}" src="./sidebar.html"></lazy-template>
+                        <slot name="nav"></slot>
                     </div>
                     <div style="flex:1;overflow:hidden;">
-<!--                        <div class="header">-->
-<!--                             <span menu-toggle class="cursor-pointer">-->
-<!--                               <svg xmlns="http://www.w3.org/2000/svg" stroke="white"-->
-<!--                                    style="color: white;height: 30px;width: 30px" viewBox="0 0 448 512">-->
-<!--                                   -->
-<!--                                   <path fill="white"-->
-<!--                                         d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>-->
-<!--                            </span>-->
-
-
-<!--                            <bind-element value="collapsed" from=".overlay:(click)"-->
-<!--                                          to=".overlay:toggleClass"></bind-element>-->
-<!--                            <bind-element value="collapsed" from=".overlay:(click)"-->
-<!--                                          to=".sidebar:toggleClass"></bind-element>-->
-
-<!--                            <bind-element value="collapsed" from="span[menu-toggle]:(click)"-->
-<!--                                          to=".overlay:toggleClass"></bind-element>-->
-<!--                            <bind-element value="collapsed" from="span[menu-toggle]:(click)"-->
-<!--                                          to=".sidebar:toggleClass"></bind-element>-->
-
-
-<!--                        </div>-->
                         <div class="content lg:px-40 sm:px-20 leading-8">
                             <slot name="content"></slot>
                         </div>

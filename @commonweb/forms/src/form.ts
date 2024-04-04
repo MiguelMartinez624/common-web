@@ -1,6 +1,7 @@
 import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
 import {FormField} from "./form-field";
 import {MultiselectComponent} from "./multiselect-form-field";
+import {TextareaField} from "./textarea-field";
 
 @WebComponent({
     //language=css
@@ -20,6 +21,10 @@ export class FormGroup extends FrameworkComponent {
         const formFields = this.querySelectorAll("form-field") as any as FormField[]
         formFields.forEach((input) => value[input.getAttribute("property")] = input.value());
 
+        const textareaFields = this.querySelectorAll("textarea-field") as any as TextareaField[]
+        textareaFields.forEach((input) => value[input.getAttribute("property")] = input.value());
+
+
         const multiselectFormFields = this.querySelectorAll("multiselect-form-field") as any as MultiselectComponent[]
         multiselectFormFields.forEach((input) => value[input.getAttribute("property")] = input.value);
 
@@ -30,6 +35,10 @@ export class FormGroup extends FrameworkComponent {
     public reset() {
         const inputs = this.querySelectorAll("form-field") as any as FormField[]
         inputs.forEach((input) => input.reset());
+
+        const textareaFields = this.querySelectorAll("textarea-field") as any as TextareaField[]
+        textareaFields.forEach((input) => input.reset());
+
     }
 
     @Attribute("property")

@@ -2,10 +2,11 @@ const CACHE_NAME = 'my-app-cache';
 const urlsToCache = [
     '/',
     '/index.html',
-    '/expenses.module.js',
+    '/modules/expenses.module.js',
+    '/modules/home.module.js',
+    '/modules/todo.module.js',
     '/icons.js',
     '/sidebar.js',
-    '/sidebar.html',
     '/manifest.json',
     // Add other static assets here, e.g., CSS, JavaScript, images
 ];

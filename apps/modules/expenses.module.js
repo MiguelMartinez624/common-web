@@ -2,6 +2,137 @@ window.RegisterWebComponent({
     selector: "expenses-module",
     // language=HTML
     template: `
+        <h4>Streams</h4>
+        <div>
+            <div>
+
+                <div class="card">
+
+                    <bind-element value="collapse" from="@parent:(click)" to="[toggle]:toggleClass"></bind-element>
+
+
+                    <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
+                        <h3>Cash</h3>
+                        <span style="color: #02b9b9">Fixed</span>
+                    </div>
+                    <span style="font-size: xx-large">$500.00</span>
+                    <div style="display: flex;justify-content: end;align-items: center;gap:8px">
+                        <strong> 43</strong>
+                        <cw-tansaction-icon class="small-icon"></cw-tansaction-icon>
+                    </div>
+                </div>
+                <bind-element value="demo-expenses-list"
+                              from=".card:(click)"
+                              to="expenses-list:setStreamID">
+                </bind-element>
+                <div toggle class="collapse fixed">
+                    <div>
+                        <div class="detail-header">
+                            <cw-left-arrow-icon>
+                                <bind-element value="collapse" from="@parent:(click)"
+                                              to="[toggle]:toggleClass"></bind-element>
+
+                            </cw-left-arrow-icon>
+                            <h3>Cash</h3>
+                            <span style="color: #02b9b9">Fixed</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <expenses-list></expenses-list>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    `,
+    // language=CSS
+    style: `
+        .detail-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid white;
+            padding: 1rem;
+            justify-content: space-between;
+        }
+
+        .small-icon {
+            height: 24px;
+            fill: white;
+
+        }
+
+        h4, h3 {
+            margin: 0;
+        }
+
+        .floating-action {
+            background: none;
+            border: none;
+            position: fixed;
+            z-index: 2;
+            bottom: 70px;
+            right: 20px;
+        }
+
+
+        .selected {
+            color: #80d674;
+            fill: #80d674;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .card {
+            padding: 1rem;
+            outline-offset: 4px;
+            outline: var(--card-outline);
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--card-fc);
+            margin: 1.4rem 0px;
+
+        }
+
+        .card[form] {
+            bottom: 80px;
+            position: absolute;
+
+            width: -webkit-fill-available;
+            height: calc(100% - 80px);
+            left: 0;
+            transition: all 0.2s ease-out;
+
+        }
+
+        .fixed {
+            width: 100%;
+            position: fixed;
+            transition: all 0.2s ease-out;
+            top: 0;
+            height: calc(100% - 50px);
+            background: var(--card-bg);
+            left: 0;
+        }
+
+        .collapse {
+
+            left: -100%;
+            overflow: hidden;
+        }
+
+    `,
+})
+
+    .build();
+
+
+window.RegisterWebComponent({
+    selector: "expenses-list",
+    // language=HTML
+    template: `
         <div>
             <h4>Transaction List</h4>
         </div>
@@ -9,7 +140,7 @@ window.RegisterWebComponent({
                 property-matcher="date"
                 item-key="date"
                 data-list
-                key="demo-expenses-list">
+                key="{{@host:[streamID]}}">
         </local-storage-value>
         <bind-element input-path="detail"
                       from="[data-list]:(appended-value)" to="[expenses-list]:push">
@@ -55,56 +186,19 @@ window.RegisterWebComponent({
     `,
     // language=CSS
     style: `
-        h4{
+        h4 {
             margin: 0;
         }
+
         .floating-action {
             background: none;
             border: none;
-            position: fixed;
+            position: absolute;
             z-index: 2;
-            bottom: 70px;
+            bottom: 0px;
             right: 20px;
         }
 
-        /* Estilo de la barra de acciones */
-        .barra-acciones {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--content-bg);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 10px 10px;
-
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Estilos de los botones de acción */
-        .btn-accion {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            font-size: 12px;
-            gap: 4px;
-        }
-
-        .btn-accion i {
-            margin-right: 5px;
-        }
-
-        cw-home-icon, cw-todo-icon {
-            fill: white;
-            height: 19px;
-            width: 19px;
-        }
 
         .selected {
             color: #80d674;
@@ -143,8 +237,17 @@ window.RegisterWebComponent({
 
     `,
 })
-    .with_method("changeRoute", function (newRoute) {
-        this.dispatchEvent(new CustomEvent("navigation-event", {detail: newRoute}))
+    .with_method("setStreamID", function (streamID) {
+        // Usar patron de cuando seteas algo, manualente evaluar los cambios
+        //ventaja q podes realizar procesos previos antes de actualizar la vista
+        //y esto seria un patron del framework
+        this.changeAttributeAndUpdate("streamID", streamID);
+        this.checkAllInterpolations();
+        this.evaluateDirectives();
+
+    })
+    .on_init(function () {
+        console.log(this)
     })
     .build();
 

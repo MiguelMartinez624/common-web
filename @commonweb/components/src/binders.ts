@@ -1,7 +1,6 @@
 import {Attribute, extractData, isJSON, WebComponent, ElementBind} from "@commonweb/core";
 
 
-
 @WebComponent({
     selector: 'bind-element',
     template: '',
@@ -43,7 +42,7 @@ export class BindElementComponent extends HTMLElement {
         const triggerQuery = new ElementBind(this, fromSelector);
         const triggerElement: any = triggerQuery.searchElement();
         if (!triggerElement) {
-            console.warn("not foound")
+            console.warn("not foound " + fromSelector)
             return;
         }
         switch (triggerQuery.propertyType) {
@@ -58,6 +57,7 @@ export class BindElementComponent extends HTMLElement {
 
     // Refactor this affection code
     private affectTarget(ev: CustomEvent): void {
+
 
         // We get the trigger here
         const targetQuery = new ElementBind(this, this.getAttribute("to"));
