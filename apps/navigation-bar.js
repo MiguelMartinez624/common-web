@@ -30,6 +30,18 @@ if (window.RegisterWebComponent) {
                             from="@parent:(click)" to="[expenses]:toggleUniqueClass">
                     </bind-element>
                 </button>
+                <button toggle learn class="btn-accion">
+                    <cw-book-icon></cw-book-icon>
+                    <span>Lean</span>
+                    <bind-element
+                            value="todos"
+                            from="@parent:(click)" to="navigation-bar:changeRoute">
+                    </bind-element>
+                    <bind-element
+                            value="selected"
+                            from="@parent:(click)" to="[todo]:toggleUniqueClass">
+                    </bind-element>
+                </button>
                 <button toggle todo class="btn-accion">
                     <cw-todo-icon></cw-todo-icon>
                     <span>To-Do</span>
@@ -42,6 +54,7 @@ if (window.RegisterWebComponent) {
                             from="@parent:(click)" to="[todo]:toggleUniqueClass">
                     </bind-element>
                 </button>
+                
             </div>
         `,
         // language=CSS
@@ -89,7 +102,7 @@ if (window.RegisterWebComponent) {
                 }
             }
 
-            cw-home-icon, cw-todo-icon {
+            cw-home-icon, cw-todo-icon,cw-book-icon{
                 fill: white;
                 height: 19px;
                 width: 19px;
