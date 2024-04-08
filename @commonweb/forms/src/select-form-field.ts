@@ -4,20 +4,45 @@ import {Attribute, WebComponent} from "@commonweb/core";
     selector: `select-form-field`,
     //language=HTML
     template: `
-        <label for="select-input"></label>
-        <select name="select-input">
-            
-            <template for-each="{{@host:[options]}">
-                <option value=""></option>
-            </template>
-        </select>
+
+        <label class="form-field">
+            <select name="select-input">
+
+            </select>
+        </label>
     `,
-    style: `:host{
-            display:flex;flex-direction:column;gap:10px;color: var( --font-primary, #efefef);
+
+    // language=CSS
+    style: `
+        :host {
+            display: flex;
+            margin: 10px;
         }
+
+        .form-field {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            margin: 10px 0;
+            background-color: var(--form-field-bg);
+            border: var(--form-border, 1px solid);
+            border-radius: var(--form-border-radius, 4px);
+            border-color: var(--form-border-color, #ccc);
+            padding-right: 10px;
+        }
+
         select {
-            padding: 12px 20px;border: 1px solid #ccc;border-radius: var(--btn-radius,4px);
-            background-color: var(--bg-primary,gray);
+            background: none;
+            font-size: var(--form-text-size);
+            color: var(--form-text);
+            border: none;
+            padding: var(--form-input-padding, 12px 20px);
+        }
+
+        label {
+            gap: 4px;
+            color: var(--form-text);
+            font-size: var(--form-text-size);
         }
     `
 })
@@ -31,4 +56,21 @@ export class SelectFormField extends HTMLElement {
 
     @Attribute('options')
     public options = [];
+
+    public reset() {
+        this.shadowRoot.querySelector("select").value = ""
+    }
+
+    public value() {
+        const value = this.shadowRoot.querySelector("select").value;
+        return value;
+    }
+
+    connectedCallback() {
+        const options = this.querySelectorAll("option") || this.shadowRoot.querySelectorAll("option");
+        const selectElement = this.shadowRoot.querySelector("select");
+        options.forEach(op => {
+            selectElement.appendChild(op.cloneNode(true));
+        })
+    }
 }

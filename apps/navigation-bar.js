@@ -96,7 +96,7 @@ if (window.RegisterWebComponent) {
             @media (max-width: 800px) {
 
                 .barra-acciones {
-                    padding: 10px 10px;
+                    padding: 0px 10px 10px 10px;
                     justify-content: space-around;
                     flex-direction: row;
                 }

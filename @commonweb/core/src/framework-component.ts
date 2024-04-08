@@ -34,11 +34,12 @@ export class FrameworkComponent extends HTMLElement {
 
     }
 
-    public evaluateDirectives(): void {
-        if (!this.directives) {
-            return
+    public evaluateDirectives(): FrameworkComponent {
+        if (this.directives) {
+            this.directives.forEach(d => d.call(this));
         }
-        this.directives.forEach(d => d.call(this))
+
+        return this;
     }
 
     updateAttributes(name: string, newValue: any) {
@@ -56,7 +57,7 @@ export class FrameworkComponent extends HTMLElement {
                 // so we can index the property on the target
                 this[handler] = valueToPass;
             }
-        }else {
+        } else {
             this[name] = newValue;
         }
     }
@@ -78,7 +79,7 @@ export class FrameworkComponent extends HTMLElement {
     }
 
     // Run al interpolations
-    public checkAllInterpolations() {
+    public checkAllInterpolations(): FrameworkComponent {
         const interpolations = this.interpolations;
         // if you didn't use the notation wont have this field set.
         if (interpolations) {
@@ -86,5 +87,16 @@ export class FrameworkComponent extends HTMLElement {
                 interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
             }
         }
+
+        return this;
     }
+
+    public changes = [];
+
+    public change(change: any): FrameworkComponent {
+        this.changes.push(change);
+        return this;
+    }
+
+
 }

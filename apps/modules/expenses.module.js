@@ -3,49 +3,42 @@ window.RegisterWebComponent({
     // language=HTML
     template: `
         <h4>Streams</h4>
-        <div>
-            <div>
+        <local-storage-value
+                property-matcher="id"
+                item-key="id"
+                data-list
+                key="demo-streams">
+        </local-storage-value>
+        <bind-element input-path="detail"
+                      from="[data-list]:(appended-value)" to="[stream-list]:push">
+        </bind-element>
+        <div style="overflow: auto;height: 84vh;position: relative">
+            <template stream-list for-each="[data-list]:[value]">
+                <stream-card data="{{@host:[data]}}"></stream-card>
+            </template>
 
-                <div class="card">
-
-                    <bind-element value="collapse" from="@parent:(click)" to="[toggle]:toggleClass"></bind-element>
-
-
-                    <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
-                        <h3>Cash</h3>
-                        <span style="color: #02b9b9">Fixed</span>
-                    </div>
-                    <span style="font-size: xx-large">$500.00</span>
-                    <div style="display: flex;justify-content: end;align-items: center;gap:8px">
-                        <strong> 43</strong>
-                        <cw-tansaction-icon class="small-icon"></cw-tansaction-icon>
-                    </div>
-                </div>
-                <bind-element value="demo-expenses-list"
-                              from=".card:(click)"
-                              to="expenses-list:setStreamID">
-                </bind-element>
-                <div toggle class="collapse fixed">
-                    <div>
-                        <div class="detail-header">
-                            <cw-left-arrow-icon>
-                                <bind-element value="collapse" from="@parent:(click)"
-                                              to="[toggle]:toggleClass"></bind-element>
-
-                            </cw-left-arrow-icon>
-                            <h3>Cash</h3>
-                            <span style="color: #02b9b9">Fixed</span>
-                        </div>
-                        <div style="padding: 1rem;">
-                            <expenses-list></expenses-list>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <floating-content>
+                <cw-plus-icon slot="trigger"></cw-plus-icon>
+                <cw-card slot="content" form>
+                    <stream-form>
+                        <bind-element input-path="detail" from="@parent:(submit)"
+                                      to="[data-list]:append"></bind-element>
+                        <bind-element from="@parent:(submit)" to="floating-content:close"></bind-element>
+                    </stream-form>
+                </cw-card>
+            </floating-content>
         </div>
+       
 
     `,
+    // language=CSS
+    style: ``,
+})
+
+    .build();
+
+
+window.RegisterWebComponent({
     // language=CSS
     style: `
         .detail-header {
@@ -66,25 +59,6 @@ window.RegisterWebComponent({
             margin: 0;
         }
 
-        .floating-action {
-            background: none;
-            border: none;
-            position: fixed;
-            z-index: 2;
-            bottom: 70px;
-            right: 20px;
-        }
-
-
-        .selected {
-            color: #80d674;
-            fill: #80d674;
-        }
-
-        .hidden {
-            display: none;
-        }
-
         .card {
             padding: 1rem;
             outline-offset: 4px;
@@ -96,16 +70,6 @@ window.RegisterWebComponent({
 
         }
 
-        .card[form] {
-            bottom: 80px;
-            position: absolute;
-
-            width: -webkit-fill-available;
-            height: calc(100% - 80px);
-            left: 0;
-            transition: all 0.2s ease-out;
-
-        }
 
         .fixed {
             width: 100%;
@@ -115,18 +79,80 @@ window.RegisterWebComponent({
             height: calc(100% - 50px);
             background: var(--card-bg);
             left: 0;
+            z-index: 2;
         }
 
         .collapse {
 
             left: -100%;
             overflow: hidden;
+        }`,
+    selector: `stream-card`,
+    //language=HTML
+    template: `
+        <div class="card">
+            <bind-element value="collapse" from="@parent:(click)" to="[toggle]:toggleClass"></bind-element>
+            <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
+                <h3>{{@host:[data.title]}}</h3>
+                <span style="color: #02b9b9">{{@host:[data.type]}}</span>
+            </div>
+            <span style="font-size: xx-large">{{@host:totalAmount}}</span>
+            <div style="display: flex;justify-content: end;align-items: center;gap:8px">
+                <strong> {{@host:transactionsCount}}</strong>
+                <cw-tansaction-icon class="small-icon"></cw-tansaction-icon>
+            </div>
+        </div>
+        <bind-element value="{{@host:[data.id]}}"
+                      from=".card:(click)"
+                      to="expenses-list:setStreamID">
+        </bind-element>
+
+        <div toggle class="collapse fixed">
+            <div>
+                <div class="detail-header">
+                    <cw-left-arrow-icon>
+                        <bind-element value="collapse" from="@parent:(click)"
+                                      to="[toggle]:toggleClass"></bind-element>
+
+                    </cw-left-arrow-icon>
+                    <h3>{{@host:[data.title]}}</h3>
+                    <span style="color: #02b9b9">{{@host:[data.type]}}</span>
+                </div>
+                <div style="padding: 1rem;">
+                    <expenses-list></expenses-list>
+                </div>
+            </div>
+        </div>
+    `,
+
+})
+    .with_method("totalAmount", function (param) {
+        if (!this.data) {
+            return 0;
+        }
+        const transactionsStr = localStorage.getItem(this.data.id);
+        if (!transactionsStr) {
+            return 0;
         }
 
-    `,
-})
+        const transactions = JSON.parse(transactionsStr);
+        const total = transactions.reduce((acc, t) => acc += t.transactions.reduce((totalDay, td) => totalDay += td.amount, 0), 0);
+        return total.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+    })
+    .with_method("transactionsCount", function (param) {
+        if (!this.data) {
+            return 0;
+        }
+        const transactionsStr = localStorage.getItem(this.data.id);
+        if (!transactionsStr) {
+            return 0;
+        }
 
-    .build();
+        const transactions = JSON.parse(transactionsStr);
+        const total = transactions.reduce((acc, t) => acc += t.transactions.length, 0);
+        return total;
+    })
+    .build()
 
 
 window.RegisterWebComponent({
@@ -161,25 +187,22 @@ window.RegisterWebComponent({
                         to="[data-list]:removeItem">
                 </bind-element>
             </template>
-            <button add class="floating-action">
-                <div>
-                    <cw-plus-icon></cw-plus-icon>
-                </div>
-                <bind-element
-                        from="button[add]:(click)" to="expense-form:reset">
-                </bind-element>
-                <bind-element
-                        value="collapse"
-                        from="button[add]:(click)" to="[form]:toggleClass">
-                </bind-element>
-            </button>
-        </div>
-        <div form toggle class="card collapse">
-            <expense-form></expense-form>
-            <bind-element input-path="detail" from="expense-form:(new-day)" to="[data-list]:append"></bind-element>
-            <bind-element input-path="detail" from="expense-form:(submit)" to="[data-list]:updateValue"></bind-element>
-            <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
-            <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
+
+            <floating-content>
+                <cw-plus-icon slot="trigger"></cw-plus-icon>
+
+                <cw-card slot="content" form>
+                    <expense-form></expense-form>
+                    <bind-element
+                            input-path="detail" from="expense-form:(new-day)"
+                            to="[data-list]:append"></bind-element>
+                    <bind-element input-path="detail" from="expense-form:(submit)"
+                                  to="[data-list]:updateValue"></bind-element>
+                    <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
+                    <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
+                </cw-card>
+            </floating-content>
+
         </div>
 
 
@@ -190,25 +213,6 @@ window.RegisterWebComponent({
             margin: 0;
         }
 
-        .floating-action {
-            background: none;
-            border: none;
-            position: absolute;
-            z-index: 2;
-            bottom: 0px;
-            right: 20px;
-        }
-
-
-        .selected {
-            color: #80d674;
-            fill: #80d674;
-        }
-
-        .hidden {
-            display: none;
-        }
-
         .card {
             padding: 0.5rem;
             outline-offset: 4px;
@@ -217,24 +221,6 @@ window.RegisterWebComponent({
             background: var(--card-bg);
             color: var(--card-fc);
         }
-
-        .card[form] {
-            bottom: 80px;
-            position: absolute;
-
-            width: -webkit-fill-available;
-            height: calc(100% - 80px);
-            left: 0;
-            transition: all 0.2s ease-out;
-
-        }
-
-        .collapse {
-            height: 0 !important;
-            padding: 0;
-            overflow: hidden;
-        }
-
     `,
 })
     .with_method("setStreamID", function (streamID) {
@@ -247,7 +233,6 @@ window.RegisterWebComponent({
 
     })
     .on_init(function () {
-        console.log(this)
     })
     .build();
 
@@ -734,6 +719,126 @@ window.RegisterWebComponent({
         }
 
         this.dispatchEvent(new CustomEvent("submit", {detail: dateList}))
+
+    })
+    .with_method("reset", function (data) {
+        this.category = null;
+        this.shadowRoot.querySelector("form-group").reset();
+    })
+    .build()
+
+
+window.RegisterWebComponent({
+    selector: "stream-form",
+    //language=CSS
+    style: `
+        :host {
+            display: block;
+            margin: 30px 0px;
+        }
+
+        .card {
+            padding: 0.5rem;
+            outline-offset: 4px;
+            outline: var(--card-outline);
+            border-radius: 5px;
+            background: var(--card-bg);
+            color: var(--card-fc);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .card-icon {
+            height: 5rem;
+            width: 5rem;
+            border-radius: 50%;
+            background: var(--content-bg);
+            padding: 1rem;
+        }
+
+        .flex-centered {
+            justify-content: center;
+            align-items: center;
+        }
+
+        button[submit] {
+            border: none;
+            outline: 2px solid #a083c3;
+            background: #5339d6;
+            font-weight: bold;
+            padding: 1rem;
+            font-size: large;
+            width: -webkit-fill-available;
+            color: white;
+            margin: 10px;
+        }
+
+        button[icon] {
+            background: none;
+            align-items: center;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            width: fit-content;
+            padding: 1rem;
+            outline: none;
+            border: none;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        }
+
+        [icon].selected {
+            border-radius: 5px;
+            outline: 2px solid #9a77e0;
+        }
+
+        .gap {
+            gap: 1.5rem;
+        }`,
+    //language=HTML
+    template: `
+        <div>
+            <!--Stepped Form-->
+            <form-group>
+                <form-field property="title" label="Reason" placeholder="Cash"></form-field>
+                <select-form-field property="type">
+                    <option disabled selected>Select a stream Type</option>
+                    <option value="Fixed">Fixed</option>
+                    <option value="Debt">Debt</option>
+                    <option value="Pending">Pending</option>
+                </select-form-field>
+                <form-field format="currency" property="amount" label="Initial Amount"
+                            placeholder="$323.23"></form-field>
+                <button submit>Create</button>
+
+            </form-group>
+            <bind-element input-path="detail.data" from="form-group:(submit)" to="@host:submit"></bind-element>
+            <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
+        </div>
+
+    `
+})
+    .with_method("submit", function (data) {
+        function generateUUID() {
+            // Generar un array de 16 bytes aleatorios
+            const bytes = new Uint8Array(16);
+            window.crypto.getRandomValues(bytes);
+
+            // Convertir los bytes a una cadena hexadecimal
+            let uuid = "";
+            for (const byte of bytes) {
+                uuid += byte.toString(16).padStart(2, "0");
+            }
+
+            // Insertar los guiones en la posición correcta
+            return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
+        }
+
+        data.initialDate = new Date();
+        data.id = generateUUID();
+        this.reset()
+        this.dispatchEvent(new CustomEvent("submit", {detail: data}));
 
     })
     .with_method("reset", function (data) {
