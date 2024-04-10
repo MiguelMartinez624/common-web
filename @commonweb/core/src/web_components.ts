@@ -125,6 +125,11 @@ export function WebComponent(attr: CustomElementConfig) {
 
 
             public connectedCallback() {
+
+                if ((this as any).servers) {
+                    (this as any).servers.forEach(s => s.onInit())
+                }
+
                 insertTemplate.call(this, attr);
                 this.wireTemplate();
 
