@@ -2,33 +2,41 @@ window.RegisterWebComponent({
     selector: "expenses-module",
     // language=HTML
     template: `
-        <h4>Streams</h4>
-        <local-storage-value
-                property-matcher="id"
-                item-key="id"
-                data-list
-                key="demo-streams">
-        </local-storage-value>
-        <bind-element input-path="detail"
-                      from="[data-list]:(appended-value)" to="[stream-list]:push">
-        </bind-element>
-        <div style="overflow: auto;height: 84vh;position: relative">
-            <template stream-list for-each="[data-list]:[value]">
-                <stream-card data="{{@host:[data]}}"></stream-card>
-            </template>
+        <div>
+            <div style="display: flex;justify-content: space-between">
+                <h4>Streams</h4>
+                <button style="background: none;outline: none;border:none;color: white; font-weight: bold">
+                    + Add
+                    <bind-element from="@parent:(click)" to="floating-content:toggle"></bind-element>
+                </button>
 
-            <floating-content>
-                <cw-plus-icon slot="trigger"></cw-plus-icon>
-                <cw-card slot="content" form>
-                    <stream-form>
-                        <bind-element input-path="detail" from="@parent:(submit)"
-                                      to="[data-list]:append"></bind-element>
-                        <bind-element from="@parent:(submit)" to="floating-content:close"></bind-element>
-                    </stream-form>
-                </cw-card>
-            </floating-content>
+            </div>
+            <local-storage-value
+                    property-matcher="id"
+                    item-key="id"
+                    data-list
+                    key="demo-streams">
+            </local-storage-value>
+            <bind-element input-path="detail"
+                          from="[data-list]:(appended-value)" to="[stream-list]:push">
+            </bind-element>
+            <div style="overflow: auto;height:85vh;position: relative">
+                <template stream-list for-each="[data-list]:[value]">
+                    <stream-card data="{{@host:[data]}}"></stream-card>
+                </template>
+
+            </div>
         </div>
-       
+
+        <floating-content>
+            <cw-card slot="content" form>
+                <stream-form>
+                    <bind-element input-path="detail" from="@parent:(submit)"
+                                  to="[data-list]:append"></bind-element>
+                    <bind-element from="@parent:(submit)" to="floating-content:toggle"></bind-element>
+                </stream-form>
+            </cw-card>
+        </floating-content>
 
     `,
     // language=CSS
@@ -50,17 +58,18 @@ window.RegisterWebComponent({
         }
 
         .small-icon {
-            height: 24px;
+            height: 20px;
+            width: 20px;
             fill: white;
 
         }
 
-        h4, h3 {
+        h4, h3, h5 {
             margin: 0;
         }
 
         .card {
-            padding: 1rem;
+            padding: 0.5rem;
             outline-offset: 4px;
             outline: var(--card-outline);
             border-radius: 5px;
@@ -93,10 +102,10 @@ window.RegisterWebComponent({
         <div class="card">
             <bind-element value="collapse" from="@parent:(click)" to="[toggle]:toggleClass"></bind-element>
             <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
-                <h3>{{@host:[data.title]}}</h3>
-                <span style="color: #02b9b9">{{@host:[data.type]}}</span>
+                <h5>{{@host:[data.title]}}</h5>
+                <span style="color: #02b9b9;font-size: small">{{@host:[data.type]}}</span>
             </div>
-            <span style="font-size: xx-large">{{@host:totalAmount}}</span>
+            <span style="font-size: x-large">{{@host:totalAmount}}</span>
             <div style="display: flex;justify-content: end;align-items: center;gap:8px">
                 <strong> {{@host:transactionsCount}}</strong>
                 <cw-tansaction-icon class="small-icon"></cw-tansaction-icon>
@@ -155,74 +164,105 @@ window.RegisterWebComponent({
     .build()
 
 
-window.RegisterWebComponent({
-    selector: "expenses-list",
-    // language=HTML
-    template: `
-        <div>
-            <h4>Transaction List</h4>
-        </div>
-        <local-storage-value
-                property-matcher="date"
-                item-key="date"
-                data-list
-                key="{{@host:[streamID]}}">
-        </local-storage-value>
-        <bind-element input-path="detail"
-                      from="[data-list]:(appended-value)" to="[expenses-list]:push">
-        </bind-element>
-        <bind-element input-path="detail" from="[data-list]:(item-removed)"
-                      to="[expenses-list]:removeItem">
-        </bind-element>
-        <bind-element input-path="detail"
-                      from="[data-list]:(updated-value)" to="[expenses-list]:replace">
-        </bind-element>
-        <div style="overflow: auto;height: 84vh;padding: 3px">
-            <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
+window
+    .RegisterWebComponent({
+        selector: "expenses-list",
+        // language=HTML
+        template: `
+            <div>
+                <h4>Transaction List</h4>
+            </div>
+            <local-storage-value
+                    property-matcher="date"
+                    item-key="date"
+                    data-list
+                    key="{{@host:[streamID]}}">
+            </local-storage-value>
+            <bind-element input-path="detail"
+                          from="[data-list]:(appended-value)" to="[expenses-list]:push">
+            </bind-element>
+            <bind-element input-path="detail" from="[data-list]:(item-removed)"
+                          to="[expenses-list]:removeItem">
+            </bind-element>
+            <bind-element input-path="detail"
+                          from="[data-list]:(updated-value)" to="[expenses-list]:replace">
+            </bind-element>
+            <div style="overflow: auto;height: 84vh;padding: 3px">
+                <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
 
-                <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
-                <bind-element
-                        input-path="detail"
-                        from="expense-list-by-date:(delete)"
-                        to="[data-list]:removeItem">
-                </bind-element>
-            </template>
-
-            <floating-content>
-                <cw-plus-icon slot="trigger"></cw-plus-icon>
-
-                <cw-card slot="content" form>
-                    <expense-form></expense-form>
+                    <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
                     <bind-element
-                            input-path="detail" from="expense-form:(new-day)"
-                            to="[data-list]:append"></bind-element>
-                    <bind-element input-path="detail" from="expense-form:(submit)"
-                                  to="[data-list]:updateValue"></bind-element>
-                    <bind-element value="collapse" from="expense-form:(submit)" to="[form]:toggleClass"></bind-element>
-                    <bind-element value="collapse" from="expense-form:(new-day)" to="[form]:toggleClass"></bind-element>
-                </cw-card>
-            </floating-content>
+                            input-path="detail"
+                            from="expense-list-by-date:(delete)"
+                            to="[data-list]:removeItem">
+                    </bind-element>
+                </template>
 
-        </div>
+                <floating-content>
+                    <cw-plus-icon slot="trigger"></cw-plus-icon>
+
+                    <cw-card slot="content" form>
+                        <expense-form></expense-form>
+                        <bind-element  from="expense-form:(submit)"
+                                       to="floating-content:toggle"></bind-element>
+                        <bind-element input-path="detail" from="expense-form:(submit)"
+                                      to="expenses-list:handleSubmit"></bind-element>
+                       
+                    </cw-card>
+                </floating-content>
+
+            </div>
 
 
-    `,
-    // language=CSS
-    style: `
-        h4 {
-            margin: 0;
+        `,
+        // language=CSS
+        style: `
+            h4 {
+                margin: 0;
+            }
+
+            .card {
+                padding: 0.5rem;
+                outline-offset: 4px;
+                outline: var(--card-outline);
+                border-radius: 5px;
+                background: var(--card-bg);
+                color: var(--card-fc);
+            }
+        `,
+    })
+    .with_method("handleSubmit", function (data) {
+        debugger
+        const storage = this.shadowRoot.querySelector("local-storage-value");
+        const value = storage.value;
+        if (!value || value.length === 0) {
+            storage.append({
+                date: new Date(data.date).toString(),
+                transactions: [data]
+            });
+            return;
         }
 
-        .card {
-            padding: 0.5rem;
-            outline-offset: 4px;
-            outline: var(--card-outline);
-            border-radius: 5px;
-            background: var(--card-bg);
-            color: var(--card-fc);
+        const dateList = value.find(v => {
+            const [days, month, year] = v.date.split("/")
+            const date1 = new Date(`${year}/${month}/${days}`).toString();
+            const date2 = new Date(data.date).toString();
+            return date1 === date2
+        });
+
+        if (dateList) {
+            dateList.transactions.push(data);
+            storage.updateValue(dateList)
+        } else {
+            storage.append({
+                date: new Date(data.date).toString(),
+                transactions: [data]
+
+
+            });
         }
-    `,
-})
+
+    })
     .with_method("setStreamID", function (streamID) {
         // Usar patron de cuando seteas algo, manualente evaluar los cambios
         //ventaja q podes realizar procesos previos antes de actualizar la vista
@@ -267,6 +307,8 @@ window.RegisterWebComponent({
     template: `
         <local-storage-value
                 item-key="data"
+                property-matcher="date"
+                item-key="date"
                 data-list
                 key="demo-expenses-list">
         </local-storage-value>
@@ -524,6 +566,9 @@ window.RegisterWebComponent({
                 break
             case "food":
                 cariCon.innerHTML = '<cw-shopping-car-icon></cw-shopping-car-icon>'
+                break;
+            case "Initial":
+                cariCon.innerHTML = '<cw-building-icon></cw-building-icon>'
                 break
             default:
                 cariCon.innerHTML = '<cw-shopping-car-icon></cw-shopping-car-icon>'
@@ -621,13 +666,6 @@ window.RegisterWebComponent({
     //language=HTML
     template: `
         <div>
-            <local-storage-value
-                    item-key="date"
-                    data-list
-                    key="demo-expenses-list">
-            </local-storage-value>
-
-
             <!--Stepped Form-->
             <form-group>
                 <div style="padding: 1rem">
@@ -671,6 +709,16 @@ window.RegisterWebComponent({
 
     `
 })
+    .with_attribute("stream-id", function (streamID) {
+        // Usar patron de cuando seteas algo, manualente evaluar los cambios
+        //ventaja q podes realizar procesos previos antes de actualizar la vista
+        //y esto seria un patron del framework
+        this.changeAttributeAndUpdate("streamID", streamID);
+        this.checkAllInterpolations();
+        this.evaluateDirectives();
+        console.log({streamID})
+
+    })
     .with_method("setCategory", function (va) {
         this.category = va;
     })
@@ -681,44 +729,7 @@ window.RegisterWebComponent({
         return "00/00/0000"
     })
     .with_method("submit", function (data) {
-        data.category = this.category;
-
-        const storage = this.shadowRoot.querySelector("local-storage-value");
-        const value = storage.value;
-        if (!value || value.length === 0) {
-            // Initialize
-            this.dispatchEvent(new CustomEvent("new-day", {
-                detail:
-                    {
-                        date: new Date(data.date).toString(),
-                        transactions: [data]
-                    }
-
-            }));
-            return
-        }
-
-        const dateList = value.find(v => {
-            const [days, month, year] = v.date.split("/")
-            const date1 = new Date(`${year}/${month}/${days}`).toString();
-            const date2 = new Date(data.date).toString();
-            return date1 === date2
-        });
-
-        if (dateList) {
-            dateList.transactions.push(data);
-        } else {
-            this.dispatchEvent(new CustomEvent("new-day", {
-                detail:
-                    {
-                        date: new Date(data.date).toString(),
-                        transactions: [data]
-                    }
-            }));
-            return
-        }
-
-        this.dispatchEvent(new CustomEvent("submit", {detail: dateList}))
+        this.dispatchEvent(new CustomEvent("submit", {detail: data}))
 
     })
     .with_method("reset", function (data) {
@@ -835,10 +846,30 @@ window.RegisterWebComponent({
             return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
         }
 
+
         data.initialDate = new Date();
         data.id = generateUUID();
+        localStorage.setItem(data.id, JSON.stringify([
+            {
+                date: data.initialDate,
+                transactions: [
+                    {
+                        title: "Initial Balance",
+                        date: data.initialDate,
+                        amount: data.amount,
+                        category: "Initial",
+                        description: "Initial stream amount."
+                    }
+                ]
+            }
+
+        ]));
+
+        delete data.amount;
+
         this.reset()
         this.dispatchEvent(new CustomEvent("submit", {detail: data}));
+
 
     })
     .with_method("reset", function (data) {

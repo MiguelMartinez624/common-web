@@ -62,7 +62,11 @@ window.RegisterWebComponent({
     `
 })
     .with_method('close', function () {
-        this.shadowRoot.querySelector("[toggle]").toggleClass("collapse");
+        this.shadowRoot.querySelector(".content").toggleClass("collapse");
+    })
+    .with_method('toggle', function () {
+        this.shadowRoot.querySelector(".content").toggleClass("collapse");
+        this.shadowRoot.querySelector("button").toggleClass("hidden");
     })
     .build();
 

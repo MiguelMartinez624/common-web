@@ -46,6 +46,21 @@ window.RegisterWebComponent({
                     </div>
                 </div>
             </div>
+
+            <div class="card" style="height: 330px;    margin-top: 14px;">
+                <h4 style="    margin: 0;
+    border-bottom: 1px solid #9fadd0;
+    padding-bottom: 0.6rem">Annaucements</h4>
+
+                <amp-ad width="100vw" height="320"
+                        type="adsense"
+                        data-ad-client="ca-pub-6199438250356984"
+                        data-ad-slot="7202022301"
+                        data-auto-format="rspv"
+                        data-full-width="">
+                    <div overflow=""></div>
+                </amp-ad>
+            </div>
         </div>
 
     `,
