@@ -1,3 +1,4 @@
+import {InterpolationServer} from "./server";
 
 export * from './attribute-interpolation';
 export * from './template-interpolation';
@@ -6,28 +7,19 @@ export * from './template-interpolation';
 export interface Interpolation {
     update()
 }
+
+
 export function TemplateScanner(): ClassDecorator {
     return (target: any) => {
-        // Agregar los métodos a la clase
-        target.prototype.scanTemplateForInterpolation = function (template: string) {
-            // Implementar la lógica de escaneo
-            // ...
-        };
-
-        target.prototype.evaluateInterpolations = function (
-            template: string,
-            data: any
-        ) {
-            // Implementar la lógica de evaluación
-            // ...
-        };
-
-        target.prototype.getInterpolationPositions = function () {
-            // Implementar la lógica de extracción de posiciones
-            // ...
-        };
-
-
+        appendInterpolationServer(target)
         return target;
     };
-}Al
+}
+
+export function appendInterpolationServer(target: any) {
+    if (target.servers === undefined) {
+        target.servers = [new InterpolationServer()];
+    } else {
+        target.servers.push(new InterpolationServer());
+    }
+}

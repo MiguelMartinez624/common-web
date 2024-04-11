@@ -1,5 +1,7 @@
 import {extractData, findAllChildrensBySelector} from "../html_manipulation";
 import {ElementBind} from "../bindings";
+import {InterpolationServer} from "../interpolations/server";
+import {LoopServer} from "./server";
 
 export * from "./for-each";
 
@@ -62,4 +64,12 @@ export function checkShowIfDirective() {
                 }
             }
         });
+}
+
+export function appendLoopServer(target: any) {
+    if (target.servers === undefined) {
+        target.servers = [new LoopServer()];
+    } else {
+        target.servers.push(new LoopServer());
+    }
 }

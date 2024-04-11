@@ -1,11 +1,14 @@
 import {syncWithStorage} from "./storage";
 
 import {
+    appendInterpolationServer,
 
     generateAttributesInterpolations,
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
+import {Server} from "./server";
+import {appendLoopServer} from "./directives";
 
 export class CustomElementConfig {
     selector: string;
@@ -94,15 +97,22 @@ export function WebComponent(attr: CustomElementConfig) {
             constructor(...args: any[]) {
                 super(...args);
 
+                appendInterpolationServer(this);
+                appendLoopServer(this);
                 // Whats the different for a framework component ?.
                 (this as any).directives = attr.directives;
 
+                if ((this as any).servers) {
+                    (this as any).servers.forEach((s: Server) => s.setup(this));
+                }
             }
 
 
             attributeChangedCallback(name, oldValue, newValue) {
                 updateAttributes(this, name, newValue);
-                this.checkInterpolationsFor(name);
+                if ((this as any).servers) {
+                    (this as any).servers.forEach(s => s.onUpdate());
+                }
             }
 
 
@@ -115,50 +125,21 @@ export function WebComponent(attr: CustomElementConfig) {
                 if (this['directives']) {
                     this['directives'].forEach(d => d.call(this))
                 }
-                if (this['checkInterpolations']) {
-                    // Whats the different for a framework component ?.
-                    (this as any).checkInterpolations();
-
-                }
-
             }
 
 
             public connectedCallback() {
 
-                if ((this as any).servers) {
-                    (this as any).servers.forEach(s => s.onInit())
-                }
 
                 insertTemplate.call(this, attr);
                 this.wireTemplate();
 
-                syncWithStorage(this as unknown as HTMLElement);
-                this["checkAllInterpolations"]();
                 if (super["connectedCallback"]) {
                     super["connectedCallback"]();
                 }
 
-            }
-
-            public checkInterpolationsFor(name) {
-                const interpolations = (this as any).interpolations;
-                // if you didn't use the notation wont have this field set.
-                if (interpolations) {
-                    const interpolationsList = interpolations.get(name);
-                    if (interpolationsList) {
-                        interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
-                    }
-                }
-            }
-
-            public checkAllInterpolations() {
-                const interpolations = (this as any).interpolations;
-                // if you didn't use the notation wont have this field set.
-                if (interpolations) {
-                    for (const [key, interpolationList] of interpolations) {
-                        interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
-                    }
+                if ((this as any).servers) {
+                    (this as any).servers.forEach(s => s.onInit());
                 }
             }
 

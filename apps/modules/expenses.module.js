@@ -176,7 +176,7 @@ window
                     property-matcher="date"
                     item-key="date"
                     data-list
-                    key="{{@host:[streamID]}}">
+                    key="{{@host:[stream-id]}}">
             </local-storage-value>
             <bind-element input-path="detail"
                           from="[data-list]:(appended-value)" to="[expenses-list]:push">
@@ -203,11 +203,11 @@ window
 
                     <cw-card slot="content" form>
                         <expense-form></expense-form>
-                        <bind-element  from="expense-form:(submit)"
-                                       to="floating-content:toggle"></bind-element>
+                        <bind-element from="expense-form:(submit)"
+                                      to="floating-content:toggle"></bind-element>
                         <bind-element input-path="detail" from="expense-form:(submit)"
                                       to="expenses-list:handleSubmit"></bind-element>
-                       
+
                     </cw-card>
                 </floating-content>
 
@@ -232,7 +232,6 @@ window
         `,
     })
     .with_method("handleSubmit", function (data) {
-        debugger
         const storage = this.shadowRoot.querySelector("local-storage-value");
         const value = storage.value;
         if (!value || value.length === 0) {
@@ -263,14 +262,9 @@ window
         }
 
     })
-    .with_method("setStreamID", function (streamID) {
-        // Usar patron de cuando seteas algo, manualente evaluar los cambios
-        //ventaja q podes realizar procesos previos antes de actualizar la vista
-        //y esto seria un patron del framework
-        this.changeAttributeAndUpdate("streamID", streamID);
-        this.checkAllInterpolations();
-        this.evaluateDirectives();
-
+    .with_attribute("stream-id", null)
+    .with_method("setStreamID", function (value) {
+        this.setAttribute("stream-id", value)
     })
     .on_init(function () {
     })
