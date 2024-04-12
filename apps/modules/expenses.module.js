@@ -1,3 +1,30 @@
+function obtenerFechaCalendario(fechaActual) {
+    // Obtener la fecha actual
+
+    // Formatear la fecha
+    const fechaCalendario = `${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getDate().toString().padStart(2, '0')}`;
+
+    // Devolver la fecha formateada
+    return fechaCalendario;
+}
+
+function generateUUID() {
+    // Generar un array de 16 bytes aleatorios
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+
+    // Convertir los bytes a una cadena hexadecimal
+    let uuid = "";
+    for (const byte of bytes) {
+        uuid += byte.toString(16).padStart(2, "0");
+    }
+
+    // Insertar los guiones en la posición correcta
+    return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
+}
+
+
+
 window.RegisterWebComponent({
     selector: "expenses-module",
     // language=HTML
@@ -190,7 +217,8 @@ window
             <div style="overflow: auto;height: 84vh;padding: 3px">
                 <template expenses-list loop-key="date" for-each="@[data-list]:[value]">
 
-                    <expense-list-by-date data="{{@host:[data]}}"></expense-list-by-date>
+                    <expense-list-by-date stream-id="{{@host:[stream-id]}}"
+                                          data="{{@host:[data]}}"></expense-list-by-date>
                     <bind-element
                             input-path="detail"
                             from="expense-list-by-date:(delete)"
@@ -204,9 +232,14 @@ window
                     <cw-card slot="content" form>
                         <expense-form></expense-form>
                         <bind-element from="expense-form:(submit)"
-                                      to="floating-content:toggle"></bind-element>
+                                      to="expense-form:reset">
+                        </bind-element>
+                        <bind-element from="expense-form:(submit)"
+                                      to="floating-content:toggle">
+                        </bind-element>
                         <bind-element input-path="detail" from="expense-form:(submit)"
-                                      to="expenses-list:handleSubmit"></bind-element>
+                                      to="expenses-list:handleSubmit">
+                        </bind-element>
 
                     </cw-card>
                 </floating-content>
@@ -232,21 +265,23 @@ window
         `,
     })
     .with_method("handleSubmit", function (data) {
+        data.id = generateUUID();
         const storage = this.shadowRoot.querySelector("local-storage-value");
         const value = storage.value;
+        const calendarDate = obtenerFechaCalendario(new Date(data.date))
         if (!value || value.length === 0) {
             storage.append({
-                date: new Date(data.date).toString(),
+                date: calendarDate,
                 transactions: [data]
             });
             return;
         }
 
         const dateList = value.find(v => {
-            const [days, month, year] = v.date.split("/")
-            const date1 = new Date(`${year}/${month}/${days}`).toString();
-            const date2 = new Date(data.date).toString();
-            return date1 === date2
+            // const [days, month, year] = v.date.split("/")
+            // const date1 = new Date(`${year}/${month}/${days}`).toString();
+            // const date2 = new Date(data.date).toString();
+            return v.date === calendarDate
         });
 
         if (dateList) {
@@ -254,10 +289,8 @@ window
             storage.updateValue(dateList)
         } else {
             storage.append({
-                date: new Date(data.date).toString(),
+                date: calendarDate,
                 transactions: [data]
-
-
             });
         }
 
@@ -265,6 +298,16 @@ window
     .with_attribute("stream-id", null)
     .with_method("setStreamID", function (value) {
         this.setAttribute("stream-id", value)
+
+        this.query()
+            .where('expenses-context')
+            .then((element) => {
+                console.log({element})
+            })
+            .catch(error => console.error(error))
+            .build()
+            .execute();
+
     })
     .on_init(function () {
     })
@@ -304,7 +347,7 @@ window.RegisterWebComponent({
                 property-matcher="date"
                 item-key="date"
                 data-list
-                key="demo-expenses-list">
+                key="{{@host:[stream-id]}}">
         </local-storage-value>
         <div>
             <div class="date-title">
@@ -572,7 +615,7 @@ window.RegisterWebComponent({
 
     })
     .with_method("delete", function (params) {
-        this.dispatchEvent(new CustomEvent("delete", {detail: this.data.title}))
+        this.dispatchEvent(new CustomEvent("delete", {detail: this.data.id}))
     })
     .with_method("dateFormatted", function () {
         if (this.data) {
@@ -710,7 +753,6 @@ window.RegisterWebComponent({
         this.changeAttributeAndUpdate("streamID", streamID);
         this.checkAllInterpolations();
         this.evaluateDirectives();
-        console.log({streamID})
 
     })
     .with_method("setCategory", function (va) {
@@ -825,29 +867,16 @@ window.RegisterWebComponent({
     `
 })
     .with_method("submit", function (data) {
-        function generateUUID() {
-            // Generar un array de 16 bytes aleatorios
-            const bytes = new Uint8Array(16);
-            window.crypto.getRandomValues(bytes);
-
-            // Convertir los bytes a una cadena hexadecimal
-            let uuid = "";
-            for (const byte of bytes) {
-                uuid += byte.toString(16).padStart(2, "0");
-            }
-
-            // Insertar los guiones en la posición correcta
-            return uuid.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, "$1-$2-$3-$4-$5");
-        }
 
 
-        data.initialDate = new Date();
+        data.initialDate = obtenerFechaCalendario(new Date());
         data.id = generateUUID();
         localStorage.setItem(data.id, JSON.stringify([
             {
                 date: data.initialDate,
                 transactions: [
                     {
+                        id: generateUUID(),
                         title: "Initial Balance",
                         date: data.initialDate,
                         amount: data.amount,

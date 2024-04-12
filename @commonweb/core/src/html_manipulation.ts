@@ -82,3 +82,69 @@ export function extractData(resultPath: string, obj: any) {
         .filter((p) => p !== "@host")
     return properties.reduce((prev: any, curr: any) => prev?.[curr], obj)
 }
+
+// // Usage example
+// const query = new QueryBuilder<HTMLElement>()
+//     .from(document.body)
+//     .where('#my-element')
+//     .then(element => console.log(element))
+//     .catch(error => console.error(error))
+//     .build();
+//
+// query.execute();
+export class QueryBuilder<T> {
+    private sourceElement: Node | null = null;
+    private selector: string | null = null;
+    private successHandler: ((result: T) => void) | null = null;
+    private errorHandler: ((error: string) => void) | null = null;
+
+    // Define methods to set properties
+    public from(sourceElement: Node): QueryBuilder<T> {
+        this.sourceElement = sourceElement;
+        return this;
+    }
+
+    public where(selector: string): QueryBuilder<T> {
+        this.selector = selector;
+        return this;
+    }
+
+    public then(successHandler: (result: T) => void): QueryBuilder<T> {
+        this.successHandler = successHandler;
+        return this;
+    }
+
+    public catch(errorHandler: (error: string) => void): QueryBuilder<T> {
+        this.errorHandler = errorHandler;
+        return this;
+    }
+
+    // Build the Query object
+    public build(): Query<T> {
+        if (!this.sourceElement || !this.selector || !this.successHandler || !this.errorHandler) {
+            throw new Error('Missing required properties for Query construction.');
+        }
+
+        return new Query<T>(this.sourceElement, this.selector, this.successHandler, this.errorHandler);
+    }
+}
+
+
+export class Query<T> {
+    constructor(
+        private readonly sourceElement: Node,
+        private readonly selector: string,
+        private readonly successHandler: (result: T) => void,
+        private readonly errorHandler: (error: string) => void) {
+    }
+
+    public execute(): void {
+        // do queery
+        const result = findNodeOnUpTree(this.selector, this.sourceElement);
+        if (!result) {
+            return this.errorHandler(`could not found element under selector ${this.selector}`);
+        }
+
+        this.successHandler(result as unknown as T);
+    }
+}

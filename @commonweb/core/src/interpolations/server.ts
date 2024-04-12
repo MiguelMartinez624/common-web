@@ -33,7 +33,6 @@ export class InterpolationServer implements Server {
 
     setup(root: any): void {
         this._root = root;
-
     }
 
 }

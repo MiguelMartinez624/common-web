@@ -9,6 +9,7 @@ import {
 } from "./interpolations";
 import {Server} from "./server";
 import {appendLoopServer} from "./directives";
+import {QueryBuilder} from "./html_manipulation";
 
 export class CustomElementConfig {
     selector: string;
@@ -127,6 +128,9 @@ export function WebComponent(attr: CustomElementConfig) {
                 }
             }
 
+            public query<T>(): QueryBuilder<T> {
+                return new QueryBuilder<T>().from(this as unknown as Node);
+            }
 
             public connectedCallback() {
 
