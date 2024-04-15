@@ -124,10 +124,6 @@ export function WebComponent(attr: CustomElementConfig) {
              *
              * */
             public wireTemplate() {
-                // Enhance with directives
-                if (this['directives']) {
-                    this['directives'].forEach(d => d.call(this))
-                }
             }
 
             public query<T>(): QueryBuilder<T> {

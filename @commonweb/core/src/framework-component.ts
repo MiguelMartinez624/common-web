@@ -41,10 +41,6 @@ export class FrameworkComponent extends HTMLElement {
     }
 
     public evaluateDirectives(): FrameworkComponent {
-        if (this.directives) {
-            this.directives.forEach(d => d.call(this));
-        }
-
         return this;
     }
 
