@@ -1,7 +1,7 @@
 import {CustomElementConfig, WebComponent} from "./web_components";
 import {FrameworkComponent} from "./framework-component";
 import {Attribute} from "./attributes";
-import {checkShowIfDirective, enhanceClassChange, forEachDirective} from "./directives";
+import {checkShowIfDirective} from "./directives";
 
 export class ComponentBuilder {
 
@@ -100,7 +100,7 @@ export class ComponentBuilder {
         };
 
 
-        WebComponent({...this.config, directives: [forEachDirective, checkShowIfDirective, enhanceClassChange]})(raw);
+        WebComponent({...this.config, directives: [ checkShowIfDirective]})(raw);
     }
 
 

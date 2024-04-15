@@ -1,9 +1,9 @@
-import {Server} from "../server";
+import {IComponent} from "../IComponent";
 import {findAllChildrensBySelector} from "../html_manipulation";
 import {interpolateAndRender} from "./for-each";
 import {ElementBind} from "../bindings";
 
-export class LoopServer implements Server {
+export class LooperComponent implements IComponent {
     private _root: any;
     private loopers: any[] = [];
 

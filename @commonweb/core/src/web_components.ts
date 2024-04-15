@@ -7,9 +7,10 @@ import {
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
-import {Server} from "./server";
+import {IComponent} from "./IComponent";
 import {appendLoopServer} from "./directives";
 import {QueryBuilder} from "./html_manipulation";
+import {appendCSSController} from "./directives/css-class";
 
 export class CustomElementConfig {
     selector: string;
@@ -100,11 +101,12 @@ export function WebComponent(attr: CustomElementConfig) {
 
                 appendInterpolationServer(this);
                 appendLoopServer(this);
+                appendCSSController(this);
                 // Whats the different for a framework component ?.
                 (this as any).directives = attr.directives;
 
                 if ((this as any).servers) {
-                    (this as any).servers.forEach((s: Server) => s.setup(this));
+                    (this as any).servers.forEach((s: IComponent) => s.setup(this));
                 }
             }
 
@@ -130,6 +132,12 @@ export function WebComponent(attr: CustomElementConfig) {
 
             public query<T>(): QueryBuilder<T> {
                 return new QueryBuilder<T>().from(this as unknown as Node);
+            }
+
+            public update(): void {
+                if ((this as any).servers) {
+                    (this as any).servers.forEach((s: IComponent) => s.onUpdate())
+                }
             }
 
             public connectedCallback() {

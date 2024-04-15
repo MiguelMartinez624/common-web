@@ -1,8 +1,8 @@
-import {Server} from "../server";
+import {IComponent} from "../IComponent";
 import {generateAttributesInterpolations, generateTemplateInterpolations, Interpolation} from "./index";
 
 
-export class InterpolationServer implements Server {
+export class InterpolationServer implements IComponent {
     public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
     private _root: any;
 

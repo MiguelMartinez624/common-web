@@ -746,15 +746,6 @@ window.RegisterWebComponent({
 
     `
 })
-    .with_attribute("stream-id", function (streamID) {
-        // Usar patron de cuando seteas algo, manualente evaluar los cambios
-        //ventaja q podes realizar procesos previos antes de actualizar la vista
-        //y esto seria un patron del framework
-        this.changeAttributeAndUpdate("streamID", streamID);
-        this.checkAllInterpolations();
-        this.evaluateDirectives();
-
-    })
     .with_method("setCategory", function (va) {
         this.category = va;
     })

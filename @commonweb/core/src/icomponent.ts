@@ -1,4 +1,4 @@
-export interface Server {
+export interface IComponent {
 
     setup(target: any): void;
 

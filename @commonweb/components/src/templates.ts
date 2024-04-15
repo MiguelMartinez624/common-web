@@ -1,8 +1,5 @@
 import {
     Attribute,
-    checkShowIfDirective,
-    enhanceClassChange,
-    forEachDirective,
     FrameworkComponent,
     WebComponent
 } from "@commonweb/core";
@@ -16,7 +13,6 @@ import {callRemoteAPI} from "./api-call.component";
 @WebComponent({
     selector: 'static-template',
     template: '<slot></slot>',
-    directives: [forEachDirective, enhanceClassChange, checkShowIfDirective]
 })
 export class StaticTemplate extends FrameworkComponent {
 

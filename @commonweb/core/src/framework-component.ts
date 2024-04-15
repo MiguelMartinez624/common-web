@@ -1,6 +1,6 @@
 import {Interpolation} from "./interpolations";
 import {bindTemplateToProperties, isJSON} from "./web_components";
-import {Server} from "./server";
+import {IComponent} from "./IComponent";
 
 
 /**
@@ -20,7 +20,7 @@ export class FrameworkComponent extends HTMLElement {
         super();
 
         if ((this as any).servers) {
-            (this as any).servers.forEach((s: Server) => s.setup(this))
+            (this as any).servers.forEach((s: IComponent) => s.setup(this))
         }
 
     }
@@ -106,7 +106,7 @@ export class FrameworkComponent extends HTMLElement {
 
     public update(): void {
         if ((this as any).servers) {
-            (this as any).servers.forEach((s: Server) => s.onUpdate())
+            (this as any).servers.forEach((s: IComponent) => s.onUpdate())
         }
     }
 }

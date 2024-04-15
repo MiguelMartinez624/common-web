@@ -36,7 +36,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
             selector = selector.slice(selector.indexOf("@") + 1);
         }
 
-        let queryResult: Node = (element as HTMLElement).querySelector(selector);
+        let queryResult: Node = (element as HTMLElement)?.shadowRoot?.querySelector(selector) || (element as HTMLElement).querySelector(selector);
         if (!queryResult && element.parentNode !== null) {
             queryResult = findNodeOnUpTree(selector, element.parentNode)
         } else if (!queryResult && element['host'] && element instanceof DocumentFragment) {

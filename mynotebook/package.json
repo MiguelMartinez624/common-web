@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "my-notebooks",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "push-canary": "npm run build && npm publish --access public",
+
+    "push": "npm run test && npm run build && npm publish --access public",
+    "build": "rollup -c ",
+    "build:watch": "rollup -c --watch",
+
+    "test": "jest"
+  },
+  "dependencies": {
+    "@commonweb/core": "npm:dist@*",
+    "@commonweb/components": "npm:dist@*",
+    "@commonweb/forms": "npm:dist@*"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MiguelMartinez624/common-web.git"
+  }
+}
