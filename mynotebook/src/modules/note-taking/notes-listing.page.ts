@@ -1,16 +1,15 @@
 import {WebComponent} from "@commonweb/core";
-import {CARD_STYLE} from "./styles";
-import {ExpensesContext, Observable} from "./expenses-context";
-import {Stream} from "./models";
-
+import {CARD_STYLE} from "../expenses/styles";
+import {ExpensesContext} from "../expenses";
+import {Stream} from "../expenses/models";
 
 @WebComponent({
-    selector: "expenses-page",
+    selector: "notes-page",
     // language=HTML
     template: `
         <div class="page">
             <div style="display: flex;justify-content: space-between;align-items: center">
-                <span class="y-center">    <h4>Streams</h4></span>
+                <span class="y-center">    <h4>Notes</h4></span>
 
                 <!-- actions                -->
                 <div class="y-center">
@@ -31,31 +30,7 @@ import {Stream} from "./models";
                 </div>
 
             </div>
-            <expenses-context></expenses-context>
-            <div style="overflow: auto;height:85vh;position: relative">
-                <div class="card">
-                    <span class="income stream-summary">Available <span> {{@host:[streamSummary.available]}}</span></span>
-                    <span class="income stream-summary">Pending <span> {{@host:[streamSummary.pending]}}</span></span>
-                    <span class="outcome stream-summary">Debt <span> {{@host:[streamSummary.debt]}}</span></span>
-                </div>
 
-                <template stream-list for-each="expenses-context:getAllStreams">
-                    <stream-card data="{{@host:[data]}}"></stream-card>
-                </template>
-
-            </div>
-        </div>
-
-        <floating-content>
-            <div class="card" slot="content" form>
-                <stream-form>
-                    <bind-element
-                            from="@parent:(submit)"
-                            to="floating-content:toggle">
-                    </bind-element>
-                </stream-form>
-            </div>
-        </floating-content>
 
     `,
     // language=CSS
@@ -77,7 +52,6 @@ import {Stream} from "./models";
             display: flex;
             background: none;
             color: var(--content-fg);
-            border: none;
             align-items: center;
             border: 1px solid cyan;
             border-radius: 6px;
@@ -113,7 +87,7 @@ import {Stream} from "./models";
         ${CARD_STYLE}
     `
 })
-export class ExpensesPage extends HTMLElement {
+export class NotesListingPage extends HTMLElement {
     public streamSummary: { available: string; pending: string; debt: string };
 
     // Temporal to allow saving real data while development is on early
@@ -121,11 +95,11 @@ export class ExpensesPage extends HTMLElement {
         const element = (this as unknown as any);
         element
             .query()
-            .where("expenses-context")
+            .where("notes-context")
             .then((ctx: ExpensesContext) => {
                 // hack for downlaod file
                 const streams = ctx.getAllStreams();
-                const filename = `expenses-${new Date().toLocaleDateString()}.json`
+                const filename = `notes-${new Date().toLocaleDateString()}.json`
                 const content = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(streams))}`;
                 const link = document.createElement('a');
                 link.setAttribute('href', content);
@@ -143,7 +117,7 @@ export class ExpensesPage extends HTMLElement {
 
         element
             .query()
-            .where("expenses-context")
+            .where("notes-context")
             .then((ctx: ExpensesContext) => {
 
                 this.streamSummary = ctx.getStreamsSummary();

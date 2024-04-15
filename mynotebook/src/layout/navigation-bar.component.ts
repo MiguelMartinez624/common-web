@@ -31,11 +31,11 @@ import {WebComponent} from "@commonweb/core";
                         from="@parent:(click)" to="[expenses]:toggleUniqueClass">
                 </bind-element>
             </button>
-            <button toggle learn class="btn-accion">
+            <button toggle notes class="btn-accion">
                 <cw-book-icon></cw-book-icon>
-                <span>Lean</span>
+                <span>notes</span>
                 <bind-element
-                        value="todos"
+                        value="notes"
                         from="@parent:(click)" to="navigation-bar:changeRoute">
                 </bind-element>
                 <bind-element
