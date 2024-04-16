@@ -1,6 +1,6 @@
 import {WebComponent} from "@commonweb/core";
 import {CARD_STYLE} from "./styles";
-import {ExpensesContext, Observable} from "./expenses-context";
+import {ExpensesContext} from "./expenses-context";
 import {Stream} from "./models";
 
 

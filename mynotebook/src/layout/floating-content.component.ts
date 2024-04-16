@@ -48,12 +48,13 @@ import {WebComponent} from "@commonweb/core";
 
         .content {
             position: fixed;
-            bottom: 0;
+            top: 0;
             width: -webkit-fill-available;
-            height: 100%;
+            height: calc(100% - 50px);
             left: 0;
             transition: all 0.2s ease-out;
             z-index: 2;
+            overflow: auto;
         }
 
         .collapse {

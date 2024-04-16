@@ -67,13 +67,20 @@ export class TextareaField extends FrameworkComponent {
         return value;
     }
 
+    public setValue(val: any) {
+        (this.shadowRoot.querySelector("textarea") as HTMLTextAreaElement).value = val;
+
+    }
+
     connectedCallback() {
         function reverseDecimals(value) {
             const parts = value.split('.');
             return parts[1] + '.' + parts[0];
         }
 
+
     }
+
 
     static get observedAttributes(): string[] {
         return ["property", "format", "label", "placeholder", "rows"];

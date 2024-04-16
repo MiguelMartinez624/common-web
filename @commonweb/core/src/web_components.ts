@@ -26,7 +26,6 @@ const validateSelector = (selector: string) => {
     }
 };
 
-export const PROCESSOR_KEY: string = '_webcommon_components_processors';
 
 function insertTemplate(attr: CustomElementConfig) {
     //TODO casted may no be required
@@ -46,15 +45,7 @@ function insertTemplate(attr: CustomElementConfig) {
 }
 
 
-/**
- * Need to create transformers from the templates and clear up those markdowns
- * host stand for the component itself (this) and then it comes the property and any key
- * <div>{{@host.property.key}}</div>
- *
- * Same as before but here we can use a [CSSSelector] to show other elements properties custom or
- * native properties
- * <div>{{[CSSSelector].property.key}}</div>
- */
+
 export function bindTemplateToProperties(root: HTMLElement) {
     const interpolations = new Map<string, Interpolation[]>();
     const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
@@ -99,11 +90,10 @@ export function WebComponent(attr: CustomElementConfig) {
             constructor(...args: any[]) {
                 super(...args);
 
+
                 appendInterpolationServer(this);
                 appendLoopServer(this);
                 appendCSSController(this);
-                // Whats the different for a framework component ?.
-                (this as any).directives = attr.directives;
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach((s: IComponent) => s.setup(this));
@@ -119,12 +109,6 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
 
-            /**
-             * Check and run all the directives
-             *
-             * */
-            public wireTemplate() {
-            }
 
             public query<T>(): QueryBuilder<T> {
                 return new QueryBuilder<T>().from(this as unknown as Node);
@@ -138,9 +122,7 @@ export function WebComponent(attr: CustomElementConfig) {
 
             public connectedCallback() {
 
-
                 insertTemplate.call(this, attr);
-                this.wireTemplate();
 
                 if (super["connectedCallback"]) {
                     super["connectedCallback"]();

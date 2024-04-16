@@ -7,6 +7,15 @@ export class InterpolationServer implements IComponent {
     private _root: any;
 
 
+    /**
+     * onInit Need to create transformers from the templates and clear up those markdowns
+     * host stand for the component itself (this) and then it comes the property and any key
+     * <div>{{@host.property.key}}</div>
+     *
+     * Same as before but here we can use a [CSSSelector] to show other elements properties custom or
+     * native properties
+     * <div>{{[CSSSelector].property.key}}</div>
+     */
     onInit(): void {
 
         const root = this._root;

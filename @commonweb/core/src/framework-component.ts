@@ -64,10 +64,6 @@ export class FrameworkComponent extends HTMLElement {
         }
     }
 
-    public checkInterpolations() {
-        bindTemplateToProperties(this);
-    }
-
 
     public checkInterpolationsFor(name) {
         const interpolations = this.interpolations;

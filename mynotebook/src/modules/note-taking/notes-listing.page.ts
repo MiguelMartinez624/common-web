@@ -2,6 +2,10 @@ import {WebComponent} from "@commonweb/core";
 import {CARD_STYLE} from "../expenses/styles";
 import {ExpensesContext} from "../expenses";
 import {Stream} from "../expenses/models";
+import {NotesContext} from "./notes-context";
+import {NewNoteRequest, Note} from "./models";
+import {Observer} from "../core";
+import {TextareaField} from "@commonweb/forms";
 
 @WebComponent({
     selector: "notes-page",
@@ -10,7 +14,7 @@ import {Stream} from "../expenses/models";
         <div class="page">
             <div style="display: flex;justify-content: space-between;align-items: center">
                 <span class="y-center">    <h4>Notes</h4></span>
-
+                <notes-context></notes-context>
                 <!-- actions                -->
                 <div class="y-center">
                     <button class="btn">
@@ -32,17 +36,112 @@ import {Stream} from "../expenses/models";
             </div>
 
 
+            <div style="overflow: auto;height:85vh;position: relative">
+                <template stream-list for-each="notes-context:getAllNotes">
+                    <note-card data="{{@host:[data]}}"></note-card>
+                </template>
+            </div>
+
+        </div>
+
+
+        <div class="desktop" style="flex:1">
+            <button id="test" class="btn">Hablar</button>
+            <form-group>
+                <form-field
+                        property="title"
+                        placeholder="Nombre de nota" label="Title"></form-field>
+                <textarea-field property="content" placeholder="un dunlanden" rows="38"
+                                label="Content"></textarea-field>
+
+            </form-group>
+            <div style="display: flex;justify-content: end">
+                <button submit class="btn">Submit
+                    <bind-element input-path="detail.data" from="form-group:(submit)" to="@host:submit"></bind-element>
+                    <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
+                    <bind-element from="form-group:(submit)" to="form-group:reset"></bind-element>
+
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile">
+            <floating-content>
+                <div class="card" slot="content" form>
+
+                    <form-group>
+                        <form-field
+                                property="title"
+                                placeholder="Nombre de nota" label="Title"></form-field>
+                        <textarea-field mobile property="content" placeholder="un dunlanden" rows="38"
+                                        label="Content">
+
+
+                        </textarea-field>
+
+                    </form-group>
+                    <div style="display: flex;justify-content: end;padding: 0 11px;gap:1rem">
+                        <button submit class="btn">Submit
+                            <bind-element input-path="detail.data" from="form-group:(submit)"
+                                          to="@host:submit"></bind-element>
+                            <bind-element from="form-group:(submit)"
+                                          to="form-group:reset"></bind-element>
+                            <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
+                            <bind-element from="form-group:(submit)" to="floating-content:toggle"></bind-element>
+                        </button>
+                        <button class="btn ">
+                            <cw-speech-recognition>
+                            </cw-speech-recognition>
+                        </button>
+                    </div>
+                </div>
+            </floating-content>
+
+        </div>
+
     `,
     // language=CSS
     style: `
+
+
+
+        :host {
+            display: flex;
+            gap: 1rem;
+            height: 100%;
+        }
+
         .page {
-            max-width: 30vw;
+            flex-basis: 30vw;
+            height: 100%;
+        }
+
+        .mobile {
+            display: none;
+        }
+
+        .desktop {
+            display: block;
         }
 
         @media (max-width: 800px) {
+            :host {
+                gap: 0;
+            }
+
             .page {
                 max-width: 100%;
                 width: 100%;
+                flex-basis: 100%;
+
+            }
+
+            .mobile {
+                display: block;
+            }
+
+            .desktop {
+                display: none;
             }
         }
 
@@ -90,15 +189,30 @@ import {Stream} from "../expenses/models";
 export class NotesListingPage extends HTMLElement {
     public streamSummary: { available: string; pending: string; debt: string };
 
+
+
+    public onAddedNoteObserver: Observer<Note> = (note: Note): void => {
+        const element = (this as any);
+        element.query()
+            .where("[stream-list]")
+            .then((list: any) => {
+                list.push(note);
+                element.update();
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+    }
+
     // Temporal to allow saving real data while development is on early
     download() {
         const element = (this as unknown as any);
         element
             .query()
             .where("notes-context")
-            .then((ctx: ExpensesContext) => {
+            .then((ctx: NotesContext) => {
                 // hack for downlaod file
-                const streams = ctx.getAllStreams();
+                const streams = ctx.getAllNotes();
                 const filename = `notes-${new Date().toLocaleDateString()}.json`
                 const content = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(streams))}`;
                 const link = document.createElement('a');
@@ -111,6 +225,22 @@ export class NotesListingPage extends HTMLElement {
             .execute();
     }
 
+    public submit(data: { title: string, content: string }) {
+
+        const element = (this as unknown as any);
+
+        element
+            .query()
+            .where("notes-context")
+            .then((ctx: NotesContext) => {
+                ctx.addNewNote(new NewNoteRequest(data.title, data.content));
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+
+    }
+
     connectedCallback() {
 
         const element = (this as unknown as any);
@@ -118,28 +248,44 @@ export class NotesListingPage extends HTMLElement {
         element
             .query()
             .where("notes-context")
-            .then((ctx: ExpensesContext) => {
+            .then((ctx: NotesContext) => {
 
-                this.streamSummary = ctx.getStreamsSummary();
+                ctx.onAppendNoteObservable.subscribe(this.onAddedNoteObserver)
+            })
+            .catch(console.error)
+            .build()
+            .execute();
 
 
-                ctx.onStreamAppend((stream: Stream) => {
+        element
+            .query()
+            .where("cw-speech-recognition")
+            .then((child: HTMLElement) => {
+                child.addEventListener("speech-ended", (ev: CustomEvent) => {
+                    const transcription = ev.detail.final_transcript;
+
                     element
                         .query()
-                        .where("[stream-list]")
-                        .then((list: any) => {
-                            this.streamSummary = ctx.getStreamsSummary();
-                            list.push(stream);
-                            element.update();
+                        .where("textarea-field[mobile]")
+                        .then((textarea: TextareaField) => {
+
+                            textarea.setValue(textarea.value() + " \n" + transcription + ".");
+
                         })
                         .catch(console.error)
                         .build()
                         .execute();
+
+
+                    console.log(ev)
                 })
             })
             .catch(console.error)
             .build()
             .execute();
+
+
     }
+
 
 }

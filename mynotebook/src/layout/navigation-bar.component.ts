@@ -32,16 +32,17 @@ import {WebComponent} from "@commonweb/core";
                 </bind-element>
             </button>
             <button toggle notes class="btn-accion">
+                <bind-element
+                        value="selected"
+                        from="@parent:(click)" to="[notes]:toggleUniqueClass">
+                </bind-element>
                 <cw-book-icon></cw-book-icon>
                 <span>notes</span>
                 <bind-element
                         value="notes"
                         from="@parent:(click)" to="navigation-bar:changeRoute">
                 </bind-element>
-                <bind-element
-                        value="selected"
-                        from="@parent:(click)" to="[todo]:toggleUniqueClass">
-                </bind-element>
+                
             </button>
             <button toggle todo class="btn-accion">
                 <cw-todo-icon></cw-todo-icon>
