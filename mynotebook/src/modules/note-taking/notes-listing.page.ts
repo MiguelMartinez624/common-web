@@ -46,7 +46,6 @@ import {TextareaField} from "@commonweb/forms";
 
 
         <div class="desktop" style="flex:1">
-            <button id="test" class="btn">Hablar</button>
             <form-group>
                 <form-field
                         property="title"
@@ -55,12 +54,18 @@ import {TextareaField} from "@commonweb/forms";
                                 label="Content"></textarea-field>
 
             </form-group>
-            <div style="display: flex;justify-content: end">
+            <div style="display: flex;justify-content: end;padding: 0 11px;gap:1rem">
                 <button submit class="btn">Submit
-                    <bind-element input-path="detail.data" from="form-group:(submit)" to="@host:submit"></bind-element>
+                    <bind-element input-path="detail.data" from="form-group:(submit)"
+                                  to="@host:submit"></bind-element>
+                    <bind-element from="form-group:(submit)"
+                                  to="form-group:reset"></bind-element>
                     <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
-                    <bind-element from="form-group:(submit)" to="form-group:reset"></bind-element>
-
+                    <bind-element from="form-group:(submit)" to="floating-content:toggle"></bind-element>
+                </button>
+                <button class="btn ">
+                    <cw-speech-recognition>
+                    </cw-speech-recognition>
                 </button>
             </div>
         </div>

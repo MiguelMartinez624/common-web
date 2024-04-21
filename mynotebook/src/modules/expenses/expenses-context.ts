@@ -23,6 +23,7 @@ import {Observable, Observer} from "../core";
 })
 export class ExpensesContext extends HTMLElement {
     public onAppendStreamObservable: Observable<Stream> = new Observable<Stream>();
+    public onRemoveStreamObservable: Observable<Stream> = new Observable<Stream>();
 
     public onStreamAppend(cb: Observer<Stream>) {
         this.onAppendStreamObservable.subscribe(cb);
@@ -133,6 +134,25 @@ export class ExpensesContext extends HTMLElement {
 
                 stream.removeTransaction(transactionId);
                 localStorage.updateValue(stream);
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+    }
+
+    removeStream(streamID: string) {
+        (this as any)
+            .query()
+            .where(`[streams-list]`)
+            .then((localStorage: LocalStorageComponent) => {
+                const stream = this.getAllStreams().find((stream: Stream) => stream.id === streamID);
+                if (!stream) {
+                    console.log("no sttream found",stream)
+                    return;
+                }
+
+                localStorage.removeItem(streamID);
+                this.onRemoveStreamObservable.notify(stream);
             })
             .catch(console.error)
             .build()

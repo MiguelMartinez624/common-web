@@ -1,40 +1,9 @@
 import { findAllChildrensBySelector} from "../html_manipulation";
 import {ElementBind} from "../bindings";
-import {LooperComponent} from "./server";
-
-export * from "./for-each";
+import {LooperComponent} from "./lopper.component";
 
 
-export function enhanceClassChange() {
-    findAllChildrensBySelector(this, "[toggle]")
-        .forEach((child) => {
-            if (!child["toggleClass"]) {
-                child["toggleClass"] = (className: string) => {
-                    child.classList.toggle(className);
-                }
 
-                child["toggleUniqueClass"] = (className: string) => {
-                    // in case there is a initial one marked as selected neeed to be marked
-                    // as the current affected
-                    if (!this._currentAffected) {
-                        this._currentAffected = this.shadowRoot.querySelector("." + className) || this.querySelector("." + className);
-                    }
-
-                    if (this._currentAffected) {
-                        this._currentAffected.classList.remove(className);
-                        this._currentAffected = child;
-                        child.classList.toggle(className);
-                    } else {
-                        this._currentAffected = child;
-                        child.classList.toggle(className);
-
-                    }
-                }
-
-
-            }
-        });
-}
 
 /*
  * checkShowIfDirective will evaluate the show-if directive and

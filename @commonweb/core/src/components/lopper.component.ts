@@ -1,15 +1,67 @@
 import {IComponent} from "../IComponent";
-import {findAllChildrensBySelector} from "../html_manipulation";
-import {interpolateAndRender} from "./for-each";
+import {extractData, findAllChildrensBySelector} from "../html_manipulation";
 import {ElementBind} from "../bindings";
 
+export const FOR_EACH_DIRECTIVE = "for-each";
+
+
+// This actions to create a tempalte infly and anilize a tempalte
+export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, recipient: HTMLElement): HTMLElement {
+    // Create the template to apply interpolation
+
+    const templateView = document.createElement("static-template") as any;
+    templateView.innerHTML = loopInitialzier.innerHTML;
+    templateView.data = value;
+    // avoid duplicates by key?
+
+    const identifier = extractData(loopInitialzier.getAttribute("loop-key") || "", value);
+    templateView.setAttribute("loop-id", identifier);
+    recipient.appendChild(templateView);
+    return templateView
+
+}
+
+
+
+/**
+ * @public
+ * @class LooperComponent
+ * @implements IComponent
+ *
+ * This class manages loop elements within a component, allowing for dynamic rendering of data lists.
+ * It supports functionalities like adding, removing, replacing, and clearing items within the loop.
+ */
 export class LooperComponent implements IComponent {
+    /**
+     * @private
+     * @type {any}
+     *
+     * A reference to the component's root element.
+     */
     private _root: any;
+
+    /**
+     * @private
+     * @type {any[]}
+     *
+     * An array that stores references to all the loop elements found within the component.
+     */
     private loopers: any[] = [];
 
+    /**
+     * @public
+     * @memberof LooperComponent
+     * @description
+     * This lifecycle hook is called after the component is initialized and its view is created.
+     * It performs the following tasks:
+     *  - Finds all child elements with the `[for-each]` attribute using a helper function.
+     *  - For each loop element:
+     *      - Defines custom properties like `clearAndPush`, `push`, `removeItem`, `replace`, and `_loopElement`.
+     *      - Stores the loop element in the `loopers` array.
+     *  - Calls `onUpdate` to trigger initial rendering of loop elements.
+     */
     onInit(): void {
-        // on init
-        findAllChildrensBySelector(this._root, "[for-each]")
+        findAllChildrensBySelector(this._root, "[for-each]") // Assuming this helper function exists
             .forEach((looper) => {
                 Object.defineProperty(looper, "clearAndPush", {
                     value: clearAndPush,
@@ -44,9 +96,19 @@ export class LooperComponent implements IComponent {
                 this.loopers.push(looper);
             });
         this.onUpdate();
-
     }
 
+    /**
+     * @public
+     * @memberof LooperComponent
+     * @description
+     * This lifecycle hook is called whenever the component's data changes or other events trigger updates.
+     * It iterates through the stored `loopers` and performs the following for each loop element:
+     *  - Extracts the data key from the `for-each` attribute.
+     *  - Creates an `ElementBind` instance to associate the loop element with the data key.
+     *  - Calls the `searchElement` method on `ElementBind` to find the element template for rendering.
+     *  - Calls the `clearAndPush` method on the loop element to render the data list based on the found template.
+     */
     onUpdate(): void {
         this.loopers.forEach((looper) => {
             const key = looper.getAttribute("for-each")
@@ -57,15 +119,21 @@ export class LooperComponent implements IComponent {
             elementBind.searchElement();
             // Need to find the element so to dhat we will do this
             looper.clearAndPush(elementBind.value);
-        })
-
+        });
     }
 
+    /**
+     * @public
+     * @memberof LooperComponent
+     * @description
+     * This method is called during component initialization to set up the component's internal state.
+     * It stores a reference to the component's root element.
+     *
+     * @param {any} target - The root element of the component.
+     */
     setup(target: any): void {
         this._root = target;
-
     }
-
 }
 
 

@@ -39,8 +39,16 @@ import {Stream} from "./models";
                     <span class="outcome stream-summary">Debt <span> {{@host:[streamSummary.debt]}}</span></span>
                 </div>
 
-                <template stream-list for-each="expenses-context:getAllStreams">
-                    <stream-card data="{{@host:[data]}}"></stream-card>
+                <template stream-list
+                          loop-key="id"
+                          for-each="expenses-context:getAllStreams">
+                    <stream-card data="{{@host:[data]}}">
+                        <bind-element
+                                input-path="detail"
+                                from="@parent:(remove-stream)"
+                                to="expenses-page:removeStream">
+                        </bind-element>
+                    </stream-card>
                 </template>
 
             </div>
@@ -140,7 +148,6 @@ export class ExpensesPage extends HTMLElement {
     connectedCallback() {
 
         const element = (this as unknown as any);
-
         element
             .query()
             .where("expenses-context")
@@ -156,16 +163,48 @@ export class ExpensesPage extends HTMLElement {
                         .then((list: any) => {
                             this.streamSummary = ctx.getStreamsSummary();
                             list.push(stream);
+                            this.streamSummary = ctx.getStreamsSummary();
                             element.update();
                         })
                         .catch(console.error)
                         .build()
                         .execute();
-                })
+                });
+
+                ctx.onRemoveStreamObservable.subscribe((stream: Stream) => {
+                    element
+                        .query()
+                        .where("[stream-list]")
+                        .then((list: any) => {
+                            console.log("removing from list")
+                            list.removeItem(stream.id);
+                            this.streamSummary = ctx.getStreamsSummary();
+
+                            element.update()
+                        })
+                        .catch(console.error)
+                        .build()
+                        .execute();
+                });
+
+
             })
             .catch(console.error)
             .build()
             .execute();
     }
 
+    removeStream(streamID: string) {
+        const element = (this as unknown as any);
+
+        element
+            .query()
+            .where("expenses-context")
+            .then((ctx: ExpensesContext) => {
+                ctx.removeStream(streamID);
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+    }
 }

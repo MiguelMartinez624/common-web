@@ -16,7 +16,6 @@ import {Stream} from "./models";
             height: 20px;
             width: 20px;
             fill: white;
-
         }
 
         h4, h3, h5 {
@@ -34,6 +33,16 @@ import {Stream} from "./models";
 
         }
 
+        cw-trash-icon {
+            height: 20px;
+            width: 15px;
+        }
+
+        .line {
+            height: 20px;
+            width: 1px;
+            background: white;
+        }
 
         .fixed {
             width: 100%;
@@ -55,7 +64,6 @@ import {Stream} from "./models";
     //language=HTML
     template: `
         <div class="card">
-            <bind-element value="collapse" from="@parent:(click)" to="[toggle]:toggleClass"></bind-element>
             <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
                 <h5>{{@host:[data.title]}}</h5>
                 <span style="color: #02b9b9;font-size: small">{{@host:[data.type]}}</span>
@@ -63,7 +71,20 @@ import {Stream} from "./models";
             <span style="font-size: x-large">{{@host:[data.totalAmount]}}</span>
             <div style="display: flex;justify-content: end;align-items: center;gap:8px">
                 <strong> {{@host:[data.transactionsCount]}}</strong>
-                <cw-tansaction-icon class="small-icon"></cw-tansaction-icon>
+                <cw-tansaction-icon class="small-icon">
+                    <bind-element
+                            value="collapse"
+                            from="@parent:(click)"
+                            to="[details]:toggleClass"></bind-element>
+                </cw-tansaction-icon>
+                <div class="line"></div>
+                <cw-trash-icon>
+                    <bind-element
+                            from="@parent:(click)"
+                            to="[confirmation]:toggle">
+                    </bind-element>
+                </cw-trash-icon>
+
             </div>
         </div>
         <bind-element value="{{@host:[data.id]}}"
@@ -71,13 +92,22 @@ import {Stream} from "./models";
                       to="expenses-list:setStreamID">
         </bind-element>
 
-        <div toggle class="collapse fixed">
+        <confirmation-modal confirmation>
+            <bind-element
+                    from="@parent:(click)"
+                    to="stream-card:removeStream">
+            </bind-element>
+        </confirmation-modal>
+
+        <div toggle details class="collapse fixed">
             <div>
                 <div class="detail-header">
                     <cw-left-arrow-icon>
-                        <bind-element value="collapse" from="@parent:(click)"
-                                      to="[toggle]:toggleClass"></bind-element>
-
+                        <bind-element
+                                value="collapse"
+                                from="@parent:(click)"
+                                to="[details]:toggleClass">
+                        </bind-element>
                     </cw-left-arrow-icon>
                     <h3>{{@host:[data.title]}}</h3>
                     <span style="color: #02b9b9">{{@host:[data.type]}}</span>
@@ -92,4 +122,9 @@ import {Stream} from "./models";
 })
 export class StreamCardComponent extends HTMLElement {
     public data: Stream;
+
+    public removeStream(): void {
+        const event = new CustomEvent("remove-stream", {detail: this.data.id});
+        this.dispatchEvent(event);
+    }
 }
