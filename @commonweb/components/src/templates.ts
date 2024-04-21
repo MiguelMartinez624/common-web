@@ -14,7 +14,7 @@ import {callRemoteAPI} from "./api-call.component";
     selector: 'static-template',
     template: '<slot></slot>',
 })
-export class StaticTemplate extends FrameworkComponent {
+export class StaticTemplate extends HTMLElement {
 
     // local reference/cache for the input
     protected _data: any;
@@ -51,7 +51,7 @@ export class StaticTemplate extends FrameworkComponent {
     selector: 'lazy-template',
     template: '<slot></slot>',
 })
-export class LazyTemplate extends FrameworkComponent {
+export class LazyTemplate extends HTMLElement {
     private _data: any;
 
 
@@ -74,8 +74,8 @@ export class LazyTemplate extends FrameworkComponent {
             //
             // This logic is relevant when the data arrives after the template has been rendered.
             // In this scenario, the `connectedCallback` wouldn't be triggered, potentially leaving the template outdated.
-            template.checkAllInterpolations()
-            template.evaluateDirectives()
+            (template as any).update();
+
         }
     }
 

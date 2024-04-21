@@ -1,5 +1,3 @@
-import {syncWithStorage} from "./storage";
-
 import {
     appendInterpolationServer,
 
@@ -7,17 +5,17 @@ import {
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
-import {IComponent} from "./IComponent";
-import {appendLoopServer} from "./directives";
+import {appendComponent, IComponent} from "./IComponent";
 import {QueryBuilder} from "./html_manipulation";
-import {appendCSSController} from "./directives/css-class";
+import {appendLoopServer} from "./components";
+import {appendCSSController} from "./components/css-controller.component";
+import {HtmlControllerComponent} from "./components/html-controller.component";
 
 export class CustomElementConfig {
     selector: string;
     template: string;
     style?: string;
     useShadow?: boolean = true;
-    directives?: any[] = [];
 }
 
 const validateSelector = (selector: string) => {
@@ -44,19 +42,6 @@ function insertTemplate(attr: CustomElementConfig) {
     }
 }
 
-
-
-export function bindTemplateToProperties(root: HTMLElement) {
-    const interpolations = new Map<string, Interpolation[]>();
-    const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
-    // Bind Attribute Interpolations
-    // childs should be the parameter
-    generateAttributesInterpolations(root, childrens, interpolations);
-
-    generateTemplateInterpolations(root, childrens, interpolations);
-
-    (root as any).interpolations = interpolations;
-}
 
 function updateAttributes(element: any, name: string, newValue: any) {
     if ((element as any).attribute_list) {
@@ -94,6 +79,7 @@ export function WebComponent(attr: CustomElementConfig) {
                 appendInterpolationServer(this);
                 appendLoopServer(this);
                 appendCSSController(this);
+                appendComponent(this, new HtmlControllerComponent())
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach((s: IComponent) => s.setup(this));
@@ -109,11 +95,6 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
 
-
-            public query<T>(): QueryBuilder<T> {
-                return new QueryBuilder<T>().from(this as unknown as Node);
-            }
-
             public update(): void {
                 if ((this as any).servers) {
                     (this as any).servers.forEach((s: IComponent) => s.onUpdate())
@@ -121,9 +102,7 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
             public connectedCallback() {
-
                 insertTemplate.call(this, attr);
-
                 if (super["connectedCallback"]) {
                     super["connectedCallback"]();
                 }

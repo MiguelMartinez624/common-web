@@ -42,7 +42,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
         </label>
     `,
 })
-export class FormField extends FrameworkComponent {
+export class FormField extends HTMLElement {
     @Attribute("placeholder")
     public placeholder: string = "";
 

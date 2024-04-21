@@ -1,4 +1,4 @@
-import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent} from "@commonweb/core";
 import {FormField} from "./form-field";
 import {MultiselectComponent} from "./multiselect-form-field";
 import {TextareaField} from "./textarea-field";
@@ -15,7 +15,7 @@ import {SelectFormField} from "./select-form-field";
     template: `
         <slot></slot>  `,
 })
-export class FormGroup extends FrameworkComponent {
+export class FormGroup extends HTMLElement {
     public submit() {
         const selects = this.querySelectorAll("form-select")
         const value = {};

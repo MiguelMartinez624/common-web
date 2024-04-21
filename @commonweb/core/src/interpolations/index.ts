@@ -1,4 +1,4 @@
-import {InterpolationServer} from "./server";
+import {InterpolationComponent} from "./component";
 
 export * from './attribute-interpolation';
 export * from './template-interpolation';
@@ -18,8 +18,8 @@ export function TemplateScanner(): ClassDecorator {
 
 export function appendInterpolationServer(target: any) {
     if (target.servers === undefined) {
-        target.servers = [new InterpolationServer()];
+        target.servers = [new InterpolationComponent()];
     } else {
-        target.servers.push(new InterpolationServer());
+        target.servers.push(new InterpolationComponent());
     }
 }

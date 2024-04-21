@@ -2,46 +2,75 @@ import {IComponent} from "../IComponent";
 import {generateAttributesInterpolations, generateTemplateInterpolations, Interpolation} from "./index";
 
 
-export class InterpolationServer implements IComponent {
+/**
+ * @public
+ * @class InterpolationComponent
+ * @implements IComponent
+ *
+ * This class manages interpolation within a component, allowing dynamic updates based on data changes.
+ * It supports interpolations within both attributes and templates.
+ */
+export class InterpolationComponent implements IComponent {
+    /**
+     * A map that stores interpolations for different keys.
+     * The key is a string identifier, and the value is an array of `Interpolation` objects.
+     */
     public interpolations: Map<string, Interpolation[]> = new Map<string, Interpolation[]>();
-    private _root: any;
-
 
     /**
-     * onInit Need to create transformers from the templates and clear up those markdowns
-     * host stand for the component itself (this) and then it comes the property and any key
-     * <div>{{@host.property.key}}</div>
-     *
-     * Same as before but here we can use a [CSSSelector] to show other elements properties custom or
-     * native properties
-     * <div>{{[CSSSelector].property.key}}</div>
+     * A private reference to the root element of the component.
+     */
+    private _root: any;
+
+    /**
+     * @public
+     * @memberof InterpolationComponent
+     * @description
+     * This lifecycle hook is called after the component is initialized and its view is created.
+     * It performs the following tasks:
+     *  - Gathers child elements from both the shadow DOM (if present) and the main DOM.
+     *  - Generates interpolations for attributes and templates within the child elements.
+     *  - Calls `onUpdate` to trigger initial updates.
      */
     onInit(): void {
-
         const root = this._root;
-        const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
+        const childrens = root.shadowRoot
+            ? [...root?.shadowRoot?.children, ...root.children]
+            : [...root.children];
+
         // Bind Attribute Interpolations
-        // childs should be the parameter
         generateAttributesInterpolations(root, childrens, this.interpolations);
 
         generateTemplateInterpolations(root, childrens, this.interpolations);
         this.onUpdate();
     }
 
+    /**
+     * @public
+     * @memberof InterpolationComponent
+     * @description
+     * This lifecycle hook is called whenever the component's data changes or other events trigger updates.
+     * It iterates through the stored interpolations and calls the `update` method on each `Interpolation` object.
+     */
     onUpdate(): void {
-        // console.log("updater", this.interpolations)
-
         const interpolations = this.interpolations;
-        // if you didn't use the notation wont have this field set.
         if (interpolations) {
             for (const [key, interpolationList] of interpolations) {
-                interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
+                interpolationList.forEach((interpolation: Interpolation) => interpolation.update());
             }
         }
     }
 
+    /**
+     * @public
+     * @memberof InterpolationComponent
+     * @description
+     * This method is called during component initialization to set up the component's internal state.
+     * It stores a reference to the component's root element.
+     *
+     * @param {any} root - The root element of the component.
+     */
     setup(root: any): void {
         this._root = root;
     }
-
 }

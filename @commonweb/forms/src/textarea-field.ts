@@ -1,4 +1,4 @@
-import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
+import {Attribute,WebComponent} from "@commonweb/core";
 
 @WebComponent({
     //language=css
@@ -44,7 +44,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
         </label>
     `,
 })
-export class TextareaField extends FrameworkComponent {
+export class TextareaField extends HTMLElement {
     @Attribute("placeholder")
     public placeholder: string = "";
 

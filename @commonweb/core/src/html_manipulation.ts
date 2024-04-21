@@ -1,4 +1,3 @@
-import {FrameworkComponent} from "./framework-component";
 
 /**
  * Finds the nearest ancestor node matching the specified selector,
@@ -19,7 +18,7 @@ export function findNodeOnUpTree(selector: string, element: Node): Node | null {
     try {
         if (selector === "@host") {
             let queryResult = element.parentNode as Node;
-            if ((queryResult.parentNode !== null) && !(queryResult instanceof FrameworkComponent)) {
+            if ((queryResult.parentNode !== null) && !((queryResult as any).servers !== undefined)) {
                 queryResult = findNodeOnUpTree(selector, queryResult);
             } else if (queryResult['host']) {
                 return queryResult['host'];

@@ -1,6 +1,5 @@
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
-import {FrameworkComponent} from "../framework-component";
 
 
 /**
@@ -117,8 +116,9 @@ export class AttributeInterpolation implements Interpolation {
             // dont do nothing for nested component for each
             return;
         }
-        if (this.element instanceof FrameworkComponent || this.element.hasOwnProperty("changeAttributeAndUpdate")) {
-            (this.element as FrameworkComponent).changeAttributeAndUpdate(this.attributeName, value);
+        if (this.element.hasOwnProperty("update")) {
+            this.element[this.attributeName] = value;
+            (this.element as any).update();
             return;
         }
 

@@ -6,21 +6,21 @@ export const FOR_EACH_DIRECTIVE = "for-each";
 
 
 // This actions to create a tempalte infly and anilize a tempalte
-export function interpolateAndRender(loopInitialzier: HTMLElement, value: any, recipient: HTMLElement): HTMLElement {
+export function interpolateAndRender(loopInitialzier: HTMLTemplateElement, value: any, recipient: HTMLElement): HTMLElement {
     // Create the template to apply interpolation
 
-    const templateView = document.createElement("static-template") as any;
-    templateView.innerHTML = loopInitialzier.innerHTML;
-    templateView.data = value;
-    // avoid duplicates by key?
+    const templateView = (loopInitialzier.content.cloneNode(true) as any).children[0];
+    recipient.appendChild(templateView);
 
     const identifier = extractData(loopInitialzier.getAttribute("loop-key") || "", value);
     templateView.setAttribute("loop-id", identifier);
-    recipient.appendChild(templateView);
+    templateView.data = value;
+    // avoid duplicates by key?
+    (templateView as any).update();
+
     return templateView
 
 }
-
 
 
 /**
