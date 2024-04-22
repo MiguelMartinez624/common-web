@@ -94,7 +94,7 @@ import {Stream} from "./models";
 
         <confirmation-modal confirmation>
             <bind-element
-                    from="@parent:(click)"
+                    from="@parent:(confirmation)"
                     to="stream-card:removeStream">
             </bind-element>
         </confirmation-modal>

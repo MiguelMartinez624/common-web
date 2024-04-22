@@ -45,6 +45,13 @@ export class FormGroup extends HTMLElement {
 
     }
 
+    public set value(obj: Record<string, any>) {
+        for (const clave of obj) {
+            console.log(`Clave: ${clave}`);
+            console.log(`Valor: ${objetoJSON[clave]}`);
+        }
+    }
+
     @Attribute("property")
     public property: string = "";
 

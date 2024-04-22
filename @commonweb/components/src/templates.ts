@@ -1,6 +1,5 @@
 import {
     Attribute,
-    FrameworkComponent,
     WebComponent
 } from "@commonweb/core";
 import {callRemoteAPI} from "./api-call.component";

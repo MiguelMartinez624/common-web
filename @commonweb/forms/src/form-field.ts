@@ -1,4 +1,4 @@
-import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     //language=css
