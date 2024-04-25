@@ -17,7 +17,6 @@ import {SelectFormField} from "./select-form-field";
 })
 export class FormGroup extends HTMLElement {
     public submit() {
-        const selects = this.querySelectorAll("form-select")
         const value = {};
         const formFields = this.querySelectorAll("form-field") as any as FormField[]
         formFields.forEach((input) => value[input.getAttribute("property")] = input.value());
@@ -45,10 +44,21 @@ export class FormGroup extends HTMLElement {
 
     }
 
-    public set value(obj: Record<string, any>) {
-        for (const clave of obj) {
-            console.log(`Clave: ${clave}`);
-            console.log(`Valor: ${objetoJSON[clave]}`);
+    public setValue(obj: Record<string, any>) {
+        for (const clave of Object.keys(obj)) {
+            const value = obj[clave];
+
+            const formFields = [...this.querySelectorAll("form-field")] as any as FormField[]
+            formFields
+                .filter((input) => input.getAttribute("property") === clave)
+                .forEach((input: FormField) => input.setValue(value));
+
+
+            const textareaFields = [...this.querySelectorAll("textarea-field")] as any as TextareaField[]
+            textareaFields
+                .filter((input) => input.getAttribute("property") === clave)
+                .forEach((input) => input.setValue(value));
+
         }
     }
 

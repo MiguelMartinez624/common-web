@@ -1,7 +1,8 @@
 import {WebComponent} from "@commonweb/core";
-import {NewNoteRequest,  Note} from "./models";
+import {NoteChangesRequest, NewNoteRequest, Note} from "./models";
 import {LocalStorageComponent} from "@commonweb/components";
 import {Observable} from "../core";
+import {Stream} from "../expenses/models";
 
 
 @WebComponent({
@@ -18,8 +19,7 @@ import {Observable} from "../core";
 })
 export class NotesContext extends HTMLElement {
     public onAppendNoteObservable: Observable<Note> = new Observable<Note>();
-
-
+    public onRemoveNoteObservable: Observable<string> = new Observable<string>();
 
     public getAllNotes(): Note[] {
         let notes: Note[] = [];
@@ -58,5 +58,32 @@ export class NotesContext extends HTMLElement {
             .execute();
     }
 
+    public updateNote(req: NoteChangesRequest) {
+        (this as any)
+            .query()
+            .where(`[streams-list]`)
+            .then((localStorage: LocalStorageComponent) => {
+                const note = req.execute();
+                localStorage.updateValue(note);
+                // should return
+                this.onAppendNoteObservable.notify(note);
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+    }
 
+
+    removeNote(noteId: string) {
+        (this as any)
+            .query()
+            .where(`[streams-list]`)
+            .then((localStorage: LocalStorageComponent) => {
+                localStorage.removeItem(noteId);
+                this.onRemoveNoteObservable.notify(noteId);
+            })
+            .catch(console.error)
+            .build()
+            .execute();
+    }
 }

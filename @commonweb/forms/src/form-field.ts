@@ -22,7 +22,7 @@ import {Attribute, WebComponent} from "@commonweb/core";
             border-color: var(--form-border-color, #ccc);
             color: var(--form-text);
             font-size: var(--form-text-size);
-    
+
             padding: var(--form-input-padding, 12px 20px);
         }
 
@@ -71,11 +71,16 @@ export class FormField extends HTMLElement {
         return value;
     }
 
+    public setValue(val: any) {
+        this.shadowRoot.querySelector("input").value = val;
+    }
+
     connectedCallback() {
         function reverseDecimals(value) {
             const parts = value.split('.');
             return parts[1] + '.' + parts[0];
         }
+
         const input = this.shadowRoot.querySelector("input");
 
         const type = this.getAttribute("format");

@@ -1,11 +1,11 @@
 import {WebComponent} from "@commonweb/core";
 import {CARD_STYLE} from "../expenses/styles";
-import {ExpensesContext} from "../expenses";
-import {Stream} from "../expenses/models";
 import {NotesContext} from "./notes-context";
-import {NewNoteRequest, Note} from "./models";
+import {NoteChangesRequest, NewNoteRequest, Note} from "./models";
 import {Observer} from "../core";
-import {TextareaField} from "@commonweb/forms";
+import {NoteFormComponent} from "./note-form.component";
+import {BUTTON_STYLE} from "../../ui/styles";
+import {FloatingContentComponent} from "../../layout";
 
 @WebComponent({
     selector: "notes-page",
@@ -26,7 +26,7 @@ import {TextareaField} from "@commonweb/forms";
                         </div>
 
                     </button>
-                    <button class="btn">
+                    <button class="btn mobile">
                         <span style="font-size:30px;font-weight: 300">+</span>
                         <bind-element from="@parent:(click)" to="floating-content:toggle">
                         </bind-element>
@@ -37,79 +37,30 @@ import {TextareaField} from "@commonweb/forms";
 
 
             <div style="overflow: auto;height:85vh;position: relative">
-                <template stream-list for-each="notes-context:getAllNotes">
-                    <note-card data="{{@host:[data]}}"></note-card>
+                <template stream-list  loop-key="id" for-each="notes-context:getAllNotes">
+                    <note-card data="{{@host:[data]}}">
+                        <bind-element
+                                input-path="detail"
+                                from="@parent:(remove-note)"
+                                to="notes-page:removeNote">
+                        </bind-element>
+                        <bind-element
+                                input-path="detail"
+                                from="@parent:(note-selected)"
+                                to="notes-pages:selectNote">
+                        </bind-element>
+                    </note-card>
                 </template>
             </div>
 
         </div>
 
 
-        <div class="desktop" style="flex:1">
-            <form-group>
-                <form-field
-                        property="title"
-                        placeholder="Nombre de nota" label="Title"></form-field>
-                <textarea-field property="content" placeholder="un dunlanden" rows="38"
-                                label="Content"></textarea-field>
 
-            </form-group>
-            <div style="display: flex;justify-content: end;padding: 0 11px;gap:1rem">
-                <button submit class="btn">Submit
-                    <bind-element input-path="detail.data" from="form-group:(submit)"
-                                  to="@host:submit"></bind-element>
-                    <bind-element from="form-group:(submit)"
-                                  to="form-group:reset"></bind-element>
-                    <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
-                    <bind-element from="form-group:(submit)" to="floating-content:toggle"></bind-element>
-                </button>
-                <button class="btn ">
-                    <cw-speech-recognition>
-                    </cw-speech-recognition>
-                </button>
-            </div>
-        </div>
-
-        <div class="mobile">
-            <floating-content>
-                <div class="card" slot="content" form>
-
-                    <form-group>
-                        <form-field
-                                property="title"
-                                placeholder="Nombre de nota" label="Title"></form-field>
-                        <textarea-field mobile property="content" placeholder="un dunlanden" rows="38"
-                                        label="Content">
-
-
-                        </textarea-field>
-
-                    </form-group>
-                    <div style="display: flex;justify-content: end;padding: 0 11px;gap:1rem">
-                        <button submit class="btn">Submit
-                            <bind-element input-path="detail.data" from="form-group:(submit)"
-                                          to="@host:submit"></bind-element>
-                            <bind-element from="form-group:(submit)"
-                                          to="form-group:reset"></bind-element>
-                            <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
-                            <bind-element from="form-group:(submit)" to="floating-content:toggle"></bind-element>
-                        </button>
-                        <button class="btn ">
-                            <cw-speech-recognition>
-                            </cw-speech-recognition>
-                        </button>
-                    </div>
-                </div>
-            </floating-content>
-
-        </div>
 
     `,
     // language=CSS
     style: `
-
-
-
         :host {
             display: flex;
             gap: 1rem;
@@ -122,11 +73,7 @@ import {TextareaField} from "@commonweb/forms";
         }
 
         .mobile {
-            display: none;
-        }
-
-        .desktop {
-            display: block;
+            display: none
         }
 
         @media (max-width: 800px) {
@@ -134,32 +81,17 @@ import {TextareaField} from "@commonweb/forms";
                 gap: 0;
             }
 
-            .page {
-                max-width: 100%;
-                width: 100%;
-                flex-basis: 100%;
-
-            }
-
             .mobile {
                 display: block;
             }
 
-            .desktop {
-                display: none;
+            .page {
+                max-width: 100%;
+                width: 100%;
+                flex-basis: 100%;
             }
         }
 
-        .btn {
-            padding: 0 15px;
-            height: 44px;
-            display: flex;
-            background: none;
-            color: var(--content-fg);
-            align-items: center;
-            border: 1px solid cyan;
-            border-radius: 6px;
-        }
 
         cw-download-icon {
             height: 22px;
@@ -172,30 +104,13 @@ import {TextareaField} from "@commonweb/forms";
             gap: 10px;
         }
 
-        .income {
-            color: lightgreen;
-        }
 
-        .outcome {
-            color: lightcoral;
-        }
-
-        .stream-summary {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 0.5px solid var(--card-fc);
-            padding: 10px 0px;
-            font-weight: bold;
-        }
-
+        ${BUTTON_STYLE}
         ${CARD_STYLE}
     `
 })
 export class NotesListingPage extends HTMLElement {
     public streamSummary: { available: string; pending: string; debt: string };
-
-
-
     public onAddedNoteObserver: Observer<Note> = (note: Note): void => {
         const element = (this as any);
         element.query()
@@ -207,90 +122,128 @@ export class NotesListingPage extends HTMLElement {
             .catch(console.error)
             .build()
             .execute();
+    };
+
+
+    private notesContext: NotesContext;
+    private selectedNote: Note | null = null;
+
+
+    selectNote(note: Note) {
+        this.selectedNote = note;
+        const element = (this as unknown as any);
+        element
+            .query()
+            .where("notes-form")
+            .then((form: NoteFormComponent) => {
+                form.setValue(note);
+
+                // move to floating content if is a mobile
+                if (window.innerWidth < 580) {
+                    element.query().where("floating-content")
+                        .then((content: FloatingContentComponent) => content.toggle())
+                        .catch(console.error)
+                        .build()
+                        .execute();
+                }
+            })
+            .catch(console.error)
+            .build()
+            .execute();
     }
 
     // Temporal to allow saving real data while development is on early
     download() {
-        const element = (this as unknown as any);
-        element
-            .query()
-            .where("notes-context")
-            .then((ctx: NotesContext) => {
-                // hack for downlaod file
-                const streams = ctx.getAllNotes();
-                const filename = `notes-${new Date().toLocaleDateString()}.json`
-                const content = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(streams))}`;
-                const link = document.createElement('a');
-                link.setAttribute('href', content);
-                link.setAttribute('download', filename);
-                link.click();
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        const streams = this.notesContext.getAllNotes();
+        const filename = `notes-${new Date().toLocaleDateString()}.json`
+        const content = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(streams))}`;
+        const link = document.createElement('a');
+        link.setAttribute('href', content);
+        link.setAttribute('download', filename);
+        link.click();
     }
 
-    public submit(data: { title: string, content: string }) {
 
+    public submit(data: { title: string, content: string }) {
         const element = (this as unknown as any);
 
-        element
-            .query()
-            .where("notes-context")
-            .then((ctx: NotesContext) => {
-                ctx.addNewNote(new NewNoteRequest(data.title, data.content));
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        if (!this.selectedNote) {
+            this.notesContext.addNewNote(new NewNoteRequest(data.title, data.content));
+        } else {
+            this.notesContext.updateNote(new NoteChangesRequest(
+                this.selectedNote.id,
+                data.title,
+                data.content,
+                this.selectedNote.creationDate));
+            if (window.innerWidth < 580) {
+                element.query().where("floating-content")
+                    .then((content: FloatingContentComponent) => content.toggle())
+                    .catch(console.error)
+                    .build()
+                    .execute();
+            }
+        }
 
+        this.selectedNote = null;
+
+    }
+
+
+    public removeNote(noteId: string) {
+        this.notesContext.removeNote(noteId)
     }
 
     connectedCallback() {
-
         const element = (this as unknown as any);
 
         element
             .query()
             .where("notes-context")
             .then((ctx: NotesContext) => {
-
+                this.notesContext = ctx;
                 ctx.onAppendNoteObservable.subscribe(this.onAddedNoteObserver)
-            })
-            .catch(console.error)
-            .build()
-            .execute();
 
-
-        element
-            .query()
-            .where("cw-speech-recognition")
-            .then((child: HTMLElement) => {
-                child.addEventListener("speech-ended", (ev: CustomEvent) => {
-                    const transcription = ev.detail.final_transcript;
-
-                    element
-                        .query()
-                        .where("textarea-field[mobile]")
-                        .then((textarea: TextareaField) => {
-
-                            textarea.setValue(textarea.value() + " \n" + transcription + ".");
+                ctx.onRemoveNoteObservable.subscribe((id)=>{
+                    element.query()
+                        .where("[stream-list]")
+                        .then((list: any) => {
+                            list.removeItem(id);
 
                         })
                         .catch(console.error)
                         .build()
                         .execute();
-
-
-                    console.log(ev)
                 })
             })
             .catch(console.error)
             .build()
             .execute();
 
+        // Think on a better way to handle this?
+        this.renderNotesForms();
 
     }
 
 
+    private renderNotesForms() {
+        if (window.innerWidth > 580) {
+            this.shadowRoot.innerHTML += `
+                 <div class="desktop" style="flex:1">
+                        <notes-form>
+                            <bind-element input-path="detail" from="@parent:(submit)" to="notes-page:submit"></bind-element>
+                        </notes-form>
+                 </div>`;
+        } else {
+            this.shadowRoot.innerHTML += `
+                    <floating-content>
+                            <notes-form slot="content">
+                                <bind-element
+                                 input-path="detail"
+                                  from="@parent:(submit)"
+                                   to="notes-page:submit"></bind-element>
+                            </notes-form>
+                    </floating-content>
+            `;
+        }
+    }
 }

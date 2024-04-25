@@ -30,9 +30,27 @@ export class NewNoteRequest {
     }
 }
 
+
+export class NoteChangesRequest {
+    constructor(
+        public readonly id: string,
+        public readonly title: string,
+        public readonly content: string,
+        public readonly date: Date,
+    ) {
+    }
+
+    public execute(): Note {
+        return new Note(
+            this.id,
+            this.title,
+            this.content,
+            this.date
+        )
+    }
+}
+
 export class Note {
-
-
     constructor(
         public readonly id: string,
         public readonly title,
