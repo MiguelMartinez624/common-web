@@ -73,7 +73,7 @@
                 to="[main-routes]:changeCase">
         </bind-element>
     </cw-navigation-bar>
-    <conditional-render-cases slot="content" main-routes case="home">
+    <conditional-render-cases slot="content" main-routes case="todo">
         <div case="expenses">
             <template>
                 <expenses-page></expenses-page>
@@ -82,6 +82,11 @@
         <div case="notes">
             <template>
                 <notes-page></notes-page>
+            </template>
+        </div>
+        <div case="todo">
+            <template>
+                <todo-board-page></todo-board-page>
             </template>
         </div>
         <div case="home">
