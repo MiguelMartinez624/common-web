@@ -116,8 +116,20 @@ export class AttributeInterpolation implements Interpolation {
             // dont do nothing for nested component for each
             return;
         }
-        if (this.element.hasOwnProperty("update")) {
-            this.element[this.attributeName] = value;
+        if (this.element["update"]) {
+            if (typeof toUpdate === "function") {
+                toUpdate.apply(this.element, value)
+            } else {
+                this.element[this.attributeName] = value;
+            }
+
+            // for string/number type only, no objects for this, as HTMLElement
+            // only accepts strings and we dont want to stringify big objects
+            if(typeof value === "string" || typeof value === "number"){
+                this.element.setAttribute(this.attributeName, `${value}`);
+            }
+
+
             (this.element as any).update();
             return;
         }
@@ -125,13 +137,6 @@ export class AttributeInterpolation implements Interpolation {
         if (typeof value === "object" && typeof toUpdate === "function") {
             // Need to make sure that attribute that receive objects are setter?
             toUpdate.apply(this.element, value)
-        } else if (typeof value === "object") {
-            // Required??
-            this.element[this.attributeName] = value;
-            if (this.element['checkInterpolationsFor']) {
-                this.element['checkInterpolationsFor'](this.attributeName);
-            }
-
         } else {
             this.element.setAttribute(this.attributeName, value);
         }

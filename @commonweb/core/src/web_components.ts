@@ -103,13 +103,15 @@ export function WebComponent(attr: CustomElementConfig) {
 
             public connectedCallback() {
                 insertTemplate.call(this, attr);
-                if (super["connectedCallback"]) {
-                    super["connectedCallback"]();
-                }
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach(s => s.onInit());
                 }
+
+                if (super["connectedCallback"]) {
+                    super["connectedCallback"]();
+                }
+
             }
 
 

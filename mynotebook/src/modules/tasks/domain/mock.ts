@@ -20,7 +20,7 @@ export function generateRandomTaskItem() {
     const title = generateRandomString(10, 20);
     const description = generateRandomString(20, 50);
     const state = getRandomEnum(TaskState); // Get random TaskState value
-    const comments = generateRandomComments(0, 3);
+    const comments = generateRandomComments(1, 3);
 
     return new TaskItem(id, title, description, state, comments);
 }

@@ -85,6 +85,7 @@ export class ExpensesListComponent extends HTMLElement {
     }
 
     public setStreamID(streamId: string) {
+        console.log({streamId})
         this.setAttribute("stream-id", streamId);
         this.loadStreams(streamId);
 

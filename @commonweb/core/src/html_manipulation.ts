@@ -1,4 +1,3 @@
-
 /**
  * Finds the nearest ancestor node matching the specified selector,
  * starting from the given node and traversing upwards the DOM tree.
@@ -76,7 +75,6 @@ export function findAllChildrensBySelector(tree: HTMLElement, selector: string):
  * @returns {any} The extracted data, or undefined if not found.
  */
 export function extractData(resultPath: string, obj: any) {
-
     let properties = Array.isArray(resultPath) ? [resultPath] : resultPath.split(".")
         .filter((p) => p !== "@host")
     return properties.reduce((prev: any, curr: any) => prev?.[curr], obj)

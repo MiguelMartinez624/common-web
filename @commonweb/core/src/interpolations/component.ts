@@ -59,6 +59,18 @@ export class InterpolationComponent implements IComponent {
                 interpolationList.forEach((interpolation: Interpolation) => interpolation.update());
             }
         }
+
+        // test query child and call update
+        const root = this._root;
+        const childrens = root.shadowRoot
+            ? [...root?.shadowRoot?.children, ...root.children]
+            : [...root.children];
+
+        childrens.forEach(c => {
+            if (c["onUpdate"]) {
+                c["onUpdate"]();
+            }
+        });
     }
 
     /**

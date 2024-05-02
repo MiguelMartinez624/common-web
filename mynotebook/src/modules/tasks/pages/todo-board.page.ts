@@ -32,14 +32,15 @@ import {BUTTON_STYLE} from "../../../ui/styles";
     // language=CSS
     style: `
         ${BUTTON_STYLE}
+        
         .board {
             display: flex;
             height: 80%;
-
-        &
-        todo-column {
+            gap:10px;
+        
+        & todo-column {
             width: 33%;
-        }
+         }
 
         }
     `
@@ -59,8 +60,8 @@ export class TodoBoardPage extends HTMLElement {
                     .query()
                     .where(`todo-column[pending]`)
                     .then((column: TodoColumnComponent) => {
-                        column.todos = ctx.getAllTodosByState();
-                        ;
+                        column.tasks = ctx.getAllTodosByState();
+
                         (column as any).update();
                     })
                     .catch(console.error)
@@ -71,7 +72,7 @@ export class TodoBoardPage extends HTMLElement {
                     .query()
                     .where(`todo-column[process]`)
                     .then((column: TodoColumnComponent) => {
-                        column.todos = ctx.getAllTodosByState();
+                        column.tasks = ctx.getAllTodosByState();
                         ;
                         (column as any).update();
                     })
@@ -83,8 +84,8 @@ export class TodoBoardPage extends HTMLElement {
                     .query()
                     .where(`todo-column[completed]`)
                     .then((column: TodoColumnComponent) => {
-                        column.todos = ctx.getAllTodosByState();
-                        ;
+                        column.tasks = ctx.getAllTodosByState();
+
                         (column as any).update();
                     })
                     .catch(console.error)
