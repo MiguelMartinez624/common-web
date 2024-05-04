@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {TaskItem} from "../domain/model";
 import {CARD_STYLE} from "../../../ui/styles";
 
@@ -6,7 +6,7 @@ import {CARD_STYLE} from "../../../ui/styles";
     selector: `todo-card`,
     // language=HTML
     template: `
-        <div class="card">
+        <div draggable="true" class="card">
             <h3>{{@host:[data.title]}}
                 <bind-element
                         value="collapse"
@@ -28,13 +28,18 @@ import {CARD_STYLE} from "../../../ui/styles";
 
         <!-- Details -->
         <cw-modal data="{{@host:[data]}}" details>
-            <div class="card" style="width: 500px">
+            <div class="card" style="width: 500px; padding: 20px">
                 <div style="display: flex;">
                     <h4>{{@host:[data.title]}}</h4>
                 </div>
-                <div>
-                    <div class="avatar-img"></div>
-                    <span>{{@host:[data.state]}}</span>
+                <div style="display: flex;align-items: center;justify-content: space-between">
+                    <div style="display: flex;align-items: center;gap:10px">
+                        <div class="avatar-img"></div>
+                        <p>Miguel Martinez</p>
+                    </div>
+                    <div>
+                        <span>{{@host:[data.state]}}</span>
+                    </div>
                 </div>
                 <div>
                     <h4>Decription</h4>
@@ -42,11 +47,17 @@ import {CARD_STYLE} from "../../../ui/styles";
                         {{@host:[data.description]}}
                     </p>
                 </div>
-                <wc-tabs>
-                    <wc-tab default="true" title="Comments">
-                        <cw-comments-box comments="{{@host:[data.comments]}}"></cw-comments-box>
-                    </wc-tab>
+                <wc-tabs data="{{@host:[data]}}">
+                    <wc-tab default="true" title="Comments"></wc-tab>
                     <wc-tab title="History"></wc-tab>
+
+                    <cw-comments-box slot="content" tab-case="Comments"
+                                     comments="{{@host:[data.comments]}}">
+                    </cw-comments-box>
+                    <div slot="content" tab-case="History">
+                        Este es el fuckin historial
+                    </div>
+
                 </wc-tabs>
 
             </div>
@@ -55,14 +66,19 @@ import {CARD_STYLE} from "../../../ui/styles";
     `,
     // language=CSS
     style: `
+        wc-tab {
+            flex: 1;
+        }
+
         ${CARD_STYLE}
         .card:hover {
             cursor: pointer;
+            outline: 1px solid;
         }
 
         .avatar-img {
-            height: 40px;
-            width: 40px;
+            height: 50px;
+            width: 50px;
             border-radius: 50%;
             background: lightgray;
         }
@@ -85,5 +101,15 @@ import {CARD_STYLE} from "../../../ui/styles";
 })
 export class TodoCardComponent extends HTMLElement {
     public data: TaskItem;
+
+    @QueryElement(".card")
+    public cardQuery: QueryResult<HTMLElement>;
+
+    connectedCallback() {
+        const card = this.cardQuery.unwrap();
+        card.addEventListener("dragend", (ev) => {
+            console.log(ev)
+        })
+    }
 
 }

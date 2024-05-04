@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {CARD_STYLE} from "../expenses/styles";
 import {NotesContext} from "./notes-context";
 import {NoteChangesRequest, NewNoteRequest, Note} from "./models";
@@ -36,8 +36,8 @@ import {FloatingContentComponent} from "../../layout";
             </div>
 
 
-            <div style="overflow: auto;height:85vh;position: relative">
-                <template stream-list  loop-key="id" for-each="notes-context:getAllNotes">
+            <div style="overflow: auto;height:85vh;position: relative;pad">
+                <template stream-list loop-key="id" for-each="notes-context:getAllNotes">
                     <note-card data="{{@host:[data]}}">
                         <bind-element
                                 input-path="detail"
@@ -110,22 +110,22 @@ import {FloatingContentComponent} from "../../layout";
     `
 })
 export class NotesListingPage extends HTMLElement {
+
+    @QueryElement("notes-context")
+    private notesContext: QueryResult<NotesContext>;
+
+    @QueryElement("[stream-list]")
+    private streamList: QueryResult<any>;
+
     public streamSummary: { available: string; pending: string; debt: string };
+
     public onAddedNoteObserver: Observer<Note> = (note: Note): void => {
-        const element = (this as any);
-        element.query()
-            .where("[stream-list]")
-            .then((list: any) => {
-                list.push(note);
-                element.update();
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        this.streamList.unwrap().push(note);
+        (this as any).update();
     };
 
 
-    private notesContext: NotesContext;
+
     private selectedNote: Note | null = null;
 
 
@@ -154,7 +154,7 @@ export class NotesListingPage extends HTMLElement {
 
     // Temporal to allow saving real data while development is on early
     download() {
-        const streams = this.notesContext.getAllNotes();
+        const streams = this.notesContext.unwrap().getAllNotes();
         const filename = `notes-${new Date().toLocaleDateString()}.json`
         const content = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(streams))}`;
         const link = document.createElement('a');
@@ -168,9 +168,9 @@ export class NotesListingPage extends HTMLElement {
         const element = (this as unknown as any);
 
         if (!this.selectedNote) {
-            this.notesContext.addNewNote(new NewNoteRequest(data.title, data.content));
+            this.notesContext.unwrap().addNewNote(new NewNoteRequest(data.title, data.content));
         } else {
-            this.notesContext.updateNote(new NoteChangesRequest(
+            this.notesContext.unwrap().updateNote(new NoteChangesRequest(
                 this.selectedNote.id,
                 data.title,
                 data.content,
@@ -190,37 +190,23 @@ export class NotesListingPage extends HTMLElement {
 
 
     public removeNote(noteId: string) {
-        this.notesContext.removeNote(noteId)
+        this.notesContext.unwrap().removeNote(noteId)
     }
 
     connectedCallback() {
         const element = (this as unknown as any);
 
-        element
-            .query()
-            .where("notes-context")
-            .then((ctx: NotesContext) => {
-                this.notesContext = ctx;
-                ctx.onAppendNoteObservable.subscribe(this.onAddedNoteObserver)
+        const ctx = this.notesContext.unwrap()
 
-                ctx.onRemoveNoteObservable.subscribe((id)=>{
-                    element.query()
-                        .where("[stream-list]")
-                        .then((list: any) => {
-                            list.removeItem(id);
+        ctx.onAppendNoteObservable.subscribe(this.onAddedNoteObserver)
+        ctx.onRemoveNoteObservable.subscribe((id) => {
+            this.streamList.unwrap().removeItem(id);
+        });
 
-                        })
-                        .catch(console.error)
-                        .build()
-                        .execute();
-                })
-            })
-            .catch(console.error)
-            .build()
-            .execute();
 
         // Think on a better way to handle this?
         this.renderNotesForms();
+        element.update();
 
     }
 

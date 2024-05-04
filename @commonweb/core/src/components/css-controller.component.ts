@@ -90,6 +90,32 @@ export class CSSControllerComponent implements IComponent {
      */
     onUpdate(): void {
         // No update logic needed currently
+        findAllChildrensBySelector(this._root, `[${CLASS_DIRECTIVE}]`) // Assuming this helper function exists
+            .forEach((child) => {
+                if (!child["toggleClass"]) {
+                    child["toggleClass"] = (className: string) => {
+                        child.classList.toggle(className);
+                    };
+
+                    child["toggleUniqueClass"] = (className: string) => {
+                        // in case there is a initial one marked as selected neeed to be marked
+                        // as the current affected
+                        if (!this._currentAffected) {
+                            this._currentAffected = this._root.shadowRoot.querySelector("." + className) || this._root.querySelector("." + className);
+                        }
+
+                        if (this._currentAffected) {
+                            this._currentAffected.classList.remove(className);
+                            this._currentAffected = child;
+                            child.classList.toggle(className);
+                        } else {
+                            this._currentAffected = child;
+                            child.classList.toggle(className);
+
+                        }
+                    };
+                }
+            });
     }
 
     /**

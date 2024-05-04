@@ -1,4 +1,3 @@
-import {LooperComponent} from "./components/lopper.component";
 
 /**
  * @public

@@ -29,6 +29,11 @@ window
                 height: 30px;
                 width: 30px;
             }
+            path{
+                    height: inherit;
+                    width: inherit;
+                    fill: inherit;
+            }
         `,
         selector: `cw-profile-icon`,
         //language=HTML

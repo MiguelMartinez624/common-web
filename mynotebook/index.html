@@ -10,7 +10,7 @@
 
 </head>
 <style>
-    .blur{
+    .blur {
         filter: blur(2px);
     }
 
@@ -73,7 +73,7 @@
                 to="[main-routes]:changeCase">
         </bind-element>
     </cw-navigation-bar>
-    <conditional-render-cases slot="content" main-routes case="todo">
+    <conditional-render-cases slot="content" main-routes case="home">
         <div case="expenses">
             <template>
                 <expenses-page></expenses-page>
@@ -87,6 +87,12 @@
         <div case="todos">
             <template>
                 <todo-board-page></todo-board-page>
+
+            </template>
+        </div>
+        <div case="users">
+            <template>
+                <listing-users-page></listing-users-page>
             </template>
         </div>
         <div case="home">

@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import {
     appendInterpolationServer,
 
@@ -5,11 +7,11 @@ import {
     generateTemplateInterpolations,
     Interpolation
 } from "./interpolations";
-import {appendComponent, IComponent} from "./IComponent";
 import {QueryBuilder} from "./html_manipulation";
-import {appendLoopServer} from "./components";
+import {appendLoopServer, QueriesKey, QueryResult} from "./components";
 import {appendCSSController} from "./components/css-controller.component";
 import {HtmlControllerComponent} from "./components/html-controller.component";
+import {appendComponent, IComponent} from "./components/icomponent";
 
 export class CustomElementConfig {
     selector: string;
@@ -75,11 +77,10 @@ export function WebComponent(attr: CustomElementConfig) {
             constructor(...args: any[]) {
                 super(...args);
 
-
+                appendComponent(this, new HtmlControllerComponent());
                 appendInterpolationServer(this);
                 appendLoopServer(this);
                 appendCSSController(this);
-                appendComponent(this, new HtmlControllerComponent())
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach((s: IComponent) => s.setup(this));
@@ -103,13 +104,29 @@ export function WebComponent(attr: CustomElementConfig) {
 
             public connectedCallback() {
                 insertTemplate.call(this, attr);
+                // Check for queries
+                if ((this as any)[QueriesKey]) {
+                    const test = (this as any)[QueriesKey];
+                    for (const [pattern, fieldName] of test) {
+                        this[fieldName] = new QueryResult(pattern, this);
+                    }
+
+                }
+
+
+                if (super["connectedCallback"]) {
+                    super["connectedCallback"]();
+                }
+
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach(s => s.onInit());
                 }
 
-                if (super["connectedCallback"]) {
-                    super["connectedCallback"]();
+
+                // Loading when a element just nit
+                if (this['init']) {
+                    this['init']();
                 }
 
             }

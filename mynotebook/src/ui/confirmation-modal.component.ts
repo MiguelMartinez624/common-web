@@ -160,7 +160,9 @@ export class ConfirmationModalComponent extends HTMLElement {
     selector: 'cw-modal',
     //language=HTML
     template: `
-        <div toggle class="back blur hidden"></div>
+        <div toggle class="back blur hidden">
+            <bind-element from="@parent:(click)" to="cw-modal:toggle"></bind-element>
+        </div>
         <div toggle class="dialog hidden">
             <slot></slot>
         </div>
@@ -170,7 +172,9 @@ export class ConfirmationModalComponent extends HTMLElement {
         .hidden {
             display: none !important;
         }
-
+        .blur {
+            backdrop-filter: blur(2px);
+        }
         .back {
             background: none;
             border: none;
@@ -184,17 +188,13 @@ export class ConfirmationModalComponent extends HTMLElement {
         }
 
         .dialog {
-            background: none;
-            border: none;
-            display: flex;
-            left: 0;
-            top: 0;
-            position: fixed;
-            z-index: 20;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            width: 100%;
+            position: fixed; /* Position relative to viewport */
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Center the dialog */
+            z-index: 100; /* Ensure it's on top */
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
 
@@ -209,7 +209,6 @@ export class ModalComponent extends HTMLElement {
 
     public toggle(): void {
         const element = (this as any);
-        console.log("TOGGING");
         element
             .query()
             .where(".dialog")

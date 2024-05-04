@@ -1,5 +1,6 @@
-import {WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent} from "@commonweb/core";
 import {Note} from "./models";
+import {CARD_STYLE} from "../../ui/styles";
 
 @WebComponent({
     // language=CSS
@@ -23,15 +24,15 @@ import {Note} from "./models";
             margin: 0;
         }
 
+        ${CARD_STYLE}
+        
         .card {
-            padding: 0.5rem;
-            outline-offset: 4px;
-            outline: var(--card-outline);
-            border-radius: 5px;
-            background: var(--card-bg);
-            color: var(--card-fc);
-            margin: 1.4rem 0px;
+            margin: 10px 0;
+        }
 
+        .card:hover {
+            cursor: pointer;
+            outline: 1px solid;
         }
 
         cw-trash-icon {
@@ -39,17 +40,17 @@ import {Note} from "./models";
             width: 18px;
             height: 18px;
         }
-`,
+    `,
     selector: `note-card`,
     //language=HTML
     template: `
         <div class="card">
-            
+
             <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
-               
+
                 <h3>{{@host:[data.title]}}</h3>
                 <span style="color: #02b9b9;font-size: small">{{@host:formattedDate}}</span>
-               
+
             </div>
             <div>
                 <bind-element
@@ -69,8 +70,8 @@ import {Note} from "./models";
                 </cw-trash-icon>
             </div>
         </div>
-        
-        <confirmation-modal 
+
+        <confirmation-modal
                 confirmation>
             <bind-element
                     from="@parent:(confirm)"
@@ -82,7 +83,7 @@ import {Note} from "./models";
 
 })
 export class NoteCardComponent extends HTMLElement {
-    private data: Note;
+    public data: Note;
 
     public removeNote(): void {
         const event = new CustomEvent("remove-note", {detail: this.data.id});

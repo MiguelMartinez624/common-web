@@ -18,7 +18,7 @@ export function generateRandomTaskItems(minItems, maxItems) {
 export function generateRandomTaskItem() {
     const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const title = generateRandomString(10, 20);
-    const description = generateRandomString(20, 50);
+    const description = generateRandomString(20, 1000);
     const state = getRandomEnum(TaskState); // Get random TaskState value
     const comments = generateRandomComments(1, 3);
 

@@ -192,7 +192,10 @@ export class ExpensesPage extends HTMLElement {
             .catch(console.error)
             .build()
             .execute();
+
+        (this as any).update();
     }
+
 
     removeStream(streamID: string) {
         const element = (this as unknown as any);

@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     selector: `wc-tabs`,
@@ -7,26 +7,55 @@ import {WebComponent} from "@commonweb/core";
         <div style="display: flex;">
             <slot></slot>
         </div>
+        <div>
+            <slot name="content"></slot>
+        </div>
+
+        <div class="content">
+
+        </div>
     `
 })
 export class TabsComponent extends HTMLElement {
-    public tabs: string[] = ["Comments", "History"];
-
-    public tabChange(value: string) {
-        console.log({value})
-    }
+    private cacheElements: any[] = [];
 
     connectedCallback() {
+        const contents = [...this.querySelectorAll("[tab-case]")];
+        contents.forEach(c => c.setAttribute("hidden", "true"));
         const tabs = [...this.querySelectorAll("wc-tab")];
 
         tabs.forEach((tab: TabComponent) => {
 
+            if (tab.getAttribute("default")) {
+                const contentForTab = contents.find((c) => c.getAttribute("tab-case") === tab.getAttribute("title"));
+                if (contentForTab) {
+                    contentForTab.removeAttribute("hidden");
+                }
+            }
+
 
             tab.addEventListener("tab-selected", () => {
-                tabs.forEach((t: any) => t.toggle());
+                tabs.forEach((t: TabComponent) => {
+                    t.toggle();
+                    const contents = [...this.querySelectorAll("[tab-case]")];
+                    const contentForTab = contents.find((c) => c.getAttribute("tab-case") === t.getAttribute("title"));
+
+                    if (!contentForTab) {
+                        return;
+                    }
+
+                    if (t.active && contentForTab) {
+                        contentForTab.removeAttribute("hidden");
+                    } else {
+                        contentForTab.setAttribute("hidden", "true");
+                    }
+
+                });
             });
         });
     }
+
+
 }
 
 
@@ -44,9 +73,6 @@ export class TabsComponent extends HTMLElement {
             <h4>{{@host:[title]}}</h4>
             <div toggle class="linea">
             </div>
-        </div>
-        <div class="hidden">
-            <slot></slot>
         </div>
     `,
     //language=CSS
@@ -99,6 +125,8 @@ export class TabsComponent extends HTMLElement {
 export class TabComponent extends HTMLElement {
     public title: string = "";
 
+    public active: boolean;
+
     public selectTab() {
         this.dispatchEvent(new CustomEvent("tab-selected"));
     }
@@ -108,17 +136,24 @@ export class TabComponent extends HTMLElement {
             .query()
             .where(".linea")
             .then((element) => {
-                element.toggleClass("visible")
+                this.active = !this.active;
+                element.toggleClass("visible");
+
             })
             .catch(console.error)
             .build()
             .execute();
     }
 
-    connectedCallback() {
+
+    init() {
+        //this.parentElement use this add the current selected
+
         const isDefault = this.getAttribute("default");
         if (isDefault) {
             this.toggle();
+
+            // (this.parentElement as any).reflect(this.getContent())
         }
 
     }

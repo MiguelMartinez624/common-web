@@ -27,7 +27,7 @@ export class TodosContextComponent extends HTMLElement {
             return []
         }
 
-        return generateRandomTaskItems(1,20)
+        return generateRandomTaskItems(1,5)
 
         // const todos = this.streamData.value;
         // if (!todos) {

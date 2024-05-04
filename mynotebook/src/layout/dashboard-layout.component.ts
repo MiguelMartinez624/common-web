@@ -24,7 +24,6 @@ import {WebComponent} from "@commonweb/core";
             color: var(--content-fc);
             background: var(--content-bg);
 
-            background-image: radial-gradient(#484848 1px, transparent 0);
             background-size: 40px 40px;
             background-position: -19px -19px;
 

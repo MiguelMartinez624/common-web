@@ -1,7 +1,7 @@
 import { findAllChildrensBySelector} from "../html_manipulation";
 import {ElementBind} from "../bindings";
 import {LooperComponent} from "./lopper.component";
-
+export * from './html-controller.component';
 
 
 

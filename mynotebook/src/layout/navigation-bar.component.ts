@@ -42,7 +42,7 @@ import {WebComponent} from "@commonweb/core";
                         value="notes"
                         from="@parent:(click)" to="navigation-bar:changeRoute">
                 </bind-element>
-                
+
             </button>
             <button toggle todo class="btn-accion">
                 <cw-todo-icon></cw-todo-icon>
@@ -54,6 +54,19 @@ import {WebComponent} from "@commonweb/core";
                 <bind-element
                         value="selected"
                         from="@parent:(click)" to="[todo]:toggleUniqueClass">
+                </bind-element>
+            </button>
+
+            <button toggle users class="btn-accion">
+                <cw-profile-icon></cw-profile-icon>
+                <span>Users</span>
+                <bind-element
+                        value="users"
+                        from="@parent:(click)" to="navigation-bar:changeRoute">
+                </bind-element>
+                <bind-element
+                        value="selected"
+                        from="@parent:(click)" to="@parent:toggleUniqueClass">
                 </bind-element>
             </button>
 
@@ -107,7 +120,7 @@ import {WebComponent} from "@commonweb/core";
             }
         }
 
-        cw-home-icon, cw-todo-icon, cw-book-icon {
+        cw-home-icon, cw-todo-icon, cw-book-icon,cw-profile-icon {
             fill: white;
             height: 19px;
             width: 19px;

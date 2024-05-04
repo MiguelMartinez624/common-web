@@ -11,7 +11,6 @@ export function interpolateAndRender(loopInitialzier: HTMLTemplateElement, value
 
     const templateView = (loopInitialzier.content.cloneNode(true) as any).children[0];
     recipient.appendChild(templateView);
-
     const identifier = extractData(loopInitialzier.getAttribute("loop-key") || "", value);
     templateView.setAttribute("loop-id", identifier);
     templateView.data = value;
@@ -114,7 +113,6 @@ export class LooperComponent implements IComponent {
             const key = looper.getAttribute("for-each")
                 .replace("{{", "")
                 .replace("}}", "");
-
             const elementBind = new ElementBind(looper, key);
             elementBind.searchElement();
             // Need to find the element so to dhat we will do this
