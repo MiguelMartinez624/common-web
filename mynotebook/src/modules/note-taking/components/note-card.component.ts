@@ -1,6 +1,6 @@
 import {Attribute, WebComponent} from "@commonweb/core";
-import {Note} from "./models";
-import {CARD_STYLE} from "../../ui/styles";
+import {Note} from "../domain";
+import {CARD_STYLE} from "../../../ui/styles";
 
 @WebComponent({
     // language=CSS
@@ -27,7 +27,10 @@ import {CARD_STYLE} from "../../ui/styles";
         ${CARD_STYLE}
         
         .card {
-            margin: 10px 0;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content:space-between;
         }
 
         .card:hover {
@@ -49,15 +52,15 @@ import {CARD_STYLE} from "../../ui/styles";
             <div style="display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px">
 
                 <h3>{{@host:[data.title]}}</h3>
-                <span style="color: #02b9b9;font-size: small">{{@host:formattedDate}}</span>
+                <span style="color: #02b9b9;font-size: small;">{{@host:formattedDate}}</span>
 
             </div>
-            <div>
+            <div style="flex: 1">
                 <bind-element
                         from="@parent:(click)"
                         to="@host:selectNote">
                 </bind-element>
-                <p style="color: #02b9b9;font-size: small;overflow: hidden; max-height: 40px;cursor: pointer;">
+                <p style="color: #02b9b9;font-size: small;overflow: hidden; max-height: 68px;cursor: pointer;">
                     {{@host:contentPreview}}
                 </p>
             </div>
@@ -99,7 +102,7 @@ export class NoteCardComponent extends HTMLElement {
             return "";
         }
 
-        return this.data.content.slice(0, 120) + "...";
+        return this.data.content.slice(0, 180) + "...";
     }
 
     public formattedDate(): string {

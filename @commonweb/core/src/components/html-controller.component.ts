@@ -5,6 +5,12 @@ export interface WithHTMLController {
     query<T>(): QueryBuilder<T>;
 }
 
+
+function query<T>(): QueryBuilder<T> {
+    return new QueryBuilder<T>().from(this as unknown as Node);
+}
+
+
 export class HtmlControllerComponent implements IComponent {
     private _root: any;
 
@@ -26,7 +32,7 @@ export class HtmlControllerComponent implements IComponent {
 
 }
 
-export const QueriesKey = "_pending_queries";
+export const QueriesKey = "web_common_pending_queries";
 
 export function QueryElement(pattern: string) {
     return function (target: any, propertyKey: string) {
@@ -64,7 +70,3 @@ export class QueryResult<T> {
     }
 }
 
-
-function query<T>(): QueryBuilder<T> {
-    return new QueryBuilder<T>().from(this as unknown as Node);
-}

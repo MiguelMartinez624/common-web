@@ -1,7 +1,7 @@
-import {WebComponent} from "@commonweb/core";
+import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {FormGroup, TextareaField} from "@commonweb/forms";
-import {NewNoteRequest, Note} from "./models";
-import {BUTTON_STYLE, CARD_STYLE} from "../../ui/styles";
+import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
+import {Note} from "../domain";
 
 @WebComponent({
     selector: `notes-form`,
@@ -16,18 +16,21 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../ui/styles";
                         label="Title">
                 </form-field>
                 <textarea-field property="content"
-                                placeholder="un dunlanden" rows="38"
+                                placeholder="un dunlanden" rows="20"
                                 label="Content">
                 </textarea-field>
-
             </form-group>
+            
             <div style="display: flex;justify-content: end;padding: 0 11px;gap:1rem">
-                <button submit class="btn">Submit
-                    <bind-element input-path="detail.data" from="form-group:(submit)"
-                                  to="@host:submit"></bind-element>
-                    <bind-element from="form-group:(submit)"
-                                  to="form-group:reset"></bind-element>
-                    <bind-element from="button[submit]:(click)" to="form-group:submit"></bind-element>
+                <button class="btn">Preview
+                    <bind-element input-path="detail.data"
+                                  from="@parent:(click)"
+                                  to="@host:preview"></bind-element>
+                </button>
+                <button  submit class="btn">Submit
+                    <bind-element
+                            from="[submit]:(click)"
+                            to="@host:submit"></bind-element>
                 </button>
                 <button class="btn ">
                     <cw-speech-recognition>
@@ -38,15 +41,23 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../ui/styles";
     `,
     //language=CSS
     style: `
+        .card{
+            height: 100%;
+        }
         ${CARD_STYLE}
-        
         ${BUTTON_STYLE}
     `
 })
 export class NoteFormComponent extends HTMLElement {
 
-    public submit(data: { title: string, content: string }) {
+    @QueryElement("form-group")
+    public formGroup: QueryResult<FormGroup>;
+
+    public submit() {
+        const form = this.formGroup.unwrap();
+        const data = form.getValue();
         this.dispatchEvent(new CustomEvent("submit", {detail: data}));
+        form.reset();
     }
 
     connectedCallback() {
@@ -78,17 +89,21 @@ export class NoteFormComponent extends HTMLElement {
     }
 
     setValue(note: Note) {
-        const element = (this as any);
-
-        element
-            .query()
-            .where("form-group")
-            .then((form: FormGroup) => {
-                form.setValue(note);
-
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        const form = this.formGroup.unwrap();
+        form.setValue(note);
     }
+
+
+    getValue() {
+        const form = this.formGroup.unwrap();
+        form.getValue();
+    }
+
+    public preview() {
+        const data = this.formGroup.unwrap().getValue();
+        console.log({data})
+        this.dispatchEvent(new CustomEvent("preview", {detail: data}));
+    }
+
+
 }

@@ -81,7 +81,31 @@
         </div>
         <div case="notes">
             <template>
-                <notes-page></notes-page>
+                <conditional-render-cases notes-route case="listing">
+                    <div case="listing">
+                        <template>
+                            <notes-listing-page>
+                                <bind-element
+                                        value="writing"
+                                        from="@parent:(selected-note)"
+                                        to="[notes-route]:changeCase"
+                                ></bind-element>
+                                </notes-lsiting-page>
+                        </template>
+                    </div>
+                    <div case="writing">
+                        <template>
+                            <notes-writing-page>
+                                <bind-element
+                                        value="listing"
+                                        from="@parent:(go-back)"
+                                        to="[notes-route]:changeCase"
+                                ></bind-element>
+                            </notes-writing-page>
+                        </template>
+                    </div>
+                </conditional-render-cases>
+
             </template>
         </div>
         <div case="todos">

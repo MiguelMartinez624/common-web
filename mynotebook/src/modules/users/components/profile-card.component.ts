@@ -22,7 +22,6 @@ import {CARD_STYLE} from "../../../ui/styles";
         }
 
         .card {
-            margin: 15px 10px;
             display: flex;
             gap: 1rem;
         }

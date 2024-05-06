@@ -1,8 +1,7 @@
 import {WebComponent} from "@commonweb/core";
-import {NoteChangesRequest, NewNoteRequest, Note} from "./models";
 import {LocalStorageComponent} from "@commonweb/components";
-import {Observable} from "../core";
-import {Stream} from "../expenses/models";
+import {Observable} from "../../core";
+import {NewNoteRequest, Note, NoteChangesRequest} from "../domain";
 
 
 @WebComponent({
@@ -20,6 +19,9 @@ import {Stream} from "../expenses/models";
 export class NotesContext extends HTMLElement {
     public onAppendNoteObservable: Observable<Note> = new Observable<Note>();
     public onRemoveNoteObservable: Observable<string> = new Observable<string>();
+
+    public static SelectedNote: Note | null = null;
+
 
     public getAllNotes(): Note[] {
         let notes: Note[] = [];

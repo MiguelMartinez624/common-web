@@ -8,7 +8,9 @@ export const CARD_STYLE = `
         background: var(--card-bg);
         color: var(--card-fc);
         box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    & .title {
+
+    &
+    .title {
         margin: 0;
         border-bottom: 1px solid #9fadd0;
         padding-bottom: 0.6rem;
@@ -27,5 +29,16 @@ export const BUTTON_STYLE = `
         align-items: center;
         border: 1px solid cyan;
         border-radius: 6px;
+    }
+
+    button:hover {
+        cursor: pointer;
+        background: var(--content-fg);
+        
+    
+        & * {
+              fill: var(--content-bg);
+              color: var(--content-bg);
+       }
     }
 `

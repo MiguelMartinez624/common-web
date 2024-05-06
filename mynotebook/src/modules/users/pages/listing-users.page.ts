@@ -10,8 +10,8 @@ import {BUTTON_STYLE} from "../../../ui/styles";
         </div>
 
         <div style="display: flex;width: 100%">
-            <div style="flex: 0.5"> 
-                <div style="display: flex;padding: 5px;align-items: center;justify-content: space-between">
+            <div style="flex:1">
+                <div style="display: flex;align-items: center;justify-content: space-between">
                     <form-field label=" " placeholder="Search..."></form-field>
                     <button class="btn mobile">
                         <span style="font-size:30px;font-weight: 300">+</span>
@@ -19,23 +19,27 @@ import {BUTTON_STYLE} from "../../../ui/styles";
                         </bind-element>
                     </button>
                 </div>
-                <div  class="list">
-                    <profile-card></profile-card>
-                    <profile-card></profile-card>
+                <div class="list">
                     <profile-card></profile-card>
                 </div>
             </div>
+<!--            <div style="flex: 1">-->
+<!--                <profile-details profile-id="test">-->
 
-            <div style="flex: 1">
-                <profile-details profile-id="test">
-
-                </profile-details>
-            </div>
+<!--                </profile-details>-->
+<!--            </div>-->
         </div>
     `,
     //language=CSS
     style: `
+        .line{
+            height: 100%;
+            width: 1px;
+        }
         .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 350px));
+            grid-gap: 1rem;
             /*background: #28324c;*/
             padding: 5px;
             overflow-y: auto;

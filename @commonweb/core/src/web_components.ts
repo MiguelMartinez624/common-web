@@ -103,14 +103,27 @@ export function WebComponent(attr: CustomElementConfig) {
             }
 
             public connectedCallback() {
-                insertTemplate.call(this, attr);
+
+                if (!attr.useShadow) {
+                    (this as unknown as HTMLElement).innerHTML = attr.style ?
+                        `<style>${attr.style}</style>${attr.template}` : attr.template;
+                } else {
+                    const shadowRoot = (this as unknown as HTMLElement).attachShadow({mode: 'open'});
+                    const template = document.createElement("template");
+
+                    template.innerHTML = attr.style ?
+                        `<style>${attr.style}</style>${attr.template}` : attr.template;
+                    shadowRoot.appendChild(template.content.cloneNode(true));
+
+                }
+
+
                 // Check for queries
                 if ((this as any)[QueriesKey]) {
                     const test = (this as any)[QueriesKey];
                     for (const [pattern, fieldName] of test) {
                         this[fieldName] = new QueryResult(pattern, this);
                     }
-
                 }
 
 

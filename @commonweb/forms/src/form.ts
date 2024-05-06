@@ -17,6 +17,14 @@ import {SelectFormField} from "./select-form-field";
 })
 export class FormGroup extends HTMLElement {
     public submit() {
+        const value = this.getValue()
+        console.log("Submiting")
+        const event = new CustomEvent("submit", {detail: {data: value}});
+        this.dispatchEvent(event)
+    }
+
+
+    public getValue(): any {
         const value = {};
         const formFields = this.querySelectorAll("form-field") as any as FormField[]
         formFields.forEach((input) => value[input.getAttribute("property")] = input.value());
@@ -30,9 +38,7 @@ export class FormGroup extends HTMLElement {
 
         const multiselectFormFields = this.querySelectorAll("multiselect-form-field") as any as MultiselectComponent[]
         multiselectFormFields.forEach((input) => value[input.getAttribute("property")] = input.value);
-
-        const event = new CustomEvent("submit", {detail: {data: value}});
-        this.dispatchEvent(event)
+        return value;
     }
 
     public reset() {

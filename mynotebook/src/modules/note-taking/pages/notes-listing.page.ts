@@ -1,71 +1,71 @@
 import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
-import {CARD_STYLE} from "../expenses/styles";
-import {NotesContext} from "./notes-context";
-import {NoteChangesRequest, NewNoteRequest, Note} from "./models";
-import {Observer} from "../core";
-import {NoteFormComponent} from "./note-form.component";
-import {BUTTON_STYLE} from "../../ui/styles";
-import {FloatingContentComponent} from "../../layout";
+import {Observer} from "../../core";
+import {NewNoteRequest, Note, NoteChangesRequest} from "../domain";
+import {FloatingContentComponent} from "../../../layout";
+import {NoteFormComponent, NotesContext} from "../components";
+import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
 
 @WebComponent({
-    selector: "notes-page",
+    selector: "notes-listing-page",
     // language=HTML
     template: `
-        <div class="page">
-            <div style="display: flex;justify-content: space-between;align-items: center">
-                <span class="y-center">    <h4>Notes</h4></span>
-                <notes-context></notes-context>
-                <!-- actions                -->
-                <div class="y-center">
-                    <button class="btn">
-                        <bind-element from="@parent:(click)" to="@host:download">
-                        </bind-element>
-                        <div class="y-center">
-                            <cw-download-icon></cw-download-icon>
-                            Download
-                        </div>
-
-                    </button>
-                    <button class="btn mobile">
-                        <span style="font-size:30px;font-weight: 300">+</span>
-                        <bind-element from="@parent:(click)" to="floating-content:toggle">
-                        </bind-element>
-                    </button>
-                </div>
-
-            </div>
-
-
-            <div style="overflow: auto;height:85vh;position: relative;pad">
-                <template stream-list loop-key="id" for-each="notes-context:getAllNotes">
-                    <note-card data="{{@host:[data]}}">
-                        <bind-element
-                                input-path="detail"
-                                from="@parent:(remove-note)"
-                                to="notes-page:removeNote">
-                        </bind-element>
-                        <bind-element
-                                input-path="detail"
-                                from="@parent:(note-selected)"
-                                to="notes-pages:selectNote">
-                        </bind-element>
-                    </note-card>
-                </template>
-            </div>
-
+        <div>
+            <h2>Notes</h2>
         </div>
 
+        <div style="display: flex;width: 100%">
+            <div style="width: 100%;height: 78vh">
+                <notes-context></notes-context>
+                <div style="display: flex;align-items: center;justify-content: space-between">
+                    <form-field label=" " placeholder="Search..."></form-field>
+                    <div class="y-center">
+                        <button class="btn">
+                            <bind-element from="@parent:(click)" to="@host:download">
+                            </bind-element>
+                            <div class="y-center">
+                                <cw-download-icon></cw-download-icon>
+                                Download
+                            </div>
 
-
-
+                        </button>
+                        <button class="btn">
+                            <span style="font-size:30px;font-weight: 300">+</span>
+                            <bind-element from="@parent:(click)" to="@host:goToForm">
+                            </bind-element>
+                        </button>
+                    </div>
+                </div>
+                <div class="list">
+                    <template stream-list loop-key="id" for-each="notes-context:getAllNotes">
+                        <note-card data="{{@host:[data]}}">
+                            <bind-element
+                                    input-path="detail"
+                                    from="@parent:(remove-note)"
+                                    to="notes-page:removeNote">
+                            </bind-element>
+                            <bind-element
+                                    input-path="detail"
+                                    from="@parent:(note-selected)"
+                                    to="notes-pages:selectNote">
+                            </bind-element>
+                        </note-card>
+                    </template>
+                </div>
+            </div>
+        </div>
     `,
     // language=CSS
     style: `
-        :host {
-            display: flex;
-            gap: 1rem;
-            height: 100%;
+        .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-gap: 1rem;
+            /*background: #28324c;*/
+            padding: 5px;
+            overflow-y: auto;
+            height: 90%;
         }
+
 
         .page {
             flex-basis: 30vw;
@@ -125,31 +125,15 @@ export class NotesListingPage extends HTMLElement {
     };
 
 
-
     private selectedNote: Note | null = null;
 
+    goToForm() {
+        this.dispatchEvent(new CustomEvent("selected-note"))
+    }
 
     selectNote(note: Note) {
-        this.selectedNote = note;
-        const element = (this as unknown as any);
-        element
-            .query()
-            .where("notes-form")
-            .then((form: NoteFormComponent) => {
-                form.setValue(note);
-
-                // move to floating content if is a mobile
-                if (window.innerWidth < 580) {
-                    element.query().where("floating-content")
-                        .then((content: FloatingContentComponent) => content.toggle())
-                        .catch(console.error)
-                        .build()
-                        .execute();
-                }
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        NotesContext.SelectedNote = note;
+        this.dispatchEvent(new CustomEvent("selected-note"))
     }
 
     // Temporal to allow saving real data while development is on early
@@ -166,15 +150,16 @@ export class NotesListingPage extends HTMLElement {
 
     public submit(data: { title: string, content: string }) {
         const element = (this as unknown as any);
-
+        const notesCtx = this.notesContext.unwrap()
         if (!this.selectedNote) {
-            this.notesContext.unwrap().addNewNote(new NewNoteRequest(data.title, data.content));
+            notesCtx.addNewNote(new NewNoteRequest(data.title, data.content));
         } else {
-            this.notesContext.unwrap().updateNote(new NoteChangesRequest(
+            notesCtx.updateNote(new NoteChangesRequest(
                 this.selectedNote.id,
                 data.title,
                 data.content,
                 this.selectedNote.creationDate));
+
             if (window.innerWidth < 580) {
                 element.query().where("floating-content")
                     .then((content: FloatingContentComponent) => content.toggle())
@@ -203,9 +188,9 @@ export class NotesListingPage extends HTMLElement {
             this.streamList.unwrap().removeItem(id);
         });
 
-
+        ``
         // Think on a better way to handle this?
-        this.renderNotesForms();
+        // this.renderNotesForms();
         element.update();
 
     }
