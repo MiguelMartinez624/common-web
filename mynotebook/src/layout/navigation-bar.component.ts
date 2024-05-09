@@ -109,6 +109,15 @@ import {WebComponent} from "@commonweb/core";
 
         }
 
+        .btn-accion:hover {
+
+        &
+        * {
+            color: rgba(128, 214, 116, 0.64);
+            fill: rgba(128, 214, 116, 0.71);
+        }
+
+        }
 
         /* Responsive layout - makes a one column layout instead of a two-column layout */
         @media (max-width: 800px) {
@@ -120,7 +129,7 @@ import {WebComponent} from "@commonweb/core";
             }
         }
 
-        cw-home-icon, cw-todo-icon, cw-book-icon,cw-profile-icon {
+        cw-home-icon, cw-todo-icon, cw-book-icon, cw-profile-icon {
             fill: white;
             height: 19px;
             width: 19px;

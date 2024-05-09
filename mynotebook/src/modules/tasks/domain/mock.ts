@@ -19,7 +19,7 @@ export function generateRandomTaskItem() {
     const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const title = generateRandomString(10, 20);
     const description = generateRandomString(20, 1000);
-    const state = getRandomEnum(TaskState); // Get random TaskState value
+    const state = TaskState.Pending // Get random TaskState value
     const comments = generateRandomComments(1, 3);
 
     return new TaskItem(id, title, description, state, comments);
@@ -60,6 +60,7 @@ export function generateRandomComment() {
 
 function getRandomEnum(enumObject) {
     const enumValues = Object.values(enumObject);
+    console.log({enumValues})
     const randomIndex = Math.floor(Math.random() * enumValues.length);
     return enumValues[randomIndex];
 }

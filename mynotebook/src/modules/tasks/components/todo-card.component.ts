@@ -115,7 +115,7 @@ export class TodoCardComponent extends HTMLElement {
 
         card.addEventListener("dragend", (ev) => {
 
-            console.log(ev)
+            console.log({target:"here"})
         })
     }
 

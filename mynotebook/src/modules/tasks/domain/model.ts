@@ -6,11 +6,11 @@ export enum TaskState {
 
 export class TaskItem {
     constructor(
-        public readonly id: string,
-        public readonly title: string,
-        public readonly description: string,
-        public readonly state: TaskState,
-        public readonly comments: TaskComment[]) {
+        public  id: string,
+        public  title: string,
+        public  description: string,
+        public  state: TaskState,
+        public  comments: TaskComment[]) {
     }
 
 }

@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {Observable} from "../../core";
 import {LocalStorageComponent} from "@commonweb/components";
 import {TaskItem} from "../domain";
@@ -20,36 +20,39 @@ export class TodosContextComponent extends HTMLElement {
 
     public onAppendNoteObservable: Observable<TaskItem> = new Observable<TaskItem>();
     public onRemoveNoteObservable: Observable<string> = new Observable<string>();
-    public streamData: LocalStorageComponent;
+
+    @QueryElement("local-storage-value")
+    public streamData: QueryResult<LocalStorageComponent>;
 
     public getAllTodosByState(): TaskItem[] {
         if (!this.streamData) {
             return []
         }
 
-        return generateRandomTaskItems(1,5)
+        const todos = this.streamData.unwrap().value;
+        if (!todos) {
+            return;
+        }
 
-        // const todos = this.streamData.value;
-        // if (!todos) {
-        //     return;
-        // }
-        //
-        // return todos;
+        return todos;
     }
 
     connectedCallback() {
-        (this as any)
-            .query()
-            .where(`[streams-list]`)
-            .then((localStorage: LocalStorageComponent) => {
-                this.streamData = localStorage
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        const list = this.streamData.unwrap();
+        list.removeKey();
+        list.setValue(generateRandomTaskItems(1, 2))
     }
 
 
+    getTaskById(cardId: string): TaskItem | null {
+        const list = this.streamData.unwrap();
+        return list.value.find((task: TaskItem) => task.id === cardId) || null;
+    }
+
+    changeTableState(card: TaskItem) {
+        const list: any = this.streamData.unwrap();
+        list.updateValue(card);
+    }
 }
 
 
