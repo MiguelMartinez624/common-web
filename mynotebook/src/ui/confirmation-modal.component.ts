@@ -189,7 +189,6 @@ export class ConfirmationModalComponent extends HTMLElement {
 
         .dialog {
             position: fixed; /* Position relative to viewport */
-            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%); /* Center the dialog */
             z-index: 100; /* Ensure it's on top */

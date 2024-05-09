@@ -28,7 +28,7 @@ import {CARD_STYLE} from "../../../ui/styles";
 
         <!-- Details -->
         <cw-modal data="{{@host:[data]}}" details>
-            <div class="card" style="width: 500px; padding: 20px">
+            <div class="card" style="width: 700px; padding: 20px">
                 <div style="display: flex;">
                     <h4>{{@host:[data.title]}}</h4>
                 </div>
@@ -43,7 +43,7 @@ import {CARD_STYLE} from "../../../ui/styles";
                 </div>
                 <div>
                     <h4>Decription</h4>
-                    <p>
+                    <p class="description">
                         {{@host:[data.description]}}
                     </p>
                 </div>
@@ -75,7 +75,12 @@ import {CARD_STYLE} from "../../../ui/styles";
             cursor: pointer;
             outline: 1px solid;
         }
-
+        
+        .description{
+            height: 21vh;
+            word-break: break-word;
+            overflow: scroll;
+        }
         .avatar-img {
             height: 50px;
             width: 50px;
