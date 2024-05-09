@@ -107,7 +107,14 @@ export class TodoCardComponent extends HTMLElement {
 
     connectedCallback() {
         const card = this.cardQuery.unwrap();
+        card.addEventListener("dragstart", (ev) => {
+            ev.dataTransfer.setData("text/plain", this.data.id);
+        });
+
+
+
         card.addEventListener("dragend", (ev) => {
+
             console.log(ev)
         })
     }

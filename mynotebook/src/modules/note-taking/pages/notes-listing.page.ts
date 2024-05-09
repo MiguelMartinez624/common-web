@@ -60,10 +60,10 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             grid-gap: 1rem;
-            /*background: #28324c;*/
             padding: 5px;
             overflow-y: auto;
             height: 90%;
+            grid-template-rows: max-content;
         }
 
 

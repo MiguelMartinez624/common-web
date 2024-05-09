@@ -1,4 +1,4 @@
-import {WebComponent} from "@commonweb/core";
+import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {TodosContextComponent} from "../components/todos-context.component";
 import {LocalStorageComponent} from "@commonweb/components";
 import {TodoColumnComponent} from "../components";
@@ -21,7 +21,7 @@ import {BUTTON_STYLE} from "../../../ui/styles";
                 </bind-element>
             </button>
         </div>
-        
+
         <div class="board">
             <todo-column pending title="Pending"></todo-column>
             <todo-column process title="In Progress"></todo-column>
@@ -32,71 +32,52 @@ import {BUTTON_STYLE} from "../../../ui/styles";
     // language=CSS
     style: `
         ${BUTTON_STYLE}
-        
         .board {
             display: flex;
             height: 80%;
-            gap:10px;
-        
-        & todo-column {
-            width: 33%;
-         }
+            gap: 10px;
+
+            & todo-column {
+                width: 33%;
+            }
 
         }
     `
 })
 export class TodoBoardPage extends HTMLElement {
-    private todoContext: TodosContextComponent;
+
+    @QueryElement("todo-column[pending]")
+    private pendingColumn: QueryResult<TodoColumnComponent>;
+
+    @QueryElement("todo-column[process]")
+    private processColumn: QueryResult<TodoColumnComponent>;
+
+    @QueryElement("todo-column[completed]")
+    private completedColumn: QueryResult<TodoColumnComponent>;
+
+    @QueryElement("todo-context")
+    private todoContext: QueryResult<TodosContextComponent>;
 
 
     connectedCallback() {
-        (this as any)
-            .query()
-            .where(`todo-context`)
-            .then((ctx: TodosContextComponent) => {
-                this.todoContext = ctx;
 
-                (this as any)
-                    .query()
-                    .where(`todo-column[pending]`)
-                    .then((column: TodoColumnComponent) => {
-                        column.tasks = ctx.getAllTodosByState();
-
-                        (column as any).update();
-                    })
-                    .catch(console.error)
-                    .build()
-                    .execute();
-
-                (this as any)
-                    .query()
-                    .where(`todo-column[process]`)
-                    .then((column: TodoColumnComponent) => {
-                        column.tasks = ctx.getAllTodosByState();
-                        ;
-                        (column as any).update();
-                    })
-                    .catch(console.error)
-                    .build()
-                    .execute();
-
-                (this as any)
-                    .query()
-                    .where(`todo-column[completed]`)
-                    .then((column: TodoColumnComponent) => {
-                        column.tasks = ctx.getAllTodosByState();
-
-                        (column as any).update();
-                    })
-                    .catch(console.error)
-                    .build()
-                    .execute();
+        const ctx = this.todoContext.unwrap();
 
 
-            })
-            .catch(console.error)
-            .build()
-            .execute();
+        const pendingColumn = this.pendingColumn.unwrap();
+        pendingColumn.tasks = ctx.getAllTodosByState();
+        (pendingColumn as any).update();
+
+        const processColumn = this.processColumn.unwrap();
+        processColumn.tasks = ctx.getAllTodosByState();
+        (processColumn as any).update();
+
+        const completedColumn = this.completedColumn.unwrap();
+        completedColumn.tasks = ctx.getAllTodosByState();
+        (completedColumn as any).update();
+
+
+
     }
 
 }

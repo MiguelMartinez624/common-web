@@ -1,7 +1,5 @@
 import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
-import {Observer} from "../../core";
 import {NewNoteRequest, Note, NoteChangesRequest} from "../domain";
-import {FloatingContentComponent} from "../../../layout";
 import {NoteFormComponent, NotesContext} from "../components";
 import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
 
@@ -15,16 +13,17 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
 
         <div style="display: flex;width: 100%">
             <div style="width: 100%;height: 78vh;">
-                <div style="display: flex;align-items: center;justify-content: space-between">
+                <div style="display: flex;align-items: center;justify-content: space-between;margin:10px">
                     <div class="y-center">
                         <button class="btn">
-                            <span style="font-size:30px;font-weight: 300"> < </span>
+                            <cw-left-arrow-icon></cw-left-arrow-icon>
+                            <span> Back </span>
                             <bind-element from="@parent:(click)" to="@host:goBack">
                             </bind-element>
                         </button>
                     </div>
                 </div>
-                <div style="display: flex;gap: 1rem">
+                <div style="display: flex;gap: 5px;padding: 5px">
                     <notes-context></notes-context>
                     <div style="flex: 1">
                         <notes-form>
@@ -50,10 +49,18 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
             gap: 10px;
             margin: 10;
         }
-
-
+        cw-left-arrow-icon{
+            height: 20px;
+            width: 16px;
+            margin-right: 5px;
+        }
         ${BUTTON_STYLE}
         ${CARD_STYLE}
+
+
+        button{
+            font-size: 20px;
+        }
     `
 })
 export class NotesWritingPage extends HTMLElement {

@@ -1,4 +1,4 @@
-import {Attribute, WebComponent} from "@commonweb/core";
+import {Attribute, QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {TaskItem} from "../domain/model";
 
 @WebComponent({
@@ -36,8 +36,26 @@ import {TaskItem} from "../domain/model";
 })
 export class TodoColumnComponent extends HTMLElement {
 
+    @QueryElement(".list")
+    public cardsColumn: QueryResult<HTMLDivElement>;
+
     public tasks: TaskItem[] = [];
 
     public title: string = "";
+
+
+    connectedCallback() {
+        const column = this.cardsColumn.unwrap();
+
+        column.addEventListener("dragover", (ev) => ev.preventDefault());
+
+        column.addEventListener("dragenter", (ev) => {
+            console.log("dragin up")
+        });
+        
+        column.addEventListener("drop", (ev) => {
+            this.dispatchEvent(new CustomEvent("card-dropped", {detail: ev.dataTransfer.getData("text/plain")}))
+        })
+    }
 
 }
