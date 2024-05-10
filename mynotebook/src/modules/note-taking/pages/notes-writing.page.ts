@@ -23,7 +23,7 @@ import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
                         </button>
                     </div>
                 </div>
-                <div style="display: flex;gap: 5px;padding: 5px">
+                <div style="display: flex;gap: 5px;padding: 5px;height: 90%;">
                     <notes-context></notes-context>
                     <div style="flex: 1">
                         <notes-form>

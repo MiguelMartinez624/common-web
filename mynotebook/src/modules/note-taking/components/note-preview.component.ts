@@ -18,6 +18,7 @@ import {Note} from "../domain";
     style: `
         .card {
             height: 100%;
+            overflow: scroll;
         }
 
         ${CARD_STYLE}
@@ -35,10 +36,10 @@ export class NotePreviewComponent extends HTMLElement {
 
     @Attribute("note")
     public set note(d: { title: string, content: string }) {
+        this._note = d;
         const contentElement = this.content.unwrap();
         const nodes = this.separateTextHtml(d.content);
         contentElement.innerHTML = "";
-
         nodes.forEach(n => {
             if (n.format === "text") {
                 const text = document.createElement("p");
@@ -49,8 +50,9 @@ export class NotePreviewComponent extends HTMLElement {
                 snipped.setAttribute("html", n.content);
                 contentElement.appendChild(snipped);
             }
-        })
+        });
 
+        (this as any).update();
     }
 
     static get observedAttributes(): string[] {
@@ -60,10 +62,10 @@ export class NotePreviewComponent extends HTMLElement {
 
     separateTextHtml(text) {
         const textNodes = [];
-        const section = text.split("```html")
+        const section = text.split("```")
         for (const char of section) {
-            if (char.endsWith("```")) {
-                textNodes.push({content: char.replace("```", ""), format: "html"})
+            if (char.startsWith("html")) {
+                textNodes.push({content: char.replace("html","").replace("```", ""), format: "html"})
             } else {
                 textNodes.push({content: char, format: "text"})
             }

@@ -43,6 +43,7 @@ import {Note} from "../domain";
     style: `
         .card{
             height: 100%;
+            overflow: scroll;
         }
         ${CARD_STYLE}
         ${BUTTON_STYLE}
