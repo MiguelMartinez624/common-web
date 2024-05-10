@@ -6,7 +6,7 @@ import {CARD_STYLE} from "../../../ui/styles";
     selector: `todo-card`,
     // language=HTML
     template: `
-        <div draggable="true" class="card">
+        <div draggable="true" class="card selectable">
             <h3>{{@host:[data.title]}}
                 <bind-element
                         value="collapse"
@@ -71,16 +71,17 @@ import {CARD_STYLE} from "../../../ui/styles";
         }
 
         ${CARD_STYLE}
-        .card:hover {
+        .selectable:hover {
             cursor: pointer;
             outline: 1px solid;
         }
-        
-        .description{
+
+        .description {
             height: 21vh;
             word-break: break-word;
             overflow: scroll;
         }
+
         .avatar-img {
             height: 50px;
             width: 50px;
@@ -117,10 +118,9 @@ export class TodoCardComponent extends HTMLElement {
         });
 
 
-
         card.addEventListener("dragend", (ev) => {
 
-            console.log({target:"here"})
+            console.log({target: "here"})
         })
     }
 

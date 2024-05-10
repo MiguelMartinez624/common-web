@@ -1,8 +1,9 @@
 import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {TodosContextComponent} from "../components/todos-context.component";
 import {TodoColumnComponent} from "../components";
-import {BUTTON_STYLE} from "../../../ui/styles";
+import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
 import {TaskState} from "../domain";
+import {ModalComponent} from "../../../ui";
 
 
 @WebComponent({
@@ -13,35 +14,41 @@ import {TaskState} from "../domain";
         <div>
             <h2>Task List</h2>
         </div>
-        <div style="display: flex;gap: 2rem;align-items: center">
+        <div style="display: flex;gap: 2rem;align-items: center;justify-content: space-between">
             <form-field label=" " placeholder="Search..."></form-field>
-            <button class="btn mobile">
-                <span style="font-size:30px;font-weight: 300">+</span>
-                <bind-element from="@parent:(click)" to="floating-content:toggle">
-                </bind-element>
-            </button>
+            <div>
+                <button class="btn mobile">
+                    <span style="font-size:30px;font-weight: 300">+</span>
+                    <bind-element from="@parent:(click)" to="todo-board-page:openForm">
+                    </bind-element>
+                </button>
+            </div>
         </div>
 
         <div class="board">
             <todo-column state="Pending" title="Pending"></todo-column>
             <todo-column state="InProgress" title="In Progress"></todo-column>
             <todo-column state="Completed" title="Completed"></todo-column>
-
         </div>
+
+
+        <cw-modal>
+            <task-form></task-form>
+        </cw-modal>
+
     `,
     // language=CSS
     style: `
+        ${CARD_STYLE}
         ${BUTTON_STYLE}
         .board {
             display: flex;
             height: 80%;
             gap: 10px;
-
-        &
-        todo-column {
-            width: 33%;
         }
 
+        todo-column {
+            width: 33%;
         }
     `
 })
@@ -59,6 +66,13 @@ export class TodoBoardPage extends HTMLElement {
     @QueryElement("todo-context")
     private todoContext: QueryResult<TodosContextComponent>;
 
+    @QueryElement("cw-modal")
+    private formModal: QueryResult<ModalComponent>;
+
+
+    openForm(): void {
+        this.formModal.unwrap().toggle();
+    }
 
     connectedCallback() {
 

@@ -1,4 +1,4 @@
-import {Attribute, WebComponent} from "@commonweb/core";
+import {Attribute, QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {BUTTON_STYLE, CARD_STYLE} from "./styles";
 
 
@@ -161,36 +161,41 @@ export class ConfirmationModalComponent extends HTMLElement {
     //language=HTML
     template: `
         <div toggle class="back blur hidden">
-            <bind-element from="@parent:(click)" to="cw-modal:toggle"></bind-element>
+
+            <div toggle class="dialog hidden">
+                <slot></slot>
+            </div>
         </div>
-        <div toggle class="dialog hidden">
-            <slot></slot>
-        </div>
+
     `,
     //language=CSS
     style: `
         .hidden {
             display: none !important;
         }
+
         .blur {
             backdrop-filter: blur(2px);
         }
+
         .back {
             background: none;
             border: none;
-            display: flex;
             left: 0;
             top: 0;
             position: fixed;
             z-index: 19;
             height: 100%;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .dialog {
             position: fixed; /* Position relative to viewport */
-            left: 50%;
-            transform: translate(-50%, -50%); /* Center the dialog */
+            margin: auto;
+            /*transform: translate(-50%, -50%); !* Center the dialog *!*/
             z-index: 100; /* Ensure it's on top */
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -205,6 +210,9 @@ export class ConfirmationModalComponent extends HTMLElement {
 })
 export class ModalComponent extends HTMLElement {
     public data: any;
+
+    @QueryElement(".back")
+    public background: QueryResult<HTMLDivElement>;
 
     public toggle(): void {
         const element = (this as any);
@@ -248,6 +256,16 @@ export class ModalComponent extends HTMLElement {
             .catch(console.error)
             .build()
             .execute();
+    }
+
+
+    connectedCallback() {
+        const background = this.background.unwrap();
+        background.addEventListener("click", (ev) => {
+            if(ev.target === background){
+                this.toggle();
+            }
+        })
     }
 
 }

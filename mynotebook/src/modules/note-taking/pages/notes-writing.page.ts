@@ -1,6 +1,6 @@
 import {QueryElement, QueryResult, WebComponent} from "@commonweb/core";
 import {NewNoteRequest, Note, NoteChangesRequest} from "../domain";
-import {NoteFormComponent, NotesContext} from "../components";
+import {NoteFormComponent, NotePreviewComponent, NotesContext} from "../components";
 import {BUTTON_STYLE, CARD_STYLE} from "../../../ui/styles";
 
 @WebComponent({
@@ -72,6 +72,9 @@ export class NotesWritingPage extends HTMLElement {
     @QueryElement("notes-form")
     private notesForms: QueryResult<NoteFormComponent>;
 
+    @QueryElement("notes-preview")
+    private notesPreview: QueryResult<NotePreviewComponent>;
+
     public goBack(): void {
         NotesContext.SelectedNote = null;
         this.dispatchEvent(new CustomEvent("go-back"))
@@ -97,6 +100,7 @@ export class NotesWritingPage extends HTMLElement {
     connectedCallback() {
         if (NotesContext.SelectedNote) {
             this.notesForms.unwrap().setValue(NotesContext.SelectedNote);
+            this.notesPreview.unwrap().note = NotesContext.SelectedNote;
         }
 
     }

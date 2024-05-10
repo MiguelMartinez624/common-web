@@ -70,6 +70,19 @@ import {WebComponent} from "@commonweb/core";
                 </bind-element>
             </button>
 
+            <button toggle chat class="btn-accion">
+                <cw-chat-icon></cw-chat-icon>
+                <span>Chats</span>
+                <bind-element
+                        value="chats"
+                        from="@parent:(click)" to="navigation-bar:changeRoute">
+                </bind-element>
+                <bind-element
+                        value="selected"
+                        from="@parent:(click)" to="@parent:toggleUniqueClass">
+                </bind-element>
+            </button>
+
         </div>
     `,
     // language=CSS
@@ -133,6 +146,11 @@ import {WebComponent} from "@commonweb/core";
             fill: white;
             height: 19px;
             width: 19px;
+        }
+        cw-chat-icon{
+            fill: white;
+            height: 23px;
+            width: 23px;
         }
 
         cw-expense-icon {
