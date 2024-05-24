@@ -1,4 +1,4 @@
-import {TaskComment, TaskItem, TaskState} from "./model";
+import {TaskComment, TaskItem, TaskState, User} from "./model";
 
 export function generateRandomTaskItems(minItems, maxItems) {
     // Ensure minItems is less than or equal to maxItems
@@ -20,14 +20,15 @@ export function generateRandomTaskItem() {
     const title = generateRandomString(10, 20);
     const description = generateRandomString(20, 1000);
     const state = TaskState.Pending // Get random TaskState value
-    const comments = generateRandomComments(1, 3);
+    const comments = generateRandomComments(1, 203);
+    const testuser = new User("test", "Miguel", "Martinez","test");
 
-    return new TaskItem(id, title, description, state, comments);
+    return new TaskItem(id, title, description, null, testuser, state, comments);
 }
 
 function generateRandomString(minLength, maxLength) {
     const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ";
     let result = "";
     for (let i = 0; i < length; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length));

@@ -7,13 +7,22 @@ import {CARD_STYLE} from "../../../ui/styles";
     // language=HTML
     template: `
         <div draggable="true" class="card selectable">
-            <h3>{{@host:[data.title]}}
-                <bind-element
-                        value="collapse"
-                        from="@parent:(click)"
-                        to="cw-modal:toggle">
-                </bind-element>
-            </h3>
+            <div style="display: flex;justify-content: space-between">
+                <h3>{{@host:[data.title]}}
+                    <bind-element
+                            value="collapse"
+                            from="@parent:(click)"
+                            to="cw-modal:toggle">
+                    </bind-element>
+                </h3>
+                <div style="display: flex;align-items: center; gap: 5px">
+                    <img title="{{@host:[data.user.name]}}"
+                         style="border-radius: 50%;" height="40" width="40"
+                         src="{{@host:[data.user.avatar]}}" alt="">
+                </div>
+            </div>
+
+
             <p class="wrap">
                 {{@host:[data.description]}}
             </p>
@@ -111,8 +120,34 @@ export class TodoCardComponent extends HTMLElement {
     @QueryElement(".card")
     public cardQuery: QueryResult<HTMLElement>;
 
+    @QueryElement("img")
+    public imgQuery: QueryResult<HTMLImageElement>;
+
     connectedCallback() {
         const card = this.cardQuery.unwrap();
+        const imgElement = this.imgQuery.unwrap();
+
+        imgElement.onerror = () => {
+            console.log("could not load this image")
+            const parent = imgElement.parentElement;
+            // language=HTML
+
+
+            imgElement.remove();
+            // TODO make a reusable component and make the color selection randomly.
+            parent.innerHTML += `<div 
+                    style="
+                    display: flex;align-items: center;justify-content: center;
+                    font-weight: bold;
+                    font-size: 16px;
+                    
+                    height: 40px;width: 40px;background: orange;color: white;border-radius: 50%">
+                ${this.data.user.name[0].toUpperCase()}${this.data.user.lastname[0].toUpperCase()}
+            </div>`
+
+        }
+
+
         card.addEventListener("dragstart", (ev) => {
             ev.dataTransfer.setData("text/plain", this.data.id);
         });
@@ -120,8 +155,11 @@ export class TodoCardComponent extends HTMLElement {
 
         card.addEventListener("dragend", (ev) => {
 
-            console.log({target: "here"})
         })
+    }
+
+    public setUserNameInitialsFallback() {
+
     }
 
 }

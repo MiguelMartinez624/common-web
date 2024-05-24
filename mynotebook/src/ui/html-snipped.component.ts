@@ -2,7 +2,7 @@ import {Attribute, WebComponent} from "@commonweb/core";
 
 
 @WebComponent({
-    selector: "html-snipped",
+    selector: "code-snipped",
     //language=HTML
     template: `
         <slot></slot>`,
@@ -34,18 +34,74 @@ import {Attribute, WebComponent} from "@commonweb/core";
 })
 export class HtmlSnippedComponent extends HTMLElement {
 
-    @Attribute("html")
-    public html: string;
+    @Attribute("language")
+    public language: string = "html";
+
+    @Attribute("source")
+    public source: string;
 
 
     connectedCallback() {
-        if (this.html) {
-            this.enhanceHTMLString(this.html);
+        if (this.source && this.language === "html") {
+            this.enhanceHTMLString(this.source);
+        } else if (this.source && this.language === "golang") {
+            this.enhanceGolangString(this.source);
         }
     }
 
     static get observedAttributes(): string[] {
-        return ['html'];
+        return ['source', 'language'];
+    }
+
+
+    private enhanceGolangString(codeStr: string) {
+        const golangKeyWords = ["break", "case", "chan", "const", "continue", "default", "defer", "else",
+            "fallthrough", "for", "func", "go", "goto", "if", "import", "interface",
+            "map", "package", "range", "return", "select", "struct", "switch", "type",
+            "var"];
+
+        const golangDatatypes = ["bool", "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64",
+            "uintptr", "float32", "float64", "complex64", "complex128", "string", "byte", "rune"];
+        let html = '';
+
+        const words = codeStr.trim().split(' ');
+        for (let i = 0; i < words.length; i++) {
+            let word = words[i];
+            let isEndOfblock = false;
+
+            if (word.endsWith("}")) {
+                word = word.replace("}", "");
+                isEndOfblock = true;
+            }
+
+            if (golangKeyWords.includes(word.trim())) {
+                html += `<span class='tag'>${word} </span>`
+            } else if (golangDatatypes.includes(word.trim())) {
+                html += `<span class='tag'>${word} </span>${!isEndOfblock ? "<br>" : ""}`
+            } else {
+                html += word + " ";
+            }
+
+            if (isEndOfblock) {
+                html += `<br> } <br>`;
+            }
+        }
+
+        function insertBreaksAroundCurlyBraces(text) {
+            // Regular expression to match curly braces
+            const regex = /\{|\}/g;
+
+            // Replace each curly brace with itself preceded/followed by a single '<br>'
+            return text.replace(regex, (match, position) => {
+                // Check if the match is at the beginning or end of the string with content
+                const hasBefore = text[position] === "}";
+                const hasAfter = text[position] === "{";
+                // Insert '<br>' only if there's content before/after the brace
+                return (hasBefore ? '' : '') + match + (hasAfter ? '<br>' : '');
+            });
+        }
+
+        this.shadowRoot.innerHTML += `<code>${insertBreaksAroundCurlyBraces(html)}</code>`;
     }
 
     private enhanceHTMLString(htmlStr: string) {
@@ -131,3 +187,5 @@ export class HtmlSnippedComponent extends HTMLElement {
 
 
 }
+
+

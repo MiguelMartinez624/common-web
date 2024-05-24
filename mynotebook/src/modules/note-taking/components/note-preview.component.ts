@@ -45,11 +45,14 @@ export class NotePreviewComponent extends HTMLElement {
                 const text = document.createElement("p");
                 text.innerText = n.content;
                 contentElement.appendChild(text);
-            } else if (n.format === "html") {
-                const snipped = document.createElement("html-snipped");
-                snipped.setAttribute("html", n.content);
+            } else {
+                const snipped = document.createElement("code-snipped");
+                snipped.setAttribute("language", n.format);
+
+                snipped.setAttribute("source", n.content);
                 contentElement.appendChild(snipped);
             }
+
         });
 
         (this as any).update();
@@ -65,7 +68,9 @@ export class NotePreviewComponent extends HTMLElement {
         const section = text.split("```")
         for (const char of section) {
             if (char.startsWith("html")) {
-                textNodes.push({content: char.replace("html","").replace("```", ""), format: "html"})
+                textNodes.push({content: char.replace("html", "").replace("```", ""), format: "html"})
+            } else if (char.startsWith("golang")) {
+                textNodes.push({content: char.replace("golang", "").replace("```", ""), format: "golang"})
             } else {
                 textNodes.push({content: char, format: "text"})
             }

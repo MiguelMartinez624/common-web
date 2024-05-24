@@ -8,7 +8,26 @@ import {TaskItem} from "../domain";
     // language=HTML
     template: `
         <div class="card">
-
+            <!-- TODO inset user ontext to query the users ? 
+                    or use a higher level to avoid coupling between
+                    uesrs -> tasks make users selector?
+                    or make a slot to the form to allow external inputs without 
+                    coupling to component level only at feature level as a facade.
+                    
+                    check how to add functionality to sloted elements
+                    query from slots on inner and allow form modifications with
+                    like contract to sloted elements shoul implement interface
+                    
+                    interface FormField {
+                      reset()
+                      value()
+                      setValue()
+                    }  
+                    
+                    add isValid() later on the road map, when validations are implemented
+                    
+                    
+            -->
             <form-group>
                 <form-field
                         property="title"
