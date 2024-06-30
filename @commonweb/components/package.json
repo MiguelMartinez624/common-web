@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-rc-2",
+  "version": "1.0.0-rc-13",
   "name": "@commonweb/components",
   "main": "dist/components.js",
   "module": "dist/components.mjs",
@@ -13,6 +13,8 @@
 
     "push": "npm run test && npm run build && npm publish --access public",
     "build": "rollup -c ",
+    "build:watch": "rollup -c --watch",
+
     "test": "jest"
   },
   "dependencies": {

@@ -1,6 +1,5 @@
 import {Interpolation} from "./index";
 import {ElementBind} from "../bindings";
-import {FrameworkComponent} from "../framework-component";
 
 
 /**
@@ -99,7 +98,8 @@ export class AttributeInterpolation implements Interpolation {
 
     public update(): void {
         const value = this.elementBind.value;
-        if (this.prevValue === value) {
+
+        if (this.prevValue === value || (typeof value === "string" && value.startsWith("{{"))) {
             return;
         }
         if (!value) {
@@ -116,22 +116,29 @@ export class AttributeInterpolation implements Interpolation {
             // dont do nothing for nested component for each
             return;
         }
+        if (typeof toUpdate === "function") {
+            toUpdate.apply(this.element, value)
+        } else {
+            this.element[this.attributeName] = value;
+        }
 
-        if (this.element instanceof FrameworkComponent) {
-            (this.element as FrameworkComponent).changeAttributeAndUpdate(this.attributeName, value);
+        // for string/number type only, no objects for this, as HTMLElement
+        // only accepts strings and we dont want to stringify big objects
+        if (typeof value === "string" || typeof value === "number") {
+            this.element.setAttribute(this.attributeName, `${value}`);
+        }
+
+        if (this.element["update"]) {
+            (this.element as any).update();
             return;
         }
 
-        if (typeof value === "object" && typeof toUpdate === "function") {
-            // Need to make sure that attribute that receive objects are setter?
-            toUpdate.apply(this.element, value)
-        } else if (typeof value === "object") {
-            // Required??
-            this.element[this.attributeName] = value;
-
-        } else {
-            this.element.setAttribute(this.attributeName, value);
-        }
+        // if (typeof value === "object" && typeof toUpdate === "function") {
+        //     // Need to make sure that attribute that receive objects are setter?
+        //     toUpdate.apply(this.element, value)
+        // } else {
+        //     this.element.setAttribute(this.attributeName, JSON.stringify(value));
+        // }
     }
 
 }

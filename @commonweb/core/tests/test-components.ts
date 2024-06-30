@@ -1,4 +1,4 @@
-import {Attribute, EventBind, EventBindAll, FromStorage, WebComponent} from "..";
+import {Attribute,  FromStorage, WebComponent} from "../src";
 
 
 @WebComponent({

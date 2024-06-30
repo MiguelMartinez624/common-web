@@ -1,18 +1,16 @@
-import {syncWithStorage} from "./storage";
-
-import {
-
-    generateAttributesInterpolations,
-    generateTemplateInterpolations,
-    Interpolation
-} from "./interpolations";
+import "reflect-metadata";
+import {QueriesKey, QueryResult, WithHTMLController} from "./components";
+import {CSSControllerComponent} from "./components/css-controller.component";
+import {HtmlControllerComponent} from "./components/html-controller.component";
+import {appendComponent, IComponent} from "./components/icomponent";
+import {InterpolationComponent} from "./interpolations/component";
+import {LooperComponent} from "./components/lopper.component";
 
 export class CustomElementConfig {
     selector: string;
     template: string;
     style?: string;
     useShadow?: boolean = true;
-    directives?: any[] = [];
 }
 
 const validateSelector = (selector: string) => {
@@ -21,7 +19,12 @@ const validateSelector = (selector: string) => {
     }
 };
 
-export const PROCESSOR_KEY: string = '_webcommon_components_processors';
+
+export interface WebComponent extends WithHTMLController{
+    // update will call all components `onUpdate` method, in the same order they where added
+    // to the component
+    update(): void;
+}
 
 function insertTemplate(attr: CustomElementConfig) {
     //TODO casted may no be required
@@ -40,27 +43,6 @@ function insertTemplate(attr: CustomElementConfig) {
     }
 }
 
-
-/**
- * Need to create transformers from the templates and clear up those markdowns
- * host stand for the component itself (this) and then it comes the property and any key
- * <div>{{@host.property.key}}</div>
- *
- * Same as before but here we can use a [CSSSelector] to show other elements properties custom or
- * native properties
- * <div>{{[CSSSelector].property.key}}</div>
- */
-export function bindTemplateToProperties(root: HTMLElement) {
-    const interpolations = new Map<string, Interpolation[]>();
-    const childrens = root.shadowRoot ? [...root?.shadowRoot?.children, ...root.children] : [...root.children];
-    // Bind Attribute Interpolations
-    // childs should be the parameter
-    generateAttributesInterpolations(root, childrens, interpolations);
-
-    generateTemplateInterpolations(root, childrens, interpolations);
-
-    (root as any).interpolations = interpolations;
-}
 
 function updateAttributes(element: any, name: string, newValue: any) {
     if ((element as any).attribute_list) {
@@ -94,67 +76,72 @@ export function WebComponent(attr: CustomElementConfig) {
             constructor(...args: any[]) {
                 super(...args);
 
-                // Whats the different for a framework component ?.
-                (this as any).directives = attr.directives;
+                appendComponent(this, new HtmlControllerComponent());
+                appendComponent(this, new InterpolationComponent());
+                appendComponent(this, new LooperComponent());
+                appendComponent(this, new CSSControllerComponent());
 
+
+                if ((this as any).servers) {
+                    (this as any).servers.forEach((s: IComponent) => s.setup(this));
+                }
             }
 
 
             attributeChangedCallback(name, oldValue, newValue) {
                 updateAttributes(this, name, newValue);
-                this.checkInterpolationsFor(name);
+                if ((this as any).servers) {
+                    (this as any).servers.forEach(s => s.onUpdate());
+                }
             }
 
 
-            /**
-             * Check and run all the directives
-             *
-             * */
-            public wireTemplate() {
-                // Enhance with directives
-                if (this['directives']) {
-                    this['directives'].forEach(d => d.call(this))
+            public update(): void {
+                if ((this as any).servers) {
+                    (this as any).servers.forEach((s: IComponent) => s.onUpdate())
                 }
-                if (this['checkInterpolations']) {
-                    // Whats the different for a framework component ?.
-                    (this as any).checkInterpolations();
-
-                }
-
             }
-
 
             public connectedCallback() {
-                insertTemplate.call(this, attr);
-                this.wireTemplate();
 
-                syncWithStorage(this as unknown as HTMLElement);
-                this["checkAllInterpolations"]();
+                if (!attr.useShadow) {
+                    (this as unknown as HTMLElement).innerHTML = attr.style ?
+                        `<style>${attr.style}</style>${attr.template}` : attr.template;
+                } else {
+                    const shadowRoot = (this as unknown as HTMLElement).attachShadow({mode: 'open'});
+                    const template = document.createElement("template");
+
+                    template.innerHTML = attr.style ?
+                        `<style>${attr.style}</style>${attr.template}` : attr.template;
+                    shadowRoot.appendChild(template.content.cloneNode(true));
+
+                }
+
+
+                // Check for queries
+                if ((this as any)[QueriesKey]) {
+                    const test = (this as any)[QueriesKey];
+                    for (const [pattern, fieldName] of test) {
+                        this[fieldName] = new QueryResult(pattern, this);
+                    }
+                }
+
+
                 if (super["connectedCallback"]) {
                     super["connectedCallback"]();
                 }
 
-            }
 
-            public checkInterpolationsFor(name) {
-                const interpolations = (this as any).interpolations;
-                // if you didn't use the notation wont have this field set.
-                if (interpolations) {
-                    const interpolationsList = interpolations.get(name);
-                    if (interpolationsList) {
-                        interpolationsList.forEach((interpolation: Interpolation) => interpolation.update())
-                    }
+                if ((this as any).servers) {
+                    (this as any).servers.forEach(s => s.onInit());
                 }
-            }
 
-            public checkAllInterpolations() {
-                const interpolations = (this as any).interpolations;
-                // if you didn't use the notation wont have this field set.
-                if (interpolations) {
-                    for (const [key, interpolationList] of interpolations) {
-                        interpolationList.forEach((interpolation: Interpolation) => interpolation.update())
-                    }
+
+                // Loading when a element just nit
+                if (this['init']) {
+                    this['init']();
                 }
+
             }
 
 

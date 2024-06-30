@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+
+</head>
+<style>
+    .blur {
+        filter: blur(2px);
+    }
+
+    *, ::after, ::before {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        background: #2d334f;
+        color: white;
+        font-family: Roboto, Helvetica Neue Light, Helvetica Neue, Helvetica, Arial, Lucida Grande, sans-serif;
+    }
+
+    cw-dashboard-layout {
+
+
+        fill: white;
+        --sidebar-fg: white;
+        --sidebar-border: 1px solid #3b82f6;
+        --sidebar-bg: #2d3a5b;
+
+        --header-fc: white;
+        --header-bg: #2d3a5b;
+        --header-bottom: 1px solid #3b82f6;
+        --content-fg: white;
+        --content-bg: #2d3a5b;
+
+
+        /*cards stylinh*/
+        --card-outline: none;
+        --card-bg: #334062;
+        --card-fc: white;
+
+
+    }
+
+    /* Responsive layout - makes a one column layout instead of a two-column layout */
+    @media (max-width: 800px) {
+        div[is-active="true"] {
+            height: 100%;
+        }
+
+    }
+
+    div[is-active="true"] {
+        height: calc(100% - 50px);
+    }
+</style>
+
+<body>
+<cw-dashboard-layout>
+    <cw-navigation-bar slot="nav">
+        <bind-element
+                slot="nav"
+                input-path="detail"
+                from="@parent:(navigation-event)"
+                to="[main-routes]:changeCase">
+        </bind-element>
+    </cw-navigation-bar>
+    <conditional-render-cases slot="content" main-routes case="login">
+        <div case="login">
+            <template>
+                <login-page></login-page>
+            </template>
+        </div>
+        <div case="expenses">
+            <template>
+                <expenses-page></expenses-page>
+            </template>
+        </div>
+        <div case="notes">
+            <template>
+                <conditional-render-cases notes-route case="listing">
+
+                    <div case="listing">
+                        <template>
+                            <notes-listing-page>
+                                <bind-element
+                                        value="writing"
+                                        from="@parent:(selected-note)"
+                                        to="[notes-route]:changeCase"
+                                ></bind-element>
+                                </notes-lsiting-page>
+                        </template>
+                    </div>
+                    <div case="writing">
+                        <template>
+                            <notes-writing-page>
+                                <bind-element
+                                        value="listing"
+                                        from="@parent:(go-back)"
+                                        to="[notes-route]:changeCase"
+                                ></bind-element>
+                            </notes-writing-page>
+                        </template>
+                    </div>
+                </conditional-render-cases>
+
+            </template>
+        </div>
+        <div case="todos">
+            <template>
+                <todo-board-page></todo-board-page>
+
+            </template>
+        </div>
+        <div case="users">
+            <template>
+                <listing-users-page></listing-users-page>
+            </template>
+        </div>
+        <div case="home">
+            <template>
+                <div class="card">
+                    <p>
+                       One to rule them all!
+                    </p>
+
+                </div>
+            </template>
+        </div>
+    </conditional-render-cases>
+</cw-dashboard-layout>
+</body>
+
+
+<!--<script src="https://unpkg.com/@commonweb/core@1.0.0-rc-12/dist/core-pkg.js"></script>-->
+<!--<script src="https://unpkg.com/@commonweb/components@1.0.0-rc-11/dist/components-pkg.js"></script>-->
+<!--<script src="https://unpkg.com/@commonweb/forms@1.0.0-rc-9/dist/forms-pkg.js"></script>-->
+
+
+<script src="../@commonweb/core/dist/core-pkg.js"></script>
+<script src="../@commonweb/components/dist/components-pkg.js"></script>
+<script src="../@commonweb/forms/dist/forms-pkg.js"></script>
+
+<script src="./dist/index-pkg.js"></script>
+<script src="./icons.js"></script>
+</html>

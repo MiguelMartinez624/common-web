@@ -1,7 +1,5 @@
 import {CustomElementConfig, WebComponent} from "./web_components";
-import {FrameworkComponent} from "./framework-component";
 import {Attribute} from "./attributes";
-import {checkShowIfDirective, enhanceClassChange, forEachDirective} from "./directives";
 
 export class ComponentBuilder {
 
@@ -70,7 +68,7 @@ export class ComponentBuilder {
     build(): void {
 
         const {attributes, methods, initStack} = this;
-        let raw = class extends FrameworkComponent {
+        let raw = class extends HTMLElement {
             constructor(...args) {
                 super();
                 methods.forEach(({methodName, handler}) => {
@@ -100,7 +98,7 @@ export class ComponentBuilder {
         };
 
 
-        WebComponent({...this.config, directives: [forEachDirective, checkShowIfDirective, enhanceClassChange]})(raw);
+        WebComponent({...this.config})(raw);
     }
 
 

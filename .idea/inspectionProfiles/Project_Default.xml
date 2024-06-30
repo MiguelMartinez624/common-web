@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="8">
+          <list size="16">
             <item index="0" class="java.lang.String" itemvalue="nobr" />
             <item index="1" class="java.lang.String" itemvalue="noembed" />
             <item index="2" class="java.lang.String" itemvalue="comment" />
@@ -13,6 +13,14 @@
             <item index="5" class="java.lang.String" itemvalue="script" />
             <item index="6" class="java.lang.String" itemvalue="style" />
             <item index="7" class="java.lang.String" itemvalue="bind-element" />
+            <item index="8" class="java.lang.String" itemvalue="local-storage-value" />
+            <item index="9" class="java.lang.String" itemvalue="form-group" />
+            <item index="10" class="java.lang.String" itemvalue="form-field" />
+            <item index="11" class="java.lang.String" itemvalue="expense-form" />
+            <item index="12" class="java.lang.String" itemvalue="cw-dashboard-layout" />
+            <item index="13" class="java.lang.String" itemvalue="cw-navigation-bar" />
+            <item index="14" class="java.lang.String" itemvalue="conditional-render-cases" />
+            <item index="15" class="java.lang.String" itemvalue="expenses-page" />
           </list>
         </value>
       </option>

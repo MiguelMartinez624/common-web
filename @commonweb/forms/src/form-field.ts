@@ -1,4 +1,4 @@
-import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
+import {Attribute, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     //language=css
@@ -22,7 +22,7 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
             border-color: var(--form-border-color, #ccc);
             color: var(--form-text);
             font-size: var(--form-text-size);
-           
+
             padding: var(--form-input-padding, 12px 20px);
         }
 
@@ -38,13 +38,11 @@ import {Attribute, FrameworkComponent, WebComponent} from "@commonweb/core";
 
         <label class="form-field" for="">
             <span>{{@host:[label]}}</span>
-            <input
-                    placeholder="{{@host:[placeholder]}}"
-                    type="{{@host:[format]}}">
+            <input placeholder="{{@host:[placeholder]}}" type="{{@host:[format]}}">
         </label>
     `,
 })
-export class FormField extends FrameworkComponent {
+export class FormField extends HTMLElement {
     @Attribute("placeholder")
     public placeholder: string = "";
 
@@ -66,10 +64,42 @@ export class FormField extends FrameworkComponent {
         if (this.format === "date") {
             return new Date(value);
         }
+        if (this.format === "currency") {
+            return parseFloat(value.replace("$", ""));
+        }
 
         return value;
     }
 
+    public setValue(val: any) {
+        this.shadowRoot.querySelector("input").value = val;
+    }
+
+    connectedCallback() {
+        function reverseDecimals(value) {
+            const parts = value.split('.');
+            return parts[1] + '.' + parts[0];
+        }
+
+        const input = this.shadowRoot.querySelector("input");
+
+        const type = this.getAttribute("format");
+        if (type === "currency") {
+
+            input.inputMode = "decimal";
+            const regex = /[^0-9.,-]/g;
+            input.value = "$";
+            input.addEventListener("keyup", (ev) => {
+                let value = input.value.replace("$", "");
+
+                value = value.replace(regex, '');
+
+                input.value = "$" + value
+
+
+            })
+        }
+    }
 
     static get observedAttributes(): string[] {
         return ["property", "format", "label", "placeholder"];

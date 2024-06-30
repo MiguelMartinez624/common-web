@@ -59,3 +59,17 @@ Add the CDN script tag to the <head> of your HTML file, and start using CommonWe
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+
+Crear metodo
+```javascript 
+    const command = this // refers to the element itself
+                        .changes({name: "hello"})
+                        .evaluateDirectives(); // optional paran list of directives to check otherwise all
+
+    // WHen runnin this command with the execute method the changes will be executed
+    // and the view will get uddated.
+    command.execute()
+    
+
+```

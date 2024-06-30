@@ -1,4 +1,4 @@
-import {Attribute, extractData, WebComponent, enhanceClassChange, FrameworkComponent} from "@commonweb/core";
+import {Attribute, extractData, WebComponent} from "@commonweb/core";
 
 @WebComponent({
     selector: `multiselect-form-field`,
@@ -101,7 +101,7 @@ import {Attribute, extractData, WebComponent, enhanceClassChange, FrameworkCompo
 
         `
 })
-export class MultiselectComponent extends FrameworkComponent {
+export class MultiselectComponent extends HTMLElement {
 
 
     @Attribute("placeholder")

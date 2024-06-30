@@ -1,16 +1,13 @@
-import {CustomElementConfig, WebComponent} from "./web_components";
+import {CustomElementConfig} from "./web_components";
 import {ComponentBuilder} from "./builder";
 
-export * from './framework-component';
 
 export * from './interpolations';
 export * from './web_components';
 export * from './html_manipulation';
-export * from './storage';
 export * from './attributes';
-export * from './directives';
+export * from './components';
 export * from './bindings';
-
 
 
 
