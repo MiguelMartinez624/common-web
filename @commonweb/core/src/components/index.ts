@@ -33,11 +33,3 @@ export function checkShowIfDirective() {
             }
         });
 }
-
-export function appendLoopServer(target: any) {
-    if (target.servers === undefined) {
-        target.servers = [new LooperComponent()];
-    } else {
-        target.servers.push(new LooperComponent());
-    }
-}

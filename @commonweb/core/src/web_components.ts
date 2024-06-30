@@ -1,17 +1,10 @@
 import "reflect-metadata";
-
-import {
-    appendInterpolationServer,
-
-    generateAttributesInterpolations,
-    generateTemplateInterpolations,
-    Interpolation
-} from "./interpolations";
-import {QueryBuilder} from "./html_manipulation";
-import {appendLoopServer, QueriesKey, QueryResult} from "./components";
-import {appendCSSController} from "./components/css-controller.component";
+import {QueriesKey, QueryResult, WithHTMLController} from "./components";
+import {CSSControllerComponent} from "./components/css-controller.component";
 import {HtmlControllerComponent} from "./components/html-controller.component";
 import {appendComponent, IComponent} from "./components/icomponent";
+import {InterpolationComponent} from "./interpolations/component";
+import {LooperComponent} from "./components/lopper.component";
 
 export class CustomElementConfig {
     selector: string;
@@ -26,6 +19,12 @@ const validateSelector = (selector: string) => {
     }
 };
 
+
+export interface WebComponent extends WithHTMLController{
+    // update will call all components `onUpdate` method, in the same order they where added
+    // to the component
+    update(): void;
+}
 
 function insertTemplate(attr: CustomElementConfig) {
     //TODO casted may no be required
@@ -78,9 +77,10 @@ export function WebComponent(attr: CustomElementConfig) {
                 super(...args);
 
                 appendComponent(this, new HtmlControllerComponent());
-                appendInterpolationServer(this);
-                appendLoopServer(this);
-                appendCSSController(this);
+                appendComponent(this, new InterpolationComponent());
+                appendComponent(this, new LooperComponent());
+                appendComponent(this, new CSSControllerComponent());
+
 
                 if ((this as any).servers) {
                     (this as any).servers.forEach((s: IComponent) => s.setup(this));

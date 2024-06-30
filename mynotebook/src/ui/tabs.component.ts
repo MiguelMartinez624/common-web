@@ -20,6 +20,7 @@ export class TabsComponent extends HTMLElement {
     private cacheElements: any[] = [];
 
     connectedCallback() {
+        debugger
         const contents = [...this.querySelectorAll("[tab-case]")];
         contents.forEach(c => c.setAttribute("hidden", "true"));
         const tabs = [...this.querySelectorAll("wc-tab")];
@@ -35,6 +36,7 @@ export class TabsComponent extends HTMLElement {
 
 
             tab.addEventListener("tab-selected", () => {
+
                 tabs.forEach((t: TabComponent) => {
                     t.toggle();
                     const contents = [...this.querySelectorAll("[tab-case]")];

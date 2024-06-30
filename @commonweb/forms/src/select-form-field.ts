@@ -6,6 +6,7 @@ import {Attribute, WebComponent} from "@commonweb/core";
     template: `
 
         <label class="form-field">
+            <span>{{@host:[label]}}</span>
             <select name="select-input">
 
             </select>
