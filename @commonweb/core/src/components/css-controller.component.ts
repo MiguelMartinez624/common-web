@@ -131,11 +131,3 @@ export class CSSControllerComponent implements IComponent {
         this._root = target;
     }
 }
-
-export function appendCSSController(target: any) {
-    if (target.servers === undefined) {
-        target.servers = [new CSSControllerComponent()];
-    } else {
-        target.servers.push(new CSSControllerComponent());
-    }
-}

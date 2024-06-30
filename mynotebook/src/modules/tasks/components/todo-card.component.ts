@@ -56,7 +56,7 @@ import {CARD_STYLE} from "../../../ui/styles";
                         {{@host:[data.description]}}
                     </p>
                 </div>
-                <wc-tabs data="{{@host:[data]}}">
+                <wc-tabs default="Comments" data="{{@host:[data]}}">
                     <wc-tab default="true" title="Comments"></wc-tab>
                     <wc-tab title="History"></wc-tab>
 

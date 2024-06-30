@@ -1,6 +1,6 @@
-import {IComponent} from "../IComponent";
 import {extractData, findAllChildrensBySelector} from "../html_manipulation";
 import {ElementBind} from "../bindings";
+import {IComponent} from "./icomponent";
 
 export const FOR_EACH_DIRECTIVE = "for-each";
 

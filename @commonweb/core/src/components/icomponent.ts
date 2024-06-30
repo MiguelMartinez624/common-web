@@ -1,4 +1,3 @@
-
 /**
  * @public
  * @interface IComponent
@@ -37,7 +36,8 @@ export interface IComponent {
     onUpdate(): void;
 }
 
-export function appendComponent(target: any, component: any) {
+
+export function appendComponent(target: any, component: IComponent) {
     if (target.servers === undefined) {
         target.servers = [component];
     } else {
