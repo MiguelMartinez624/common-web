@@ -76,7 +76,7 @@
     <conditional-render-cases slot="content" main-routes case="login">
         <div case="login">
             <template>
-                <login-page></login-page>
+               <lazy-template src="http://localhost:8080/static/auth.html"></lazy-template>
             </template>
         </div>
         <div case="expenses">
@@ -84,57 +84,7 @@
                 <expenses-page></expenses-page>
             </template>
         </div>
-        <div case="notes">
-            <template>
-                <conditional-render-cases notes-route case="listing">
 
-                    <div case="listing">
-                        <template>
-                            <notes-listing-page>
-                                <bind-element
-                                        value="writing"
-                                        from="@parent:(selected-note)"
-                                        to="[notes-route]:changeCase"
-                                ></bind-element>
-                                </notes-lsiting-page>
-                        </template>
-                    </div>
-                    <div case="writing">
-                        <template>
-                            <notes-writing-page>
-                                <bind-element
-                                        value="listing"
-                                        from="@parent:(go-back)"
-                                        to="[notes-route]:changeCase"
-                                ></bind-element>
-                            </notes-writing-page>
-                        </template>
-                    </div>
-                </conditional-render-cases>
-
-            </template>
-        </div>
-        <div case="todos">
-            <template>
-                <todo-board-page></todo-board-page>
-
-            </template>
-        </div>
-        <div case="users">
-            <template>
-                <listing-users-page></listing-users-page>
-            </template>
-        </div>
-        <div case="home">
-            <template>
-                <div class="card">
-                    <p>
-                       One to rule them all!
-                    </p>
-
-                </div>
-            </template>
-        </div>
     </conditional-render-cases>
 </cw-dashboard-layout>
 </body>

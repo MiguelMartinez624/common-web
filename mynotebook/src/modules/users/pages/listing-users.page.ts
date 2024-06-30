@@ -2,7 +2,7 @@ import {WebComponent} from "@commonweb/core";
 import {BUTTON_STYLE} from "../../../ui/styles";
 
 @WebComponent({
-    selector: `listing-users-page`,
+    selector: `listing-users-page-tes`,
     //language=HTML
     template: `
         <div>

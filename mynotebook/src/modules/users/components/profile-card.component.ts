@@ -6,8 +6,10 @@ import {CARD_STYLE} from "../../../ui/styles";
     //language=HTML
     template: `
         <div class="card">
-            <div>
-                <img src="" alt="">
+            <div style="display: flex;align-items: center; gap: 5px">
+                <img title="{{@host:[data.user.name]}}"
+                     style="border-radius: 50%;" height="40" width="40"
+                     src="{{@host:[data.user.avatar]}}" alt="">
             </div>
             <div>
                 <h4>Miguel Martinez</h4>
